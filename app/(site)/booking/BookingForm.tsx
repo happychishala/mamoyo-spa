@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { CalendarCheck, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { createBooking, type ActionResult } from "@/lib/actions";
 import type { BookableService } from "@/lib/content";
+import ServiceCombobox from "./ServiceCombobox";
 
 const inputClasses =
   "w-full rounded-xl border border-mist-200 bg-white px-4 py-3 text-sm text-mist-950 placeholder:text-mist-400 transition-colors duration-200 focus:border-mist-500 focus:outline-none focus:ring-2 focus:ring-mist-200";
@@ -15,7 +16,6 @@ export default function BookingForm({
   services: BookableService[];
   preselected?: string;
 }) {
-  const sections = [...new Set(services.map((s) => s.section))];
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     createBooking,
     null
@@ -69,28 +69,12 @@ export default function BookingForm({
           <label htmlFor="service" className="mb-1.5 block text-sm font-medium text-mist-900">
             Treatment
           </label>
-          <select
-            id="service"
+          <ServiceCombobox
+            services={services}
             name="service"
-            required
-            defaultValue={preselected ?? ""}
-            className={inputClasses}
-          >
-            <option value="" disabled>
-              Choose a treatment…
-            </option>
-            {sections.map((section) => (
-              <optgroup key={section} label={section}>
-                {services
-                  .filter((s) => s.section === section)
-                  .map((s) => (
-                    <option key={s.name} value={s.name}>
-                      {s.name} · K{s.price.toLocaleString()}
-                    </option>
-                  ))}
-              </optgroup>
-            ))}
-          </select>
+            preselected={preselected}
+            triggerClassName={inputClasses}
+          />
         </div>
 
         <div>
