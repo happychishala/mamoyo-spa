@@ -279,8 +279,8 @@ export function DataTable<T>({
         </div>
       </div>
 
-      {/* Table */}
-      <div className="mt-4 overflow-x-auto">
+      {/* Table (tablet & desktop) */}
+      <div className="mt-4 hidden overflow-x-auto sm:block">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead>
             <tr className="border-b border-mist-200 text-xs font-semibold uppercase tracking-wide text-mist-600">
@@ -343,6 +343,47 @@ export function DataTable<T>({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Cards (mobile) — no horizontal scroll, easy vertical scrolling */}
+      <div className="mt-4 space-y-3 sm:hidden">
+        {pageRows.map((row, i) => {
+          const [first, ...rest] = columns;
+          const rc = rowClassName?.(row);
+          return (
+            <div
+              key={i}
+              className={`rounded-xl border border-mist-200 p-4 shadow-soft ${rc ?? "bg-white"}`}
+            >
+              <div className="mb-2 text-sm font-semibold text-mist-950">
+                {first.cell ? first.cell(row) : text(row, first)}
+              </div>
+              <dl className="space-y-1.5">
+                {rest.map((col) =>
+                  col.exportable === false ? (
+                    <dd key={col.key} className="pt-2">
+                      {col.cell ? col.cell(row) : text(row, col)}
+                    </dd>
+                  ) : (
+                    <div key={col.key} className="flex items-baseline justify-between gap-3">
+                      <dt className="shrink-0 text-xs font-medium uppercase tracking-wide text-mist-500">
+                        {col.header}
+                      </dt>
+                      <dd className={`text-right text-sm ${col.cellClassName ?? "text-mist-800"}`}>
+                        {col.cell ? col.cell(row) : text(row, col)}
+                      </dd>
+                    </div>
+                  )
+                )}
+              </dl>
+            </div>
+          );
+        })}
+        {pageRows.length === 0 && (
+          <div className="rounded-xl border border-mist-200 bg-white p-8 text-center text-sm text-mist-600">
+            {rows.length === 0 ? emptyMessage : "No matches — try a different search or filter."}
+          </div>
+        )}
       </div>
 
       {/* Footer / pagination */}

@@ -59,9 +59,15 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-mist-800 pt-8 text-xs text-mist-400 sm:flex-row">
-          <p>© {new Date().getFullYear()} MaMoyo Wellness &amp; Beauty. All rights reserved.</p>
-          <p>Kabulonga, Lusaka, Zambia</p>
+        <div className="mt-14 flex flex-col items-center gap-4 border-t border-mist-800 pt-8 text-xs text-mist-400 sm:flex-row sm:justify-between">
+          <p className="order-2 sm:order-1">
+            © {new Date().getFullYear()} MaMoyo Wellness &amp; Beauty. All rights reserved.
+          </p>
+          <nav aria-label="Legal" className="order-1 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:order-2">
+            <Link href="/privacy" className="transition-colors duration-200 hover:text-white">Privacy Policy</Link>
+            <Link href="/terms" className="transition-colors duration-200 hover:text-white">Terms &amp; Conditions</Link>
+            <Link href="/cookies" className="transition-colors duration-200 hover:text-white">Cookie Policy</Link>
+          </nav>
         </div>
       </div>
       </div>
