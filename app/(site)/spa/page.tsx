@@ -6,9 +6,16 @@ import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 
 export const metadata: Metadata = {
-  title: "The Spa",
+  title: { absolute: "MaMoyo Spa Lusaka | Kabulonga and Twangale Resort" },
   description:
-    "Explore MaMoyo spa care across Kabulonga and Twangale Resort — massage, facials, body rituals, advanced skincare, grooming and hydrotherapy.",
+    "Explore MaMoyo spa care across Kabulonga and Twangale Resort, including massage, facials, body rituals, advanced skincare and wellness experiences.",
+  alternates: { canonical: "/spa" },
+  openGraph: {
+    title: "MaMoyo Spa Lusaka | Kabulonga and Twangale Resort",
+    description:
+      "Explore MaMoyo spa care across Kabulonga and Twangale Resort, including massage, facials, body rituals, advanced skincare and wellness experiences.",
+    url: "/spa",
+  },
 };
 
 const locations = [
@@ -84,7 +91,7 @@ export default function SpaOverviewPage() {
         eyebrow="The Spa at MaMoyo"
         title="Treatment begins with listening"
         intro="The best treatment is the one that responds accurately to the body, skin and state of mind in front of us. Across Kabulonga and Twangale Resort, MaMoyo offers massage, body rituals, professional facials, advanced aesthetic care, hand and foot care and hydrotherapy — delivered with warmth and discretion."
-        primary={{ label: "View Treatment Menu", href: "/treatments" }}
+        primary={{ label: "View Treatment Menu", href: "/spa/menu" }}
         secondary={{ label: "Ask a Treatment Host", href: "/contact" }}
         image={{ src: "/photos/hero-massage.jpg", alt: "Warm oil poured during a MaMoyo massage" }}
       />
@@ -151,7 +158,7 @@ export default function SpaOverviewPage() {
           </div>
           <div className="mt-10 text-center">
             <Link
-              href="/treatments"
+              href="/spa/menu"
               className="inline-flex items-center gap-2 text-sm font-semibold text-mist-700 transition-colors duration-200 hover:text-mist-900"
             >
               View the full Treatment Menu

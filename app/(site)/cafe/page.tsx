@@ -10,9 +10,16 @@ import { cafeMenu, locationInfo } from "@/lib/content";
 import { formatMoney } from "@/lib/format";
 
 export const metadata: Metadata = {
-  title: "MaMoyo Café",
+  title: { absolute: "MaMoyo Café Kabulonga | Breakfast, Lunch and Tea Rituals" },
   description:
     "Visit MaMoyo Café in Kabulonga for considered breakfast and lunch, coffee, matcha, tea rituals, wellness drinks, meetings and afternoon tea.",
+  alternates: { canonical: "/cafe" },
+  openGraph: {
+    title: "MaMoyo Café Kabulonga | Breakfast, Lunch and Tea Rituals",
+    description:
+      "Visit MaMoyo Café in Kabulonga for considered breakfast and lunch, coffee, matcha, tea rituals, wellness drinks, meetings and afternoon tea.",
+    url: "/cafe",
+  },
 };
 
 const loc = locationInfo.Kabulonga;

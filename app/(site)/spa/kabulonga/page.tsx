@@ -6,11 +6,20 @@ import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 import FaqList from "@/components/site/FaqList";
 import { locationInfo } from "@/lib/content";
+import JsonLd from "@/components/site/JsonLd";
+import { branchSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
-  title: "MaMoyo Kabulonga",
+  title: { absolute: "MaMoyo Kabulonga | Boutique Spa and Skincare Lusaka" },
   description:
     "Visit MaMoyo Kabulonga for boutique spa care, professional facials, advanced skincare, café rituals and MaMoyo Suites on Reedbuck Road.",
+  alternates: { canonical: "/spa/kabulonga" },
+  openGraph: {
+    title: "MaMoyo Kabulonga | Boutique Spa and Skincare Lusaka",
+    description:
+      "Visit MaMoyo Kabulonga for boutique spa care, professional facials, advanced skincare, café rituals and MaMoyo Suites on Reedbuck Road.",
+    url: "/spa/kabulonga",
+  },
 };
 
 const loc = locationInfo.Kabulonga;
@@ -36,7 +45,7 @@ const features = [
   {
     title: "Professional skincare without guesswork",
     text: "Kabulonga is MaMoyo’s primary destination for professional facials and advanced aesthetic care — peels, dermaplaning, HydraFacial, microneedling, LED and focused eye care. First-time advanced treatment requires consultation.",
-    cta: { label: "View Facial Care", href: "/treatments" },
+    cta: { label: "View Facial Care", href: "/spa/menu" },
   },
   {
     title: "Let the treatment change the rest of the day",
@@ -60,6 +69,7 @@ const faqs = [
 export default function KabulongaPage() {
   return (
     <>
+      <JsonLd data={branchSchema("Kabulonga")} />
       <PageHero
         eyebrow="MaMoyo Kabulonga"
         title="A quieter way to move through the city"

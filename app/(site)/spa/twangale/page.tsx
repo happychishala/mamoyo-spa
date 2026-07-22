@@ -6,11 +6,20 @@ import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 import FaqList from "@/components/site/FaqList";
 import { locationInfo } from "@/lib/content";
+import JsonLd from "@/components/site/JsonLd";
+import { branchSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
-  title: "MaMoyo at Twangale Resort",
+  title: { absolute: "MaMoyo at Twangale Resort | Spa Days in Lilayi" },
   description:
-    "Plan a MaMoyo spa day at Twangale Resort in Lilayi — massage, body rituals, pool time, couples experiences, groups and corporate retreats.",
+    "Plan a MaMoyo spa day at Twangale Resort in Lilayi with massage, body rituals, pool time, couples experiences, groups and corporate retreats.",
+  alternates: { canonical: "/spa/twangale" },
+  openGraph: {
+    title: "MaMoyo at Twangale Resort | Spa Days in Lilayi",
+    description:
+      "Plan a MaMoyo spa day at Twangale Resort in Lilayi with massage, body rituals, pool time, couples experiences, groups and corporate retreats.",
+    url: "/spa/twangale",
+  },
 };
 
 const loc = locationInfo.Twangale;
@@ -61,6 +70,7 @@ const faqs = [
 export default function TwangalePage() {
   return (
     <>
+      <JsonLd data={branchSchema("Twangale")} />
       <PageHero
         eyebrow="MaMoyo at Twangale Resort"
         title="Let the day become larger than the appointment"

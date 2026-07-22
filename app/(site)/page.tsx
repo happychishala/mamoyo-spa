@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock, CalendarCheck } from "lucide-react";
@@ -7,6 +8,18 @@ import Wave from "@/components/site/Wave";
 import SplashScreen from "@/components/site/SplashScreen";
 import { services, cafeMenu } from "@/lib/content";
 import { formatMoney } from "@/lib/format";
+import JsonLd from "@/components/site/JsonLd";
+import { homeGraphSchema } from "@/lib/schema";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "MaMoyo | Spa, Wellness, Café and Suites in Lusaka",
+    description:
+      "Discover MaMoyo, Lusaka's premier wellness destination for spa treatments, professional skincare, café rituals, serviced suites and curated experiences.",
+    url: "/",
+  },
+};
 
 const pillars = [
   {
@@ -14,7 +27,7 @@ const pillars = [
     text: "Massage, body rituals, professional facials and advanced skincare",
     image: "/photos/hot-stone.jpg",
     alt: "Hot stone massage during a treatment at MaMoyo",
-    href: "/treatments",
+    href: "/spa/menu",
   },
   {
     title: "MaMoyo Café",
@@ -44,6 +57,7 @@ export default function HomePage() {
 
   return (
     <>
+      <JsonLd data={homeGraphSchema()} />
       <SplashScreen />
 
       {/* Hero */}
@@ -246,7 +260,7 @@ export default function HomePage() {
         </div>
         <div className="mt-10 text-center">
           <Link
-            href="/treatments"
+            href="/spa/menu"
             className="inline-flex items-center gap-2 text-sm font-semibold text-mist-700 transition-colors duration-200 hover:text-mist-900"
           >
             View the Treatment Menu

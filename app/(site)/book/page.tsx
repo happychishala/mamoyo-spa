@@ -7,9 +7,16 @@ import Reveal from "@/components/site/Reveal";
 import { locationInfo } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Book MaMoyo",
+  title: { absolute: "Book MaMoyo | Spa, Suites, Café and Wellness Experiences" },
   description:
     "Book a MaMoyo treatment, direct suite stay, café ritual, wellness experience, membership consultation, gift card or corporate programme.",
+  alternates: { canonical: "/book" },
+  openGraph: {
+    title: "Book MaMoyo | Spa, Suites, Café and Wellness Experiences",
+    description:
+      "Book a MaMoyo treatment, direct suite stay, café ritual, wellness experience, membership consultation, gift card or corporate programme.",
+    url: "/book",
+  },
 };
 
 const WHATSAPP_TEXT = encodeURIComponent("Hello MaMoyo. I would like help with a booking or enquiry.");

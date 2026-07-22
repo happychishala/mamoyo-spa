@@ -10,9 +10,16 @@ import { spaMenu, contactInfo, bookableName, type MenuTreatment } from "@/lib/co
 import { formatMoney } from "@/lib/format";
 
 export const metadata: Metadata = {
-  title: "Spa Menu & Prices",
+  title: { absolute: "MaMoyo Spa Menu and Prices | Lusaka" },
   description:
-    "The full MaMoyo Spa menu — massages, facials, hands & feet, waxing, hydro and packages, with prices in Kwacha.",
+    "View MaMoyo massage, facial, body, grooming, hydrotherapy and spa package options, with location availability across Kabulonga and Twangale.",
+  alternates: { canonical: "/spa/menu" },
+  openGraph: {
+    title: "MaMoyo Spa Menu and Prices | Lusaka",
+    description:
+      "View MaMoyo massage, facial, body, grooming, hydrotherapy and spa package options, with location availability across Kabulonga and Twangale.",
+    url: "/spa/menu",
+  },
 };
 
 function TreatmentCard({ t, dark = false }: { t: MenuTreatment; dark?: boolean }) {

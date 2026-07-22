@@ -4,9 +4,16 @@ import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 
 export const metadata: Metadata = {
-  title: "The MaMoyo Journal",
+  title: { absolute: "The MaMoyo Journal | Wellness, Skincare and Lusaka Living" },
   description:
-    "Grounded guidance from MaMoyo across wellness, skincare, nutrition, lifestyle, travel, hospitality and corporate wellbeing.",
+    "Read grounded guidance from MaMoyo across wellness, skincare, nutrition, lifestyle, travel, hospitality and corporate wellbeing.",
+  alternates: { canonical: "/journal" },
+  openGraph: {
+    title: "The MaMoyo Journal | Wellness, Skincare and Lusaka Living",
+    description:
+      "Read grounded guidance from MaMoyo across wellness, skincare, nutrition, lifestyle, travel, hospitality and corporate wellbeing.",
+    url: "/journal",
+  },
 };
 
 const articles = [

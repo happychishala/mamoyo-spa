@@ -5,6 +5,13 @@ import { contactInfo } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Cookie Policy",
   description: "How MaMoyo Wellness & Beauty uses cookies on this website.",
+  alternates: { canonical: "/cookies" },
+  openGraph: {
+    title: "Cookie Policy | MaMoyo",
+    description:
+      "How MaMoyo Wellness & Beauty uses cookies on this website.",
+    url: "/cookies",
+  },
 };
 
 export default function CookiesPage() {

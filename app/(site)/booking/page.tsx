@@ -6,6 +6,13 @@ import BookingForm from "./BookingForm";
 export const metadata: Metadata = {
   title: "Book a Treatment",
   description: "Reserve your massage, facial or retreat package at MaMoyo Wellness & Beauty, Kabulonga, Lusaka.",
+  alternates: { canonical: "/booking" },
+  openGraph: {
+    title: "Book a Treatment | MaMoyo",
+    description:
+      "Reserve your massage, facial or retreat package at MaMoyo Wellness & Beauty, Kabulonga, Lusaka.",
+    url: "/booking",
+  },
 };
 
 export default async function BookingPage({

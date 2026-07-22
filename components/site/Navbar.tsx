@@ -19,7 +19,7 @@ const spaLinks = [
   { href: "/spa", label: "Spa Overview" },
   { href: "/spa/kabulonga", label: "Kabulonga" },
   { href: "/spa/twangale", label: "Twangale Resort" },
-  { href: "/treatments", label: "Treatment Menu" },
+  { href: "/spa/menu", label: "Treatment Menu" },
   { href: "/spa/etiquette", label: "Spa Etiquette" },
 ];
 
@@ -77,7 +77,7 @@ export default function Navbar() {
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
-  const spaActive = pathname.startsWith("/spa") || pathname === "/treatments";
+  const spaActive = pathname.startsWith("/spa") || pathname === "/spa/menu";
 
   const linkClass = (active: boolean) =>
     `rounded-full px-2.5 py-2 text-[0.8rem] font-medium transition-colors duration-200 ${

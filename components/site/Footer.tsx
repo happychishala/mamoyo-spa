@@ -32,7 +32,7 @@ export default function Footer() {
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-mist-400">Explore</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
-              <li><Link href="/treatments" className="transition-colors duration-200 hover:text-white">Treatments</Link></li>
+              <li><Link href="/spa/menu" className="transition-colors duration-200 hover:text-white">Treatments</Link></li>
               <li><Link href="/cafe" className="transition-colors duration-200 hover:text-white">Café MaMoyo</Link></li>
               <li><Link href="/suites" className="transition-colors duration-200 hover:text-white">MaMoyo Suites</Link></li>
               <li><Link href="/booking" className="transition-colors duration-200 hover:text-white">Book a Visit</Link></li>

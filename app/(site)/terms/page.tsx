@@ -5,6 +5,13 @@ import { contactInfo } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Terms & Conditions",
   description: "The terms that apply when you book and visit MaMoyo Wellness & Beauty.",
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    title: "Terms & Conditions | MaMoyo",
+    description:
+      "The terms that apply when you book and visit MaMoyo Wellness & Beauty.",
+    url: "/terms",
+  },
 };
 
 export default function TermsPage() {

@@ -5,6 +5,13 @@ import { contactInfo } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "How MaMoyo Wellness & Beauty collects, uses and protects your personal information.",
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    title: "Privacy Policy | MaMoyo",
+    description:
+      "How MaMoyo Wellness & Beauty collects, uses and protects your personal information.",
+    url: "/privacy",
+  },
 };
 
 export default function PrivacyPage() {

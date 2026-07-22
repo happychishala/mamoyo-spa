@@ -6,9 +6,16 @@ import Reveal from "@/components/site/Reveal";
 import FaqList from "@/components/site/FaqList";
 
 export const metadata: Metadata = {
-  title: "About MaMoyo",
+  title: { absolute: "About MaMoyo | A Zambian Wellness and Hospitality Brand" },
   description:
     "Read the MaMoyo story, founder vision and philosophy behind a Zambian wellness destination built on trust, care, professional expertise and hospitality.",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About MaMoyo | A Zambian Wellness and Hospitality Brand",
+    description:
+      "Read the MaMoyo story, founder vision and philosophy behind a Zambian wellness destination built on trust, care, professional expertise and hospitality.",
+    url: "/about",
+  },
 };
 
 const promise = [

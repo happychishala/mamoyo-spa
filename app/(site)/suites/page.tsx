@@ -10,9 +10,16 @@ import FaqList from "@/components/site/FaqList";
 import StayBookingForm from "./StayBookingForm";
 
 export const metadata: Metadata = {
-  title: "MaMoyo Suites",
+  title: { absolute: "MaMoyo Suites | Serviced Apartments in Kabulonga Lusaka" },
   description:
     "Book MaMoyo Suites directly for private serviced studio accommodation in Kabulonga, ideal for business, long stays, wellness visits and bridal stays.",
+  alternates: { canonical: "/suites" },
+  openGraph: {
+    title: "MaMoyo Suites | Serviced Apartments in Kabulonga Lusaka",
+    description:
+      "Book MaMoyo Suites directly for private serviced studio accommodation in Kabulonga, ideal for business, long stays, wellness visits and bridal stays.",
+    url: "/suites",
+  },
 };
 
 const atAGlance = [

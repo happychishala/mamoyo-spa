@@ -6,9 +6,16 @@ import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 
 export const metadata: Metadata = {
-  title: "Experiences",
+  title: { absolute: "MaMoyo Wellness Experiences | Couples, Bridal and Spa Days" },
   description:
-    "Discover Executive Reset, Couples Retreat, Bridal Glow, Girls Wellness Days, Mom To Be, full-day spa journeys and private events in Lusaka.",
+    "Discover Executive Reset, Couples Retreat, Bridal Glow, Girls Wellness Days, Mom To Be, full day spa journeys and private events in Lusaka.",
+  alternates: { canonical: "/experiences" },
+  openGraph: {
+    title: "MaMoyo Wellness Experiences | Couples, Bridal and Spa Days",
+    description:
+      "Discover Executive Reset, Couples Retreat, Bridal Glow, Girls Wellness Days, Mom To Be, full day spa journeys and private events in Lusaka.",
+    url: "/experiences",
+  },
 };
 
 const signature = [

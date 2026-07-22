@@ -7,6 +7,13 @@ export const metadata: Metadata = {
   title: "Spa Etiquette",
   description:
     "How to prepare for your MaMoyo visit — arrival times, what to tell us, and our booking and cancellation terms.",
+  alternates: { canonical: "/spa/etiquette" },
+  openGraph: {
+    title: "Spa Etiquette | MaMoyo",
+    description:
+      "How to prepare for your MaMoyo visit — arrival times, what to tell us, and our booking and cancellation terms.",
+    url: "/spa/etiquette",
+  },
 };
 
 const sections = [

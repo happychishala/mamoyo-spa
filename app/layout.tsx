@@ -4,6 +4,7 @@ import "./globals.css";
 import { Geist } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { cn } from "@/lib/utils";
+import { SITE_URL, NOINDEX } from "@/lib/site";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -30,12 +31,20 @@ const kaushan = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "MaMoyo | Spa, Wellness, Café and Suites in Lusaka",
     template: "%s | MaMoyo",
   },
   description:
     "Discover MaMoyo, Lusaka's premier wellness destination for spa treatments, professional skincare, café rituals, serviced suites and curated experiences.",
+  openGraph: {
+    type: "website",
+    siteName: "MaMoyo",
+    locale: "en_ZM",
+  },
+  twitter: { card: "summary_large_image" },
+  ...(NOINDEX ? { robots: { index: false, follow: false } } : {}),
 };
 
 export default function RootLayout({

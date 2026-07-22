@@ -6,9 +6,16 @@ import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 
 export const metadata: Metadata = {
-  title: "Wellness",
+  title: { absolute: "MaMoyo Wellness Lusaka | A More Complete Way to Live Well" },
   description:
     "Explore the MaMoyo approach to body care, skin, nourishment, movement, rest, membership and holistic wellbeing in everyday Lusaka life.",
+  alternates: { canonical: "/wellness" },
+  openGraph: {
+    title: "MaMoyo Wellness Lusaka | A More Complete Way to Live Well",
+    description:
+      "Explore the MaMoyo approach to body care, skin, nourishment, movement, rest, membership and holistic wellbeing in everyday Lusaka life.",
+    url: "/wellness",
+  },
 };
 
 const dimensions = [

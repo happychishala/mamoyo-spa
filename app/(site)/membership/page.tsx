@@ -7,9 +7,16 @@ import Reveal from "@/components/site/Reveal";
 import EnquiryForm from "@/components/site/EnquiryForm";
 
 export const metadata: Metadata = {
-  title: "Membership",
+  title: { absolute: "The MaMoyo Circle | Wellness Membership in Lusaka" },
   description:
     "Join Silver, Gold or Platinum MaMoyo membership for monthly treatment credits, priority access, café rituals, suite benefits and member gatherings.",
+  alternates: { canonical: "/membership" },
+  openGraph: {
+    title: "The MaMoyo Circle | Wellness Membership in Lusaka",
+    description:
+      "Join Silver, Gold or Platinum MaMoyo membership for monthly treatment credits, priority access, café rituals, suite benefits and member gatherings.",
+    url: "/membership",
+  },
 };
 
 const tiers = [

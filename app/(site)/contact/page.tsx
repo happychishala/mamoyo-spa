@@ -6,9 +6,16 @@ import EnquiryForm from "@/components/site/EnquiryForm";
 import { contactInfo, locationInfo } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Contact",
+  title: { absolute: "Contact MaMoyo | Kabulonga and Twangale Spa Lusaka" },
   description:
     "Contact MaMoyo Kabulonga or MaMoyo at Twangale Resort for spa bookings, directions, suites, café reservations, membership and corporate enquiries.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Contact MaMoyo | Kabulonga and Twangale Spa Lusaka",
+    description:
+      "Contact MaMoyo Kabulonga or MaMoyo at Twangale Resort for spa bookings, directions, suites, café reservations, membership and corporate enquiries.",
+    url: "/contact",
+  },
 };
 
 const WHATSAPP_TEXT = encodeURIComponent("Hello MaMoyo. I would like help with a booking or enquiry.");

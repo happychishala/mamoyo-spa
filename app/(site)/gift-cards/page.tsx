@@ -6,9 +6,16 @@ import FaqList from "@/components/site/FaqList";
 import EnquiryForm from "@/components/site/EnquiryForm";
 
 export const metadata: Metadata = {
-  title: "Gift Cards",
+  title: { absolute: "MaMoyo Gift Cards | Spa and Wellness Gifts in Lusaka" },
   description:
     "Send a MaMoyo digital or presentation gift card for massage, facials, wellness experiences, café rituals or a direct MaMoyo Suites stay.",
+  alternates: { canonical: "/gift-cards" },
+  openGraph: {
+    title: "MaMoyo Gift Cards | Spa and Wellness Gifts in Lusaka",
+    description:
+      "Send a MaMoyo digital or presentation gift card for massage, facials, wellness experiences, café rituals or a direct MaMoyo Suites stay.",
+    url: "/gift-cards",
+  },
 };
 
 const options = [

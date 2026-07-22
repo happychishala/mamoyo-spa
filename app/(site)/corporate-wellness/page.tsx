@@ -6,9 +6,16 @@ import FaqList from "@/components/site/FaqList";
 import EnquiryForm from "@/components/site/EnquiryForm";
 
 export const metadata: Metadata = {
-  title: "Corporate Wellness",
+  title: { absolute: "Corporate Wellness Zambia | MaMoyo Programmes and Retreats" },
   description:
     "MaMoyo creates corporate wellness programmes, executive care, employee vouchers, workplace activations, team days and Twangale retreats across Zambia.",
+  alternates: { canonical: "/corporate-wellness" },
+  openGraph: {
+    title: "Corporate Wellness Zambia | MaMoyo Programmes and Retreats",
+    description:
+      "MaMoyo creates corporate wellness programmes, executive care, employee vouchers, workplace activations, team days and Twangale retreats across Zambia.",
+    url: "/corporate-wellness",
+  },
 };
 
 const services = [
