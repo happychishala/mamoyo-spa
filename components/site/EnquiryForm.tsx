@@ -23,6 +23,7 @@ export default function EnquiryForm({
   showPhone = true,
   showLocation = true,
   extraFields = [],
+  typeOptions,
 }: {
   type: string;
   submitLabel?: string;
@@ -31,6 +32,8 @@ export default function EnquiryForm({
   showPhone?: boolean;
   showLocation?: boolean;
   extraFields?: ExtraField[];
+  /** When set, the visitor chooses the enquiry type from this list. */
+  typeOptions?: { label: string; value: string }[];
 }) {
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     createEnquiry,
@@ -51,8 +54,22 @@ export default function EnquiryForm({
 
   return (
     <form action={formAction} className="rounded-2xl border border-mist-200 bg-white p-7 shadow-soft sm:p-8">
-      <input type="hidden" name="type" value={type} />
+      {!typeOptions && <input type="hidden" name="type" value={type} />}
       <div className="grid gap-4 sm:grid-cols-2">
+        {typeOptions && (
+          <div className="sm:col-span-2">
+            <label htmlFor="ef-type" className="mb-1.5 block text-sm font-medium text-mist-900">
+              What can we help with?
+            </label>
+            <select id="ef-type" name="type" defaultValue={type} className={inputClasses}>
+              {typeOptions.map((o) => (
+                <option key={o.label} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="sm:col-span-2">
           <label htmlFor="ef-name" className="mb-1.5 block text-sm font-medium text-mist-900">
             Full name

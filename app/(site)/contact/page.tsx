@@ -1,126 +1,152 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { MapPin, Phone, Mail, Clock, ArrowRight, Navigation } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Navigation, MessageCircle, AtSign } from "lucide-react";
 import { SectionHeading } from "@/components/site/Section";
+import FaqList from "@/components/site/FaqList";
+import EnquiryForm from "@/components/site/EnquiryForm";
 import { contactInfo, locationInfo } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Contact & Directions",
+  title: "Contact",
   description:
-    "Two MaMoyo homes in Lusaka — Kabulonga (spa, salon, café & suites) and Twangale (spa at Twangale Lodge, Lilayi). Opening hours, phone, email and directions.",
+    "Contact MaMoyo Kabulonga or MaMoyo at Twangale Resort for spa bookings, directions, suites, café reservations, membership and corporate enquiries.",
 };
 
-const branches = [
-  {
-    key: "Kabulonga" as const,
-    services: "Spa · Salon & Barber · Health Café · Suites",
-    note: "In the leafy heart of Kabulonga, ten minutes from the city centre.",
-  },
-  {
-    key: "Twangale" as const,
-    services: "Spa & wellness",
-    note: "Set in the gardens of Twangale Lodge, Lilayi.",
-  },
+const WHATSAPP_TEXT = encodeURIComponent("Hello MaMoyo. I would like help with a booking or enquiry.");
+const digits = (p: string) => p.replace(/[^\d]/g, "");
+const mapsUrl = (a: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a)}`;
+
+const branches = ["Kabulonga", "Twangale"] as const;
+
+const typeOptions = [
+  { label: "General enquiry", value: "General" },
+  { label: "Spa booking", value: "General" },
+  { label: "MaMoyo Suites", value: "Suite" },
+  { label: "Café & afternoon tea", value: "Café" },
+  { label: "Experience or private event", value: "Experience" },
+  { label: "Membership", value: "Membership" },
+  { label: "Corporate wellness", value: "Corporate" },
+  { label: "Gift card", value: "Gift Card" },
+  { label: "Press or partnership", value: "General" },
 ];
 
-function mapsUrl(address: string): string {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`MaMoyo ${address}`)}`;
-}
+const faqs = [
+  { q: "What is the fastest way to make a same-day booking?", a: "WhatsApp the relevant location. Same-day availability is not guaranteed, but the team can respond more quickly than through the general form." },
+  { q: "Which number should I use for MaMoyo Suites?", a: "Use the Kabulonga number, +260 967 245833, or the direct suite availability form on the Suites page." },
+  { q: "Can I book Twangale Resort rooms through MaMoyo?", a: "No. MaMoyo books spa services. Twangale Resort confirms its own rooms and wider resort facilities." },
+];
 
 export default function ContactPage() {
   return (
-    <div className="pt-36 pb-8">
+    <div className="pt-32 pb-16 sm:pt-40">
       <div className="mx-auto max-w-6xl px-6">
-        <SectionHeading
-          overline="Contact"
-          title="Come find your quiet"
-          description="Two homes across Lusaka — the full MaMoyo in Kabulonga, and our spa in the gardens of Twangale Resort and Spa. Call, write, or simply arrive."
-        />
+        <div className="text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">Contact MaMoyo</p>
+          <h1 className="mt-4 text-balance font-serif text-4xl font-semibold text-mist-950 sm:text-5xl">
+            Choose the place, then let us help with the details
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-mist-700">
+            Contact the relevant location for treatment availability, directions and same-day support. For
+            suites, membership, corporate wellness, private events and general enquiries, use the form or WhatsApp.
+          </p>
+        </div>
 
         {/* Two locations */}
-        <div className="mt-14 grid gap-6 md:grid-cols-2">
-          {branches.map((b) => {
-            const branch = locationInfo[b.key];
+        <div className="mt-16 grid gap-6 md:grid-cols-2">
+          {branches.map((key) => {
+            const b = locationInfo[key];
             return (
-              <div key={b.key} className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-mist-100 text-mist-600">
-                    <MapPin className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <span className="rounded-full bg-mist-50 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-wide text-mist-600">
-                    {b.key}
-                  </span>
+              <div key={key} className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-mist-100 text-mist-600">
+                  <MapPin className="h-5 w-5" aria-hidden="true" />
                 </div>
-                <h2 className="mt-4 font-serif text-xl font-semibold text-mist-950">{branch.name}</h2>
-                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-mist-600">{b.services}</p>
-                <p className="mt-3 text-sm leading-relaxed text-mist-800">{branch.address}</p>
-                <p className="mt-2 text-sm text-mist-700">{b.note}</p>
-                <a
-                  href={mapsUrl(branch.address)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-mist-700 transition-colors duration-200 hover:text-mist-900"
-                >
-                  <Navigation className="h-4 w-4" aria-hidden="true" />
-                  Get directions
-                </a>
+                <h2 className="mt-4 font-serif text-xl font-semibold text-mist-950">{b.name}</h2>
+                <p className="mt-1 text-sm text-mist-700">{b.blurb}</p>
+                <ul className="mt-4 space-y-2.5 text-sm text-mist-800">
+                  <li className="flex items-start gap-2.5">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-mist-500" aria-hidden="true" />
+                    {b.address}
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Phone className="mt-0.5 h-4 w-4 shrink-0 text-mist-500" aria-hidden="true" />
+                    <a href={`tel:${digits(b.phone)}`} className="hover:text-mist-950">
+                      {b.phone}
+                    </a>
+                    <span className="text-mist-500">· {b.phoneLabel}</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Clock className="mt-0.5 h-4 w-4 shrink-0 text-mist-500" aria-hidden="true" />
+                    <span>
+                      {b.hours.map((h) => (
+                        <span key={h.days} className="block">
+                          {h.days}: {h.time}
+                        </span>
+                      ))}
+                    </span>
+                  </li>
+                </ul>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <a
+                    href={`https://wa.me/${digits(b.phone)}?text=${WHATSAPP_TEXT}`}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-mist-600 px-4 py-2 text-xs font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                    WhatsApp {key}
+                  </a>
+                  <a
+                    href={mapsUrl(b.address)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-mist-300 px-4 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+                  >
+                    <Navigation className="h-3.5 w-3.5" aria-hidden="true" />
+                    Directions
+                  </a>
+                </div>
               </div>
             );
           })}
         </div>
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-mist-100 text-mist-600">
-              <Phone className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <h2 className="mt-4 font-serif text-lg font-semibold text-mist-950">Talk to us</h2>
-            <ul className="mt-2 space-y-2 text-sm text-mist-800">
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-mist-500" aria-hidden="true" />
-                <a href={`tel:${contactInfo.phone.replace(/\s/g, "")}`} className="transition-colors duration-200 hover:text-mist-950">
-                  {contactInfo.phone}
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-mist-500" aria-hidden="true" />
-                <a href={`mailto:${contactInfo.email}`} className="transition-colors duration-200 hover:text-mist-950">
-                  {contactInfo.email}
-                </a>
-              </li>
-            </ul>
-            <p className="mt-3 text-sm text-mist-700">
-              WhatsApp bookings welcome — we reply within the hour during opening times.
+        {/* General contact */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 rounded-2xl border border-mist-200 bg-white px-6 py-5 text-sm text-mist-800 shadow-soft">
+          <a href={`mailto:${contactInfo.email}`} className="inline-flex items-center gap-2 hover:text-mist-950">
+            <Mail className="h-4 w-4 text-mist-500" aria-hidden="true" />
+            {contactInfo.email}
+          </a>
+          <a href={contactInfo.instagramUrl} className="inline-flex items-center gap-2 hover:text-mist-950">
+            <AtSign className="h-4 w-4 text-mist-500" aria-hidden="true" />
+            {contactInfo.instagram}
+          </a>
+        </div>
+
+        {/* Enquiry form → back office */}
+        <div className="mt-16 grid gap-10 lg:grid-cols-5">
+          <div className="lg:col-span-2">
+            <SectionHeading overline="Message MaMoyo" title="Send us a note" />
+            <p className="mt-4 text-sm leading-relaxed text-mist-700">
+              We&rsquo;ll respond through your preferred contact method. Time-sensitive and same-day requests are
+              best sent by WhatsApp to the relevant location.
             </p>
           </div>
-
-          <div className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-mist-100 text-mist-600">
-              <Clock className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <h2 className="mt-4 font-serif text-lg font-semibold text-mist-950">Hours</h2>
-            <ul className="mt-2 space-y-2 text-sm text-mist-800">
-              {contactInfo.hours.map((h) => (
-                <li key={h.days} className="flex justify-between gap-3">
-                  <span>{h.days}</span>
-                  <span className="font-medium text-mist-950">{h.time}</span>
-                </li>
-              ))}
-            </ul>
+          <div className="lg:col-span-3">
+            <EnquiryForm
+              type="General"
+              typeOptions={typeOptions}
+              submitLabel="Send Enquiry"
+              messageLabel="Your message"
+              messagePlaceholder="How can we help?"
+              extraFields={[
+                { label: "Preferred contact method", type: "select", options: ["WhatsApp", "Phone call", "Email"] },
+                { label: "Best time to reach you", placeholder: "e.g. weekday mornings" },
+              ]}
+            />
           </div>
         </div>
 
-        <div className="mt-12 rounded-2xl border border-mist-200 bg-mist-100/60 p-8 text-center">
-          <p className="text-sm text-mist-800">
-            Ready to book? Skip the phone queue entirely.
-          </p>
-          <Link
-            href="/booking"
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-mist-700"
-          >
-            Book online
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
+        {/* FAQ */}
+        <div className="mx-auto mt-16 max-w-3xl">
+          <SectionHeading overline="Contact FAQ" title="Good to know" />
+          <div className="mt-8">
+            <FaqList items={faqs} />
+          </div>
         </div>
       </div>
     </div>
