@@ -162,7 +162,7 @@ export default function Navbar() {
             ))}
             <li>
               <Link
-                href="/booking"
+                href="/book"
                 className="ml-2 rounded-full bg-mist-600 px-5 py-2.5 text-[0.8rem] font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-mist-700"
               >
                 Book Now
@@ -238,7 +238,7 @@ export default function Navbar() {
             </div>
 
             <Link
-              href="/booking"
+              href="/book"
               className="mt-4 block rounded-xl bg-mist-600 px-4 py-3 text-center text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
             >
               Book Now
