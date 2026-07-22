@@ -144,7 +144,7 @@ export default async function TaxPage({
           <CalendarDays className="h-5 w-5 text-mist-500" aria-hidden="true" />
           <h2 className="font-serif text-xl font-semibold text-mist-950">Daily VAT sales</h2>
         </div>
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 hidden overflow-x-auto sm:block print:block">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
               <tr className="border-b border-mist-200 text-xs font-semibold uppercase tracking-wide text-mist-600">
@@ -181,6 +181,37 @@ export default async function TaxPage({
             </tbody>
           </table>
         </div>
+        <div className="mt-4 space-y-3 sm:hidden print:hidden">
+          {dailyRows.map((row) => (
+            <div key={row.date} className="rounded-xl border border-mist-200 bg-white p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-mist-950">{formatDate(row.date)}</p>
+                <p className="text-xs text-mist-600">
+                  {row.receiptCount} {row.receiptCount === 1 ? "receipt" : "receipts"}
+                </p>
+              </div>
+              <dl className="mt-2.5 space-y-1.5 text-sm">
+                <div className="flex justify-between gap-3">
+                  <dt className="text-mist-500">Sales incl. VAT</dt>
+                  <dd className="font-medium text-mist-950">{formatTaxMoney(row.grossAmount)}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-mist-500">Sales excl. VAT</dt>
+                  <dd className="text-mist-800">{formatTaxMoney(row.netAmount)}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-mist-500">Output VAT</dt>
+                  <dd className="font-semibold text-emerald-700">{formatTaxMoney(row.vatAmount)}</dd>
+                </div>
+              </dl>
+            </div>
+          ))}
+          {dailyRows.length === 0 && (
+            <div className="rounded-xl border border-mist-200 bg-white p-8 text-center text-sm text-mist-500">
+              No receipt sales in this period.
+            </div>
+          )}
+        </div>
       </Card>
 
       <Card className="p-6 print:border-0 print:p-0 print:shadow-none">
@@ -188,7 +219,7 @@ export default async function TaxPage({
           <ReceiptText className="h-5 w-5 text-mist-500" aria-hidden="true" />
           <h2 className="font-serif text-xl font-semibold text-mist-950">Receipt audit trail</h2>
         </div>
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 hidden overflow-x-auto sm:block print:block">
           <table className="w-full min-w-[780px] text-left text-sm">
             <thead>
               <tr className="border-b border-mist-200 text-xs font-semibold uppercase tracking-wide text-mist-600">
@@ -233,6 +264,45 @@ export default async function TaxPage({
               )}
             </tbody>
           </table>
+        </div>
+        <div className="mt-4 space-y-3 sm:hidden print:hidden">
+          {receipts.map((receipt) => {
+            const vat = inclusiveVatBreakdown(receipt.amount);
+            return (
+              <div key={receipt.id} className="rounded-xl border border-mist-200 bg-white p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-mist-950">{receipt.number}</p>
+                    <p className="truncate text-xs text-mist-600">{receipt.customer}</p>
+                  </div>
+                  <p className="shrink-0 text-xs text-mist-600">{formatDate(receipt.date)}</p>
+                </div>
+                <dl className="mt-2.5 space-y-1.5 text-sm">
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-mist-500">Invoice</dt>
+                    <dd className="text-mist-800">{receipt.invoiceNumber}</dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-mist-500">Incl. VAT</dt>
+                    <dd className="font-medium text-mist-950">{formatTaxMoney(vat.grossAmount)}</dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-mist-500">Excl. VAT</dt>
+                    <dd className="text-mist-800">{formatTaxMoney(vat.netAmount)}</dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-mist-500">VAT</dt>
+                    <dd className="font-semibold text-emerald-700">{formatTaxMoney(vat.vatAmount)}</dd>
+                  </div>
+                </dl>
+              </div>
+            );
+          })}
+          {receipts.length === 0 && (
+            <div className="rounded-xl border border-mist-200 bg-white p-8 text-center text-sm text-mist-500">
+              No receipts to show.
+            </div>
+          )}
         </div>
       </Card>
     </div>
