@@ -278,7 +278,7 @@ export interface Suite {
 }
 
 const studioDescription =
-  "A generous open-plan studio: king bed, lounge with velvet armchairs, dining table, full kitchenette and en-suite bathroom — with the spa, salon and Café MaMoyo just downstairs.";
+  "A generous open-plan studio: king bed, lounge with velvet armchairs, dining table, full kitchenette and en-suite bathroom — with the spa, MaMoyo Café, pool and gardens just downstairs.";
 
 const studioAmenities = [
   "King bed",
