@@ -1,69 +1,33 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Clock, Coffee, CalendarCheck, Star } from "lucide-react";
+import { ArrowRight, Clock, CalendarCheck } from "lucide-react";
 import { SectionHeading, ServiceIcon } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 import Wave from "@/components/site/Wave";
 import SplashScreen from "@/components/site/SplashScreen";
-import LocationCycler from "@/components/site/LocationCycler";
-import { services, cafeMenu, contactInfo } from "@/lib/content";
+import { services, cafeMenu } from "@/lib/content";
 import { formatMoney } from "@/lib/format";
-
-const testimonials = [
-  {
-    quote:
-      "The hot stone massage undid three months of deadline stress in ninety minutes. Café MaMoyo afterwards is the perfect landing.",
-    name: "Thandiwe M.",
-    detail: "Regular since 2024",
-  },
-  {
-    quote:
-      "We booked the couples retreat for our anniversary — private pavilion, lunch under the jacarandas. Easily the best afternoon in Lusaka.",
-    name: "Grace & Peter P.",
-    detail: "Couples Retreat",
-  },
-  {
-    quote:
-      "I come for the flat white and stay for the calm. Half my best ideas this year happened on the MaMoyo veranda.",
-    name: "Daniel K.",
-    detail: "Café regular",
-  },
-];
 
 const pillars = [
   {
-    title: "Spa",
-    text: "Massages, facials and body rituals",
+    title: "The Spa",
+    text: "Massage, body rituals, professional facials and advanced skincare",
     image: "/photos/hot-stone.jpg",
-    alt: "Hot stone massage on a guest's back",
+    alt: "Hot stone massage during a treatment at MaMoyo",
     href: "/treatments",
   },
   {
-    title: "Salon & Barber",
-    text: "Hair, nails and grooming",
-    image: "/photos/salon.jpg",
-    alt: "Salon styling stations with mirrors",
-    href: "/booking",
-  },
-  {
-    title: "Health Café",
-    text: "Cold-pressed juices and slow lunches",
+    title: "MaMoyo Café",
+    text: "Considered breakfast, lunch, coffee and tea rituals — open to everyone",
     image: "/photos/salad-bowl.jpg",
-    alt: "Fresh salad bowl at the health café",
+    alt: "A fresh, garden-led plate at MaMoyo Café",
     href: "/cafe",
   },
   {
-    title: "Private Events",
-    text: "A venue for your quiet celebrations",
-    image: "/photos/events-venue.jpg",
-    alt: "Elegant private events hall set for dinner",
-    href: "/contact",
-  },
-  {
     title: "MaMoyo Suites",
-    text: "Four serviced studios — stay a night, or a season",
+    text: "Fully serviced studio stays within the Kabulonga grounds",
     image: "/photos/suites/studio-2.jpg",
-    alt: "MaMoyo Suites studio with lounge, dining table and kitchenette",
+    alt: "A MaMoyo Suites studio with lounge, dining table and kitchenette",
     href: "/suites",
   },
 ];
@@ -124,13 +88,13 @@ export default function HomePage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="text-center lg:text-left">
               <p className="animate-rise text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">
-                Spa · Salon &amp; Barber · Health Café — <LocationCycler />
+                Lusaka&rsquo;s Premier Wellness Destination
               </p>
               <h1
                 className="animate-rise mt-6 font-serif text-4xl font-semibold leading-[1.12] tracking-tight text-mist-950 sm:text-5xl xl:text-6xl"
                 style={{ animationDelay: "80ms" }}
               >
-                Come back to
+                Return to
                 <span className="relative mx-2 inline-block align-baseline">
                   <span className="animate-write inline-block font-brush text-[1.2em] font-normal tracking-normal text-mist-600">
                     yourself
@@ -156,8 +120,9 @@ export default function HomePage() {
                 className="animate-rise mx-auto mt-7 max-w-xl text-lg leading-relaxed text-mist-800 lg:mx-0"
                 style={{ animationDelay: "160ms" }}
               >
-                Restorative massages, glowing facials and slow mornings at our health café —
-                a wellness sanctuary hidden in plain sight, minutes from the city.
+                MaMoyo brings together restorative spa care, professional skincare, nourishing
+                food, considered stays and experiences designed around how you want to feel when
+                you leave.
               </p>
               <div
                 className="animate-rise mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start"
@@ -167,15 +132,14 @@ export default function HomePage() {
                   href="/booking"
                   className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-8 py-4 text-sm font-semibold text-white shadow-lift transition-colors duration-200 hover:bg-mist-700"
                 >
-                  Book a Treatment
+                  Book Your Visit
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
                 <Link
-                  href="/cafe"
+                  href="/about"
                   className="inline-flex items-center gap-2 rounded-full border border-mist-300 bg-white/80 px-8 py-4 text-sm font-semibold text-mist-800 backdrop-blur transition-colors duration-200 hover:border-mist-400 hover:bg-white"
                 >
-                  <Coffee className="h-4 w-4" aria-hidden="true" />
-                  Visit the Café
+                  Discover MaMoyo
                 </Link>
               </div>
             </div>
@@ -196,7 +160,7 @@ export default function HomePage() {
                 <div className="relative aspect-square">
                   <Image
                     src="/photos/facial.jpg"
-                    alt="Facial treatment in progress"
+                    alt="Professional facial treatment in progress at MaMoyo"
                     fill
                     sizes="12rem"
                     className="object-cover"
@@ -207,7 +171,7 @@ export default function HomePage() {
                 <div className="relative aspect-square">
                   <Image
                     src="/photos/coffee.jpg"
-                    alt="Latte art at Café MaMoyo"
+                    alt="A coffee ritual at MaMoyo Café"
                     fill
                     sizes="10rem"
                     className="object-cover"
@@ -216,56 +180,38 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-
-          {/* Stats strip */}
-          <div
-            className="animate-rise mx-auto mt-24 grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-mist-200 bg-mist-200 shadow-soft sm:grid-cols-4"
-            style={{ animationDelay: "320ms" }}
-          >
-            {[
-              { value: "8+", label: "Signature treatments" },
-              { value: "6", label: "Years of calm" },
-              { value: "4.9", label: "Guest rating" },
-              { value: "7 days", label: "Open every week" },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-white/90 px-6 py-6 text-center backdrop-blur">
-                <p className="font-serif text-3xl font-semibold text-mist-700">{stat.value}</p>
-                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-mist-600">{stat.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* Pillars */}
+      {/* Two settings + offerings */}
       <section className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
-          overline="One Address, Five Escapes"
-          title="Everything under one roof"
-          description="MaMoyo is more than a spa — it's a whole slow day in Kabulonga, from your morning juice to your evening event."
+          overline="Kabulonga & Twangale Resort"
+          title="Two settings, one standard of care"
+          description="MaMoyo brings restorative spa care, professional skincare, nourishing food and considered stays into two distinct destinations across Lusaka — boutique city care in Kabulonga and resort-scale wellness at Twangale."
         />
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {pillars.map((p, i) => (
-            <Reveal key={p.title} delay={(i % 5) * 80}>
-            <Link
-              href={p.href}
-              className="group relative block overflow-hidden rounded-2xl shadow-soft transition-shadow duration-300 hover:shadow-lift"
-            >
-              <div className="relative aspect-[4/5]">
-                <Image
-                  src={p.image}
-                  alt={p.alt}
-                  fill
-                  sizes="(min-width: 1024px) 20vw, (min-width: 640px) 45vw, 90vw"
-                  className="object-cover transition-opacity duration-300 group-hover:opacity-90"
-                />
-                <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-mist-950/85 via-mist-950/20 to-transparent" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <h3 className="font-serif text-lg text-white">{p.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-mist-200">{p.text}</p>
-              </div>
-            </Link>
+            <Reveal key={p.title} delay={(i % 3) * 80}>
+              <Link
+                href={p.href}
+                className="group relative block overflow-hidden rounded-2xl shadow-soft transition-shadow duration-300 hover:shadow-lift"
+              >
+                <div className="relative aspect-[4/5]">
+                  <Image
+                    src={p.image}
+                    alt={p.alt}
+                    fill
+                    sizes="(min-width: 1024px) 32vw, (min-width: 640px) 45vw, 90vw"
+                    className="object-cover transition-opacity duration-300 group-hover:opacity-90"
+                  />
+                  <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-mist-950/85 via-mist-950/20 to-transparent" />
+                </div>
+                <div className="absolute inset-x-0 bottom-0 p-5">
+                  <h3 className="font-serif text-lg text-white">{p.title}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-mist-200">{p.text}</p>
+                </div>
+              </Link>
             </Reveal>
           ))}
         </div>
@@ -274,27 +220,27 @@ export default function HomePage() {
       {/* Treatments preview */}
       <section className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
-          overline="Treatments"
-          title="Rituals for body and mind"
-          description="Every treatment begins with a warm foot ritual and a herbal infusion from our café — because arrival matters as much as the massage."
+          overline="The Spa"
+          title="Care that is precise, personal and deeply restorative"
+          description="From trusted massage and African-inspired body rituals to professional facials and advanced aesthetic care, every booking begins with what your body or skin needs now."
         />
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((service, i) => (
             <Reveal key={service.name} delay={(i % 3) * 90}>
-            <article className="group h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft transition-shadow duration-300 hover:shadow-lift">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-mist-100 text-mist-600 transition-colors duration-300 group-hover:bg-mist-600 group-hover:text-white">
-                <ServiceIcon icon={service.icon} />
-              </div>
-              <h3 className="mt-5 font-serif text-xl font-semibold text-mist-950">{service.name}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-mist-800">{service.description}</p>
-              <div className="mt-5 flex items-center justify-between border-t border-mist-100 pt-4 text-sm">
-                <span className="inline-flex items-center gap-1.5 text-mist-600">
-                  <Clock className="h-4 w-4" aria-hidden="true" />
-                  {service.durationMin} min
-                </span>
-                <span className="font-semibold text-mist-800">{formatMoney(service.price)}</span>
-              </div>
-            </article>
+              <article className="group h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft transition-shadow duration-300 hover:shadow-lift">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-mist-100 text-mist-600 transition-colors duration-300 group-hover:bg-mist-600 group-hover:text-white">
+                  <ServiceIcon icon={service.icon} />
+                </div>
+                <h3 className="mt-5 font-serif text-xl font-semibold text-mist-950">{service.name}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-mist-800">{service.description}</p>
+                <div className="mt-5 flex items-center justify-between border-t border-mist-100 pt-4 text-sm">
+                  <span className="inline-flex items-center gap-1.5 text-mist-600">
+                    <Clock className="h-4 w-4" aria-hidden="true" />
+                    {service.durationMin} min
+                  </span>
+                  <span className="font-semibold text-mist-800">{formatMoney(service.price)}</span>
+                </div>
+              </article>
             </Reveal>
           ))}
         </div>
@@ -303,7 +249,7 @@ export default function HomePage() {
             href="/treatments"
             className="inline-flex items-center gap-2 text-sm font-semibold text-mist-700 transition-colors duration-200 hover:text-mist-900"
           >
-            View all treatments
+            View the Treatment Menu
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
@@ -314,19 +260,20 @@ export default function HomePage() {
       <section className="bg-mist-900 pb-20 pt-14 text-white">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 lg:grid-cols-2">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-300">Café MaMoyo · Health Café</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-300">MaMoyo Café · Kabulonga</p>
             <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-              Slow food, fast friendships
+              Food that belongs to the way you want to feel
             </h2>
             <p className="mt-4 max-w-md text-base leading-relaxed text-mist-200">
-              Cold-pressed juices, Zambian coffee and a kitchen that believes lunch should
-              never be rushed. Open to everyone — no treatment required.
+              Thoughtful breakfast and lunch plates, excellent coffee, ceremonial teas, matcha,
+              cold-pressed juices and desserts made with restraint. Open to everyone — no spa
+              booking required.
             </p>
             <Link
               href="/cafe"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-mist-900 transition-colors duration-200 hover:bg-mist-100"
             >
-              See the full menu
+              Explore the Café
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
@@ -334,7 +281,7 @@ export default function HomePage() {
             <div className="relative aspect-[4/3]">
               <Image
                 src="/photos/cafe-latte.jpg"
-                alt="Flat white being served at Café MaMoyo"
+                alt="A coffee ritual being served at MaMoyo Café"
                 fill
                 sizes="(min-width: 1024px) 45vw, 90vw"
                 className="object-cover"
@@ -349,7 +296,7 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-3 text-xs text-mist-300">Juiced to order, every morning.</p>
+              <p className="mt-3 text-xs text-mist-300">Made fresh, every morning.</p>
             </div>
           </div>
         </div>
@@ -361,47 +308,22 @@ export default function HomePage() {
         <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
           {gallery.map((g, i) => (
             <Reveal key={g.src} delay={i * 100} className={i % 2 === 0 ? "" : "mt-6 md:mt-10"}>
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-soft">
-              <Image
-                src={g.src}
-                alt={g.alt}
-                fill
-                sizes="(min-width: 768px) 22vw, 45vw"
-                className="object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <SectionHeading overline="Guest Stories" title="Why people keep coming back" />
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <Reveal key={t.name} delay={i * 100}>
-            <figure className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-              <div className="flex gap-1 text-mist-500" aria-label="5 out of 5 stars">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" aria-hidden="true" />
-                ))}
+              <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-soft">
+                <Image
+                  src={g.src}
+                  alt={g.alt}
+                  fill
+                  sizes="(min-width: 768px) 22vw, 45vw"
+                  className="object-cover transition-transform duration-500 hover:scale-105"
+                />
               </div>
-              <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-mist-900">
-                “{t.quote}”
-              </blockquote>
-              <figcaption className="mt-5 border-t border-mist-100 pt-4">
-                <p className="text-sm font-semibold text-mist-950">{t.name}</p>
-                <p className="text-xs text-mist-600">{t.detail}</p>
-              </figcaption>
-            </figure>
             </Reveal>
           ))}
         </div>
       </section>
 
       {/* CTA */}
-      <section className="mx-auto max-w-6xl px-6 pb-4">
+      <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="relative overflow-hidden rounded-3xl px-8 py-20 text-center text-white shadow-lift sm:px-16">
           <Image
             src="/photos/towels-candle.jpg"
@@ -413,18 +335,27 @@ export default function HomePage() {
           />
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-mist-800/90 to-mist-950/80" />
           <h2 className="relative font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-            Your calm is one booking away
+            Your time is worth protecting
           </h2>
           <p className="relative mx-auto mt-4 max-w-lg text-mist-100">
-            {`Open ${contactInfo.hours[0].time} on weekdays. Same-day appointments often available — we'll confirm within hours.`}
+            Choose the location, treatment or experience that meets you where you are today. We
+            will take care of the details from there.
           </p>
-          <Link
-            href="/booking"
-            className="relative mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:bg-mist-100"
-          >
-            <CalendarCheck className="h-4 w-4" aria-hidden="true" />
-            Reserve your moment
-          </Link>
+          <div className="relative mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link
+              href="/booking"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:bg-mist-100"
+            >
+              <CalendarCheck className="h-4 w-4" aria-hidden="true" />
+              Book MaMoyo
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-full border border-white/40 px-8 py-4 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white/10"
+            >
+              Speak to Our Team
+            </Link>
+          </div>
         </div>
       </section>
     </>
