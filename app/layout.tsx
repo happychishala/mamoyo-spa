@@ -30,11 +30,11 @@ const kaushan = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "MaMoyo Wellness & Beauty — Spa, Salon & Health Café in Kabulonga, Lusaka",
-    template: "%s | MaMoyo Wellness & Beauty",
+    default: "MaMoyo | Spa, Wellness, Café and Suites in Lusaka",
+    template: "%s | MaMoyo",
   },
   description:
-    "MaMoyo Wellness & Beauty in Kabulonga, Lusaka — spa treatments, salon & barber, a health café, private events venue and serviced apartments. Book your moment of calm today.",
+    "Discover MaMoyo, Lusaka's premier wellness destination for spa treatments, professional skincare, café rituals, serviced suites and curated experiences.",
 };
 
 export default function RootLayout({

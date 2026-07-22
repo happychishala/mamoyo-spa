@@ -345,24 +345,53 @@ export const suites: Suite[] = [
 ];
 
 export const contactInfo = {
-  address: "Kabulonga, Lusaka",
-  phone: "+260 76 502 2713",
   email: "info@mamoyospa.com",
+  instagram: "@real_mamoyo",
+  instagramUrl: "https://instagram.com/real_mamoyo",
+  // Kabulonga is the primary public contact; per-branch details live in locationInfo.
+  address: "16 Reedbuck Road, Kabulonga, Lusaka",
+  phone: "+260 967 245833",
   hours: [
-    { days: "Monday – Friday", time: "10:00 – 21:00" },
-    { days: "Saturday", time: "08:00 – 21:00" },
-    { days: "Sunday & Holidays", time: "10:00 – 20:00" },
+    { days: "Monday", time: "Closed" },
+    { days: "Tuesday – Saturday", time: "09:00 – 18:00" },
+    { days: "Sunday", time: "12:00 – 18:00" },
   ],
 };
 
-/** Per-branch details for invoices, receipts and directions. */
-export const locationInfo: Record<Location, { name: string; address: string }> = {
+/** Per-branch details for the site, invoices, receipts and directions. */
+export const locationInfo: Record<
+  Location,
+  {
+    name: string;
+    address: string;
+    phone: string;
+    phoneLabel: string;
+    hours: { days: string; time: string }[];
+    blurb: string;
+  }
+> = {
   Kabulonga: {
     name: "MaMoyo Kabulonga",
-    address: "Kabulonga, Lusaka, Zambia",
+    address: "16 Reedbuck Road, Kabulonga, Lusaka, Zambia",
+    phone: "+260 967 245833",
+    phoneLabel: "Telephone & WhatsApp",
+    hours: [
+      { days: "Monday", time: "Closed" },
+      { days: "Tuesday – Saturday", time: "09:00 – 18:00" },
+      { days: "Sunday", time: "12:00 – 18:00" },
+    ],
+    blurb: "Boutique spa, professional skincare, MaMoyo Café and MaMoyo Suites.",
   },
   Twangale: {
-    name: "MaMoyo Twangale",
+    name: "MaMoyo at Twangale Resort",
     address: "Plot PP, Mukwa Drive, Lilayi, Lusaka, Zambia",
+    phone: "+260 765 022713",
+    phoneLabel: "Spa bookings",
+    hours: [
+      { days: "Monday – Friday", time: "10:00 – 21:00" },
+      { days: "Saturday", time: "08:00 – 21:00" },
+      { days: "Sunday & public holidays", time: "10:00 – 20:00" },
+    ],
+    blurb: "Garden spa, longer treatment days, hydrotherapy, couples, groups and corporate retreats.",
   },
 };
