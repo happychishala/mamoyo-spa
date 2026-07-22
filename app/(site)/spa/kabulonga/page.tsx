@@ -66,6 +66,7 @@ export default function KabulongaPage() {
         intro="At 16 Reedbuck Road, MaMoyo Kabulonga brings spa care, professional skincare, nourishing food, calm gardens and serviced suites into one personal city address — an early treatment before the day gets busy, a facial between commitments, or a longer stay when Lusaka needs to feel more settled."
         primary={{ label: "Book Kabulonga", href: "/booking" }}
         secondary={{ label: "Get Directions", href: mapsUrl }}
+        image={{ src: "/photos/facial.jpg", alt: "Professional facial care at MaMoyo Kabulonga" }}
       />
 
       {/* Ritual */}

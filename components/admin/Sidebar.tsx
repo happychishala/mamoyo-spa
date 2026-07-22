@@ -21,6 +21,7 @@ import {
   Menu,
   X,
   ShoppingCart,
+  Inbox,
 } from "lucide-react";
 import { logout } from "@/lib/auth-actions";
 import type { UserRole } from "@/lib/db";
@@ -32,6 +33,7 @@ const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, minRank: 0, module: "dashboard" },
   { href: "/admin/calendar", label: "Calendar", icon: CalendarDays, minRank: 0, module: "calendar" },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck, minRank: 0, module: "bookings" },
+  { href: "/admin/enquiries", label: "Enquiries", icon: Inbox, minRank: 0, module: "enquiries" },
   { href: "/admin/pos", label: "POS", icon: ShoppingCart, minRank: 0, module: "pos" },
   { href: "/admin/stays", label: "Stays", icon: BedDouble, minRank: 0, module: "stays" },
   { href: "/admin/reports", label: "Reports", icon: BarChart3, minRank: 0, module: "reports" },

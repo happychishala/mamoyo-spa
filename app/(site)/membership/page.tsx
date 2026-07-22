@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, ArrowRight } from "lucide-react";
+import { Check } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
+import EnquiryForm from "@/components/site/EnquiryForm";
 
 export const metadata: Metadata = {
   title: "Membership",
@@ -94,8 +95,9 @@ export default function MembershipPage() {
         eyebrow="The MaMoyo Circle"
         title="Belong to a more consistent way of living well"
         intro="Membership is a decision to stop leaving care until everything else has been handled. The MaMoyo Circle creates a monthly rhythm of treatment, priority access, café rituals, selected suite privileges and member gatherings across Kabulonga and Twangale Resort."
-        primary={{ label: "Apply to Join", href: "/contact" }}
+        primary={{ label: "Apply to Join", href: "#apply" }}
         secondary={{ label: "Ask Our Team", href: "/contact" }}
+        image={{ src: "/photos/interior.jpg", alt: "The calm of a MaMoyo member visit" }}
       />
 
       {/* Tiers */}
@@ -136,7 +138,7 @@ export default function MembershipPage() {
                 </ul>
                 <p className="mt-6 rounded-xl bg-mist-50 p-4 text-xs leading-relaxed text-mist-600">{tier.best}</p>
                 <Link
-                  href="/contact"
+                  href="#apply"
                   className={`mt-5 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors duration-200 ${
                     tier.featured
                       ? "bg-mist-600 text-white hover:bg-mist-700"
@@ -185,14 +187,26 @@ export default function MembershipPage() {
             </div>
           ))}
         </div>
-        <div className="mt-10 text-center">
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-8 py-4 text-sm font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-mist-700"
-          >
-            Submit an Application
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
+      </section>
+
+      {/* Application → back office */}
+      <section id="apply" className="mx-auto max-w-2xl px-6 pb-16 scroll-mt-28">
+        <SectionHeading
+          overline="Application"
+          title="Apply to join the Circle"
+          description="Choose a preferred tier and tell us how you currently use MaMoyo. A host will contact you to confirm payment, home location and your first booking."
+        />
+        <div className="mt-10">
+          <EnquiryForm
+            type="Membership"
+            submitLabel="Submit Application"
+            messageLabel="How do you currently use MaMoyo?"
+            messagePlaceholder="Visit frequency, favourite treatments, what you'd like from membership…"
+            extraFields={[
+              { label: "Preferred tier", type: "select", required: true, options: ["Silver", "Gold", "Platinum"] },
+              { label: "Expected visits per month", placeholder: "e.g. 1–2" },
+            ]}
+          />
         </div>
       </section>
     </>

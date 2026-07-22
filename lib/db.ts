@@ -168,6 +168,43 @@ export interface ChannelIntegrationSetting {
   lastSyncedAt?: string;
 }
 
+export type EnquiryType =
+  | "Membership"
+  | "Corporate"
+  | "Gift Card"
+  | "Experience"
+  | "Suite"
+  | "Café"
+  | "General";
+
+export const ENQUIRY_TYPES: EnquiryType[] = [
+  "Membership",
+  "Corporate",
+  "Gift Card",
+  "Experience",
+  "Suite",
+  "Café",
+  "General",
+];
+
+export type EnquiryStatus = "New" | "In progress" | "Closed";
+
+/** A submission from a public site form (membership, corporate, gift, contact…). */
+export interface Enquiry {
+  id: string;
+  ref: string; // ENQ-…
+  type: EnquiryType;
+  name: string;
+  email: string;
+  phone?: string;
+  location?: string;
+  message: string;
+  /** Extra structured fields captured by a specific form (tier, organisation, budget…). */
+  details?: { label: string; value: string }[];
+  status: EnquiryStatus;
+  createdAt: string;
+}
+
 export interface DB {
   bookings: Booking[];
   invoices: Invoice[];
@@ -180,6 +217,7 @@ export interface DB {
   users: User[];
   roles: RoleDefinitionRecord[];
   channelIntegrations: ChannelIntegrationSetting[];
+  enquiries: Enquiry[];
 }
 
 export function staysOverlap(
@@ -334,6 +372,7 @@ const seed: DB = {
     { provider: "booking.com", enabled: false, endpoint: "", apiKey: "", lastStatus: "idle", lastMessage: "Not configured yet." },
     { provider: "expedia", enabled: false, endpoint: "", apiKey: "", lastStatus: "idle", lastMessage: "Not configured yet." },
   ],
+  enquiries: [],
 };
 
 /** Backfill arrays added after a stored DB was first written. Mutates in place. */
@@ -366,6 +405,20 @@ function migrate(db: DB): boolean {
   if (!Array.isArray(db.channelIntegrations)) {
     db.channelIntegrations = seed.channelIntegrations;
     migrated = true;
+  }
+  if (!Array.isArray(db.enquiries)) {
+    db.enquiries = [];
+    migrated = true;
+  }
+  // Backfill newly added modules into existing system roles so they appear
+  // for Owners/Managers/Staff without re-seeding.
+  if (Array.isArray(db.roles)) {
+    for (const role of db.roles) {
+      if (role.isSystemRole && Array.isArray(role.modules) && !role.modules.includes("enquiries")) {
+        role.modules.push("enquiries");
+        migrated = true;
+      }
+    }
   }
   return migrated;
 }

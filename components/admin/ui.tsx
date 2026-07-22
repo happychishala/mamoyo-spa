@@ -1,4 +1,10 @@
-import type { BookingStatus, InvoiceStatus, StayStatus, TransactionType } from "@/lib/db";
+import type {
+  BookingStatus,
+  InvoiceStatus,
+  StayStatus,
+  TransactionType,
+  EnquiryStatus,
+} from "@/lib/db";
 
 const badgeStyles: Record<string, string> = {
   // Bookings
@@ -17,6 +23,10 @@ const badgeStyles: Record<string, string> = {
   // Stays
   CheckedIn: "bg-mist-100 text-mist-800 border-mist-300",
   CheckedOut: "bg-slate-100 text-slate-600 border-slate-200",
+  // Enquiries
+  New: "bg-amber-50 text-amber-800 border-amber-200",
+  "In progress": "bg-mist-100 text-mist-800 border-mist-300",
+  Closed: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
 const badgeLabels: Record<string, string> = {
@@ -26,12 +36,12 @@ const badgeLabels: Record<string, string> = {
 
 // Statuses that still need eyes on them get a live "ping" dot: a new request
 // awaiting confirmation, and a confirmed booking that's coming up.
-const pingStatuses = new Set<string>(["Pending", "Confirmed"]);
+const pingStatuses = new Set<string>(["Pending", "Confirmed", "New"]);
 
 export function StatusBadge({
   status,
 }: {
-  status: BookingStatus | InvoiceStatus | StayStatus | TransactionType;
+  status: BookingStatus | InvoiceStatus | StayStatus | TransactionType | EnquiryStatus;
 }) {
   const ping = pingStatuses.has(status);
   return (

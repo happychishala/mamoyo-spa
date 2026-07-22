@@ -97,6 +97,7 @@ export default function ExperiencesPage() {
         intro="Our experiences bring together massage, skin, body care, nourishment, tea, water and time in a sequence that makes sense. Choose according to the state you need, the people you are bringing and the time you can protect."
         primary={{ label: "Find Your Experience", href: "/booking" }}
         secondary={{ label: "Ask Our Team", href: "/contact" }}
+        image={{ src: "/photos/hot-stone.jpg", alt: "A restorative MaMoyo treatment in progress" }}
       />
 
       {/* Signature experiences */}

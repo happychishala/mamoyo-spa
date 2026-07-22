@@ -11,7 +11,8 @@ export type AdminModule =
   | "finance"
   | "tax"
   | "team"
-  | "integrations";
+  | "integrations"
+  | "enquiries";
 
 export interface RoleDefinition {
   id: string;
@@ -36,6 +37,7 @@ export const ADMIN_MODULES: Array<{ id: AdminModule; label: string; description:
   { id: "tax", label: "Tax", description: "Tax reporting" },
   { id: "team", label: "Team", description: "Therapists and user management" },
   { id: "integrations", label: "Integrations", description: "Third-party booking connectors" },
+  { id: "enquiries", label: "Enquiries", description: "Website enquiries and applications" },
 ];
 
 export function normalizeRoleName(value: string): string {
@@ -48,7 +50,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
       id: "role-staff",
       name: "Staff",
       description: "Front-line operations access",
-      modules: ["dashboard", "calendar", "bookings", "stays", "reports", "inventory", "pos"],
+      modules: ["dashboard", "calendar", "bookings", "stays", "reports", "inventory", "pos", "enquiries"],
       rank: 0,
       isSystemRole: true,
     },
@@ -70,6 +72,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "tax",
         "team",
         "integrations",
+        "enquiries",
       ],
       rank: 1,
       isSystemRole: true,
@@ -92,6 +95,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "tax",
         "team",
         "integrations",
+        "enquiries",
       ],
       rank: 2,
       isSystemRole: true,

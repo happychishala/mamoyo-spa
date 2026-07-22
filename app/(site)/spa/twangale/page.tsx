@@ -67,6 +67,7 @@ export default function TwangalePage() {
         intro="Within the gardens of Twangale Resort in Lilayi, MaMoyo unfolds at a slower, more expansive pace. Treatment rooms, pool time, open air and the landscape create space for a complete day rather than a single hour — come as a couple, family, group of friends, corporate team or resort guest."
         primary={{ label: "Book Twangale", href: "/booking" }}
         secondary={{ label: "Get Directions", href: mapsUrl }}
+        image={{ src: "/photos/interior.jpg", alt: "The garden-set calm of MaMoyo at Twangale Resort" }}
       />
 
       {/* Rhythm */}

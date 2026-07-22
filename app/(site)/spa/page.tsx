@@ -86,6 +86,7 @@ export default function SpaOverviewPage() {
         intro="The best treatment is the one that responds accurately to the body, skin and state of mind in front of us. Across Kabulonga and Twangale Resort, MaMoyo offers massage, body rituals, professional facials, advanced aesthetic care, hand and foot care and hydrotherapy — delivered with warmth and discretion."
         primary={{ label: "View Treatment Menu", href: "/treatments" }}
         secondary={{ label: "Ask a Treatment Host", href: "/contact" }}
+        image={{ src: "/photos/hero-massage.jpg", alt: "Warm oil poured during a MaMoyo massage" }}
       />
 
       {/* Location choice */}

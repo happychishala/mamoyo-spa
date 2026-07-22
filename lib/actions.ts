@@ -13,6 +13,10 @@ import {
   type InvoiceItem,
   type Receipt,
   TREATMENT_PAYMENTS,
+  type Enquiry,
+  type EnquiryType,
+  type EnquiryStatus,
+  ENQUIRY_TYPES,
   type Booking,
   type BookingStatus,
   type InventoryCategory,
@@ -930,4 +934,75 @@ export async function addTransaction(
   revalidatePath("/admin/finance");
   revalidatePath("/admin");
   return { ok: true, message: `${type} of ${amount.toLocaleString()} recorded.` };
+}
+
+// ---------- Enquiries (public site → back office) ----------
+
+/** Public: capture a site enquiry (membership, corporate, gift, café, general…). */
+export async function createEnquiry(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  const rawType = String(formData.get("type") ?? "General") as EnquiryType;
+  const type: EnquiryType = ENQUIRY_TYPES.includes(rawType) ? rawType : "General";
+  const name = String(formData.get("name") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  const location = String(formData.get("location") ?? "").trim();
+  const message = String(formData.get("message") ?? "").trim();
+
+  if (!name || !email || !message) {
+    return { ok: false, message: "Please add your name, email and a short message so we can help." };
+  }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return { ok: false, message: "That email address doesn't look right — please check it." };
+  }
+
+  // Any field named detail_<Label> becomes a structured detail line for the back office.
+  const details: { label: string; value: string }[] = [];
+  for (const [key, value] of formData.entries()) {
+    if (key.startsWith("detail_")) {
+      const v = String(value).trim();
+      if (v) details.push({ label: key.slice(7).replace(/_/g, " "), value: v });
+    }
+  }
+
+  const db = await readDb();
+  const enquiry: Enquiry = {
+    id: `enq-${Date.now()}`,
+    ref: `ENQ-${1000 + db.enquiries.length + 1}`,
+    type,
+    name,
+    email,
+    phone: phone || undefined,
+    location: location || undefined,
+    message,
+    details: details.length ? details : undefined,
+    status: "New",
+    createdAt: todayISO(),
+  };
+  db.enquiries.unshift(enquiry);
+  await writeDb(db);
+  revalidatePath("/admin/enquiries");
+  revalidatePath("/admin");
+
+  return {
+    ok: true,
+    message:
+      "Thank you — your enquiry has reached MaMoyo. We'll respond through your preferred contact method. Time-sensitive requests are best sent by WhatsApp.",
+  };
+}
+
+/** Admin: move an enquiry through New → In progress → Closed. */
+export async function updateEnquiryStatus(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "") as EnquiryStatus;
+  if (!["New", "In progress", "Closed"].includes(status)) return;
+  const db = await readDb();
+  const enquiry = db.enquiries.find((e) => e.id === id);
+  if (!enquiry) return;
+  enquiry.status = status;
+  await writeDb(db);
+  revalidatePath("/admin/enquiries");
 }

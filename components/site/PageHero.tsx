@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -9,12 +10,14 @@ export default function PageHero({
   intro,
   primary,
   secondary,
+  image,
 }: {
   eyebrow: string;
   title: string;
   intro: string;
   primary?: Cta;
   secondary?: Cta;
+  image?: { src: string; alt: string };
 }) {
   return (
     <section className="relative overflow-hidden pt-32 pb-14 sm:pt-40">
@@ -50,6 +53,20 @@ export default function PageHero({
           </div>
         )}
       </div>
+      {image && (
+        <div className="mx-auto mt-12 max-w-5xl px-6">
+          <div className="relative aspect-[16/7] overflow-hidden rounded-3xl shadow-lift">
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              priority
+              sizes="(min-width: 1024px) 64rem, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
