@@ -79,7 +79,7 @@ export default function AboutPage() {
             were working harder, travelling more and expecting more, yet there was still space for a wellness
             destination built around genuine care rather than appearance alone.
           </p>
-          <p className="font-serif text-2xl font-semibold text-mist-950">That question became MaMoyo.</p>
+          <p className="font-serif text-2xl font-semibold text-cocoa-700">That question became MaMoyo.</p>
         </div>
       </section>
 
@@ -118,7 +118,7 @@ export default function AboutPage() {
       {/* Why MaMoyo exists */}
       <section className="mt-12 bg-mist-50 py-16">
         <div className="mx-auto max-w-3xl px-6">
-          <h2 className="font-serif text-2xl font-semibold text-mist-950">Why MaMoyo exists</h2>
+          <h2 className="font-serif text-2xl font-semibold text-cocoa-700">Why MaMoyo exists</h2>
           <div className="mt-5 space-y-4 text-base leading-relaxed text-mist-700">
             <p>
               MaMoyo was created to be a place people could trust with their skin, their bodies, their time
@@ -138,7 +138,7 @@ export default function AboutPage() {
           </div>
 
           <div className="mt-10 rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-            <h3 className="font-serif text-xl font-semibold text-mist-950">Our philosophy</h3>
+            <h3 className="font-serif text-xl font-semibold text-cocoa-700">Our philosophy</h3>
             <p className="mt-3 text-sm leading-relaxed text-mist-700">
               People do not simply buy massages. They buy restoration. They buy confidence, health, time,
               transformation and the feeling of being properly cared for. Every part of MaMoyo should support
@@ -152,7 +152,7 @@ export default function AboutPage() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-12 lg:grid-cols-2">
           <div>
-            <h2 className="font-serif text-2xl font-semibold text-mist-950">Our promise</h2>
+            <h2 className="font-serif text-2xl font-semibold text-cocoa-700">Our promise</h2>
             <ul className="mt-6 space-y-2.5">
               {promise.map((p) => (
                 <li key={p} className="flex items-baseline gap-2.5 text-sm text-mist-700">
@@ -163,7 +163,7 @@ export default function AboutPage() {
             </ul>
           </div>
           <div>
-            <h2 className="font-serif text-2xl font-semibold text-mist-950">The MaMoyo difference</h2>
+            <h2 className="font-serif text-2xl font-semibold text-cocoa-700">The MaMoyo difference</h2>
             <ul className="mt-6 space-y-2.5">
               {difference.map((d) => (
                 <li key={d} className="flex items-baseline gap-2.5 text-sm text-mist-700">
@@ -183,7 +183,7 @@ export default function AboutPage() {
           {values.map((v, i) => (
             <Reveal key={v.name} delay={(i % 4) * 60}>
               <div className="h-full rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
-                <h3 className="font-serif text-lg font-semibold text-mist-950">{v.name}</h3>
+                <h3 className="font-serif text-lg font-semibold text-cocoa-700">{v.name}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-mist-700">{v.text}</p>
               </div>
             </Reveal>

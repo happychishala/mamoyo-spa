@@ -130,9 +130,9 @@ export default function MembershipPage() {
                     Most chosen
                   </span>
                 )}
-                <h3 className="font-serif text-2xl font-semibold text-mist-950">{tier.name}</h3>
+                <h3 className="font-serif text-2xl font-semibold text-cocoa-700">{tier.name}</h3>
                 <p className="mt-1 text-xs font-medium uppercase tracking-wide text-mist-500">{tier.tagline}</p>
-                <p className="mt-4 font-serif text-3xl font-semibold text-mist-950">
+                <p className="mt-4 font-serif text-3xl font-semibold text-cocoa-700">
                   {tier.price}
                   <span className="text-sm font-normal text-mist-500"> / month</span>
                 </p>
@@ -175,7 +175,7 @@ export default function MembershipPage() {
       <section className="bg-mist-50 py-16">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-2">
           <div className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-            <h2 className="font-serif text-xl font-semibold text-mist-950">How Ritual Credits work</h2>
+            <h2 className="font-serif text-xl font-semibold text-cocoa-700">How Ritual Credits work</h2>
             <p className="mt-4 text-sm leading-relaxed text-mist-700">
               A credit is valid against one eligible treatment up to the value stated for the tier. If the
               treatment costs more, the member pays the difference. If it costs less, the balance is not paid
@@ -184,7 +184,7 @@ export default function MembershipPage() {
             </p>
           </div>
           <div className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-            <h2 className="font-serif text-xl font-semibold text-mist-950">Belonging without pressure</h2>
+            <h2 className="font-serif text-xl font-semibold text-cocoa-700">Belonging without pressure</h2>
             <p className="mt-4 text-sm leading-relaxed text-mist-700">
               Member gatherings are designed to be useful and genuinely enjoyable: early-morning skin sessions,
               private café tables, garden conversations, movement previews, tea rituals, seasonal dinners and

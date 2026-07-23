@@ -112,7 +112,7 @@ export default function HomePage() {
                 Lusaka&rsquo;s Premier Wellness Destination
               </p>
               <h1
-                className="animate-rise mt-6 font-serif text-4xl font-semibold leading-[1.12] tracking-tight text-mist-950 sm:text-5xl xl:text-6xl"
+                className="animate-rise mt-6 font-serif text-4xl font-semibold leading-[1.12] tracking-tight text-cocoa-700 sm:text-5xl xl:text-6xl"
                 style={{ animationDelay: "80ms" }}
               >
                 Return to
@@ -206,7 +206,7 @@ export default function HomePage() {
 
       {/* Philosophy */}
       <section className="mx-auto max-w-3xl px-6 py-20 text-center">
-        <h2 className="text-balance font-serif text-3xl font-semibold tracking-tight text-mist-950 sm:text-4xl">
+        <h2 className="text-balance font-serif text-3xl font-semibold tracking-tight text-cocoa-700 sm:text-4xl">
           Wellness becomes meaningful when it becomes part of life
         </h2>
         <div className="mt-6 space-y-4 text-base leading-relaxed text-mist-800">
@@ -244,7 +244,7 @@ export default function HomePage() {
           </Reveal>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">Our Story</p>
-            <h2 className="mt-3 text-balance font-serif text-3xl font-semibold tracking-tight text-mist-950 sm:text-4xl">
+            <h2 className="mt-3 text-balance font-serif text-3xl font-semibold tracking-tight text-cocoa-700 sm:text-4xl">
               Built from a question Lusaka deserved an answer to
             </h2>
             <div className="mt-5 space-y-4 text-base leading-relaxed text-mist-800">
@@ -293,7 +293,7 @@ export default function HomePage() {
                   />
                 </div>
                 <div className="flex flex-1 flex-col p-7">
-                  <h3 className="font-serif text-xl font-semibold text-mist-950">{d.title}</h3>
+                  <h3 className="font-serif text-xl font-semibold text-cocoa-700">{d.title}</h3>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-mist-800">{d.text}</p>
                   <div className="mt-6 flex flex-wrap gap-3">
                     <Link
@@ -330,7 +330,7 @@ export default function HomePage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-mist-100 text-mist-600 transition-colors duration-300 group-hover:bg-mist-600 group-hover:text-white">
                   <ServiceIcon icon={service.icon} />
                 </div>
-                <h3 className="mt-5 font-serif text-xl font-semibold text-mist-950">{service.name}</h3>
+                <h3 className="mt-5 font-serif text-xl font-semibold text-cocoa-700">{service.name}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-mist-800">{service.description}</p>
                 <div className="mt-5 flex items-center justify-between border-t border-mist-100 pt-4 text-sm">
                   <span className="inline-flex items-center gap-1.5 text-mist-600">
@@ -429,7 +429,7 @@ export default function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">
               MaMoyo Suites · Kabulonga
             </p>
-            <h2 className="mt-3 text-balance font-serif text-3xl font-semibold tracking-tight text-mist-950 sm:text-4xl">
+            <h2 className="mt-3 text-balance font-serif text-3xl font-semibold tracking-tight text-cocoa-700 sm:text-4xl">
               Stay where wellbeing is already part of the address
             </h2>
             <p className="mt-5 text-base leading-relaxed text-mist-800">
@@ -479,7 +479,7 @@ export default function HomePage() {
             {homeExperiences.map((e, i) => (
               <Reveal key={e.name} delay={(i % 4) * 70}>
                 <article className="h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                  <h3 className="font-serif text-lg font-semibold text-mist-950">{e.name}</h3>
+                  <h3 className="font-serif text-lg font-semibold text-cocoa-700">{e.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-mist-700">{e.text}</p>
                 </article>
               </Reveal>
@@ -505,7 +505,7 @@ export default function HomePage() {
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">
                 The MaMoyo Circle
               </p>
-              <h2 className="mt-3 font-serif text-2xl font-semibold text-mist-950">
+              <h2 className="mt-3 font-serif text-2xl font-semibold text-cocoa-700">
                 Belong to a more consistent way of caring for yourself
               </h2>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-mist-800">
@@ -534,7 +534,7 @@ export default function HomePage() {
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">
                 Corporate Wellness
               </p>
-              <h2 className="mt-3 font-serif text-2xl font-semibold text-mist-950">
+              <h2 className="mt-3 font-serif text-2xl font-semibold text-cocoa-700">
                 Care for the people carrying the organisation
               </h2>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-mist-800">
@@ -566,7 +566,7 @@ export default function HomePage() {
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">
           The MaMoyo Journal
         </p>
-        <h2 className="mt-3 text-balance font-serif text-3xl font-semibold tracking-tight text-mist-950 sm:text-4xl">
+        <h2 className="mt-3 text-balance font-serif text-3xl font-semibold tracking-tight text-cocoa-700 sm:text-4xl">
           Useful thinking for living well
         </h2>
         <p className="mt-5 text-base leading-relaxed text-mist-800">

@@ -52,7 +52,7 @@ export default function JournalPage() {
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-mist-600">
                   {a.category}
                 </p>
-                <h3 className="mt-2 flex-1 font-serif text-lg font-semibold leading-snug text-mist-950">
+                <h3 className="mt-2 flex-1 font-serif text-lg font-semibold leading-snug text-cocoa-700">
                   {a.title}
                 </h3>
                 <p className="mt-4 inline-flex w-fit rounded-full bg-mist-100 px-3 py-1 text-[0.65rem] font-medium uppercase tracking-wide text-mist-600">

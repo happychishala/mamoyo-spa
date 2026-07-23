@@ -150,7 +150,7 @@ export default async function SuitesPage({
                 </div>
                 <div className="p-7">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h2 className="font-serif text-2xl font-semibold text-mist-950">{s.name}</h2>
+                    <h2 className="font-serif text-2xl font-semibold text-cocoa-700">{s.name}</h2>
                     <p className="text-xs font-medium uppercase tracking-wide text-mist-600">{s.tagline}</p>
                   </div>
                   <p className="mt-3 text-sm leading-relaxed text-mist-800">{s.description}</p>
@@ -252,7 +252,7 @@ export default async function SuitesPage({
 
         {/* Not a conventional hotel */}
         <div className="mx-auto mt-20 max-w-3xl text-center">
-          <h2 className="text-balance font-serif text-2xl font-semibold text-mist-950 sm:text-3xl">
+          <h2 className="text-balance font-serif text-2xl font-semibold text-cocoa-700 sm:text-3xl">
             Everything needed, nothing made complicated
           </h2>
           <div className="mt-5 space-y-4 text-base leading-relaxed text-mist-700">
@@ -272,7 +272,7 @@ export default async function SuitesPage({
         {/* At a glance + who the suites are for */}
         <div className="mt-20 grid gap-10 lg:grid-cols-2">
           <div>
-            <h2 className="font-serif text-2xl font-semibold text-mist-950">At a glance</h2>
+            <h2 className="font-serif text-2xl font-semibold text-cocoa-700">At a glance</h2>
             <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
               {atAGlance.map((a) => (
                 <li key={a} className="flex items-baseline gap-2.5 text-sm text-mist-700">
@@ -283,7 +283,7 @@ export default async function SuitesPage({
             </ul>
           </div>
           <div>
-            <h2 className="font-serif text-2xl font-semibold text-mist-950">Who the suites are for</h2>
+            <h2 className="font-serif text-2xl font-semibold text-cocoa-700">Who the suites are for</h2>
             <div className="mt-6 space-y-4">
               {whoFor.map((w) => (
                 <div key={w.name}>
@@ -297,7 +297,7 @@ export default async function SuitesPage({
 
         {/* Privacy with care */}
         <div className="mx-auto mt-20 max-w-3xl text-center">
-          <h2 className="text-balance font-serif text-2xl font-semibold text-mist-950 sm:text-3xl">
+          <h2 className="text-balance font-serif text-2xl font-semibold text-cocoa-700 sm:text-3xl">
             Privacy with care close enough to matter
           </h2>
           <div className="mt-5 space-y-4 text-base leading-relaxed text-mist-700">
@@ -325,7 +325,7 @@ export default async function SuitesPage({
             {bookDirect.map((b, i) => (
               <Reveal key={b.name} delay={(i % 3) * 70}>
                 <div className="h-full rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
-                  <h3 className="font-serif text-lg font-semibold text-mist-950">{b.name}</h3>
+                  <h3 className="font-serif text-lg font-semibold text-cocoa-700">{b.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-mist-700">{b.text}</p>
                 </div>
               </Reveal>
@@ -360,7 +360,7 @@ export default async function SuitesPage({
             {stayExperiences.map((s, i) => (
               <Reveal key={s.name} delay={(i % 2) * 80}>
                 <div className="h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                  <h3 className="font-serif text-xl font-semibold text-mist-950">{s.name}</h3>
+                  <h3 className="font-serif text-xl font-semibold text-cocoa-700">{s.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-mist-700">{s.text}</p>
                 </div>
               </Reveal>

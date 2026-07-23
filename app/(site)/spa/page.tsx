@@ -113,7 +113,7 @@ export default function SpaOverviewPage() {
           {locations.map((loc, i) => (
             <Reveal key={loc.name} delay={i * 90}>
               <div className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-                <h3 className="font-serif text-2xl font-semibold text-mist-950">{loc.name}</h3>
+                <h3 className="font-serif text-2xl font-semibold text-cocoa-700">{loc.name}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-mist-700">{loc.blurb}</p>
                 <ul className="mt-5 flex-1 space-y-2">
                   {loc.points.map((p) => (
@@ -168,7 +168,7 @@ export default function SpaOverviewPage() {
             {care.map((c, i) => (
               <Reveal key={c.name} delay={(i % 3) * 80}>
                 <article className="h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                  <h3 className="font-serif text-lg font-semibold text-mist-950">{c.name}</h3>
+                  <h3 className="font-serif text-lg font-semibold text-cocoa-700">{c.name}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-mist-700">{c.text}</p>
                 </article>
               </Reveal>
@@ -211,7 +211,7 @@ export default function SpaOverviewPage() {
         </ol>
 
         <div className="mt-12 rounded-2xl border border-mist-200 bg-white p-8 text-center shadow-soft">
-          <h2 className="font-serif text-xl font-semibold text-mist-950">Not sure what to book?</h2>
+          <h2 className="font-serif text-xl font-semibold text-cocoa-700">Not sure what to book?</h2>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-mist-700">
             Tell us what your body or skin is asking for. Our team can guide you according to your goals,
             available time, treatment history, sensitivity, pregnancy, current health considerations and

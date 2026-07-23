@@ -120,7 +120,7 @@ export default function CafePage() {
 
         {/* Philosophy */}
         <div className="mx-auto mt-16 max-w-3xl text-center">
-          <h2 className="font-serif text-2xl font-semibold text-mist-950 sm:text-3xl">
+          <h2 className="font-serif text-2xl font-semibold text-cocoa-700 sm:text-3xl">
             Food should be wanted before it is explained
           </h2>
           <div className="mt-4 space-y-4 text-base leading-relaxed text-mist-700">
@@ -144,7 +144,7 @@ export default function CafePage() {
             {menuCategories.map((c, i) => (
               <Reveal key={c.name} delay={(i % 3) * 70}>
                 <article className="h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                  <h3 className="font-serif text-lg font-semibold text-mist-950">{c.name}</h3>
+                  <h3 className="font-serif text-lg font-semibold text-cocoa-700">{c.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-mist-700">{c.text}</p>
                 </article>
               </Reveal>
@@ -167,7 +167,7 @@ export default function CafePage() {
             <Reveal key={section.title} delay={(i % 2) * 100}>
               <section className="h-full rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
                 <div className="flex items-baseline justify-between gap-3 border-b border-mist-100 pb-4">
-                  <h2 className="font-serif text-2xl font-semibold text-mist-950">{section.title}</h2>
+                  <h2 className="font-serif text-2xl font-semibold text-cocoa-700">{section.title}</h2>
                   <p className="text-xs font-medium uppercase tracking-wide text-mist-600">{section.note}</p>
                 </div>
                 <ul className="mt-5 space-y-5">
@@ -197,7 +197,7 @@ export default function CafePage() {
             {rituals.map((r, i) => (
               <Reveal key={r.name} delay={(i % 3) * 70}>
                 <article className="h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                  <h3 className="font-serif text-lg font-semibold text-mist-950">{r.name}</h3>
+                  <h3 className="font-serif text-lg font-semibold text-cocoa-700">{r.name}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-mist-700">{r.text}</p>
                 </article>
               </Reveal>
@@ -224,7 +224,7 @@ export default function CafePage() {
         <div className="mt-20 grid gap-6 lg:grid-cols-2">
           <Reveal>
             <div className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-              <h2 className="font-serif text-xl font-semibold text-mist-950">A useful table</h2>
+              <h2 className="font-serif text-xl font-semibold text-cocoa-700">A useful table</h2>
               <p className="mt-3 flex-1 text-sm leading-relaxed text-mist-700">
                 The café welcomes discreet meetings, interviews, one-to-one working sessions and small
                 team lunches. Reserve in advance when timing, privacy, afternoon tea or a set
@@ -267,7 +267,7 @@ export default function CafePage() {
               table, a set ritual or a small celebration.
             </p>
             <div className="mt-6 rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
-              <h3 className="font-serif text-lg font-semibold text-mist-950">Practical information</h3>
+              <h3 className="font-serif text-lg font-semibold text-cocoa-700">Practical information</h3>
               <ul className="mt-4 space-y-3 text-sm text-mist-700">
                 <li className="flex items-start gap-3">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-mist-500" aria-hidden="true" />

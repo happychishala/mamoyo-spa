@@ -46,7 +46,7 @@ export default function EnquiryForm({
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-mist-100 text-mist-600">
           <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
         </div>
-        <h3 className="mt-5 font-serif text-xl font-semibold text-mist-950">Enquiry received</h3>
+        <h3 className="mt-5 font-serif text-xl font-semibold text-cocoa-700">Enquiry received</h3>
         <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-mist-700">{state.message}</p>
       </div>
     );

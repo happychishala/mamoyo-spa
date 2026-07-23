@@ -74,7 +74,7 @@ export default function WellnessPage() {
 
       {/* Approach */}
       <section id="approach" className="mx-auto max-w-3xl scroll-mt-28 px-6 py-16">
-        <h2 className="text-balance text-center font-serif text-3xl font-semibold tracking-tight text-mist-950">
+        <h2 className="text-balance text-center font-serif text-3xl font-semibold tracking-tight text-cocoa-700">
           Care that reaches beyond one room
         </h2>
         <div className="mt-6 space-y-4 text-base leading-relaxed text-mist-800">
@@ -103,7 +103,7 @@ export default function WellnessPage() {
             <Reveal key={d.name} delay={(i % 3) * 70}>
               <article className="h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
                 <span className="font-serif text-2xl text-mist-400">0{i + 1}</span>
-                <h3 className="mt-2 font-serif text-lg font-semibold text-mist-950">{d.name}</h3>
+                <h3 className="mt-2 font-serif text-lg font-semibold text-cocoa-700">{d.name}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-mist-700">{d.text}</p>
               </article>
             </Reveal>
@@ -119,7 +119,7 @@ export default function WellnessPage() {
             {principles.map((p, i) => (
               <Reveal key={p.name} delay={(i % 3) * 70}>
                 <article className="h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                  <h3 className="font-serif text-lg font-semibold text-mist-950">{p.name}</h3>
+                  <h3 className="font-serif text-lg font-semibold text-cocoa-700">{p.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-mist-700">{p.text}</p>
                 </article>
               </Reveal>
@@ -140,7 +140,7 @@ export default function WellnessPage() {
                 className="group flex items-center justify-between gap-4 rounded-2xl border border-mist-200 bg-white p-5 shadow-soft transition-shadow duration-200 hover:shadow-lift"
               >
                 <div>
-                  <p className="font-serif text-lg font-semibold text-mist-950">“{s.feel}”</p>
+                  <p className="font-serif text-lg font-semibold text-cocoa-700">“{s.feel}”</p>
                   <p className="mt-1 text-sm text-mist-700">{s.start}</p>
                 </div>
                 <ArrowRight className="h-5 w-5 shrink-0 text-mist-400 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-mist-600" aria-hidden="true" />
@@ -164,7 +164,7 @@ export default function WellnessPage() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
-            <h2 className="font-serif text-2xl font-semibold text-mist-950">The MaMoyo promise</h2>
+            <h2 className="font-serif text-2xl font-semibold text-cocoa-700">The MaMoyo promise</h2>
             <ul className="mt-6 space-y-2.5">
               {promise.map((p) => (
                 <li key={p} className="flex items-baseline gap-2.5 text-sm text-mist-700">
@@ -175,7 +175,7 @@ export default function WellnessPage() {
             </ul>
           </div>
           <div className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-            <h2 className="font-serif text-xl font-semibold text-mist-950">Important scope</h2>
+            <h2 className="font-serif text-xl font-semibold text-cocoa-700">Important scope</h2>
             <p className="mt-4 text-sm leading-relaxed text-mist-700">
               MaMoyo provides spa, skincare, hospitality, food and wellbeing services. These do not replace
               diagnosis, medical treatment, physiotherapy, psychotherapy or emergency care. The team may

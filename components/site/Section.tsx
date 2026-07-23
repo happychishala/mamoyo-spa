@@ -10,7 +10,7 @@ export function SectionHeading({ overline, title, description, align = "center" 
   return (
     <div className={`max-w-2xl ${alignment}`}>
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">{overline}</p>
-      <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight text-mist-950 sm:text-4xl">
+      <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight text-cocoa-700 sm:text-4xl">
         {title}
       </h2>
       {description && (

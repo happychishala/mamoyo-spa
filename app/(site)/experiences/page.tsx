@@ -128,7 +128,7 @@ export default function ExperiencesPage() {
             <Reveal key={x.name} delay={(i % 3) * 80}>
               <article className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-7 shadow-soft transition-shadow duration-300 hover:shadow-lift">
                 <div className="flex items-baseline justify-between gap-3">
-                  <h3 className="font-serif text-xl font-semibold text-mist-950">{x.name}</h3>
+                  <h3 className="font-serif text-xl font-semibold text-cocoa-700">{x.name}</h3>
                 </div>
                 <p className="mt-1 text-sm font-semibold text-mist-700">
                   {x.price} <span className="font-normal text-mist-500">{x.unit}</span>
@@ -168,7 +168,7 @@ export default function ExperiencesPage() {
             <Reveal key={x.name} delay={i * 90}>
               <article className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
                 <div className="flex items-baseline justify-between gap-3">
-                  <h3 className="font-serif text-2xl font-semibold text-mist-950">{x.name}</h3>
+                  <h3 className="font-serif text-2xl font-semibold text-cocoa-700">{x.name}</h3>
                   <p className="shrink-0 text-sm font-semibold text-mist-700">
                     {x.price} <span className="font-normal text-mist-500">{x.unit}</span>
                   </p>
@@ -201,7 +201,7 @@ export default function ExperiencesPage() {
       <section className="bg-mist-50 py-16">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-2">
           <div>
-            <h2 className="font-serif text-2xl font-semibold text-mist-950">The arrival &amp; departure ritual</h2>
+            <h2 className="font-serif text-2xl font-semibold text-cocoa-700">The arrival &amp; departure ritual</h2>
             <ol className="mt-6 space-y-4">
               {arrivalRitual.map((step, i) => (
                 <li key={i} className="flex gap-4">
@@ -214,7 +214,7 @@ export default function ExperiencesPage() {
             </ol>
           </div>
           <div>
-            <h2 className="font-serif text-2xl font-semibold text-mist-950">How booking works</h2>
+            <h2 className="font-serif text-2xl font-semibold text-cocoa-700">How booking works</h2>
             <ol className="mt-6 space-y-4">
               {bookingSteps.map((step, i) => (
                 <li key={i} className="flex gap-4">
@@ -252,7 +252,7 @@ export default function ExperiencesPage() {
           ].map((b, i) => (
             <Reveal key={b.title} delay={i * 80}>
               <div className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                <h3 className="font-serif text-lg font-semibold text-mist-950">{b.title}</h3>
+                <h3 className="font-serif text-lg font-semibold text-cocoa-700">{b.title}</h3>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-mist-700">{b.text}</p>
                 <Link
                   href={b.cta.href}

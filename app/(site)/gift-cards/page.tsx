@@ -64,7 +64,7 @@ export default function GiftCardsPage() {
           {options.map((o, i) => (
             <Reveal key={o.title} delay={(i % 4) * 70}>
               <article className="h-full rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
-                <h3 className="font-serif text-lg font-semibold text-mist-950">{o.title}</h3>
+                <h3 className="font-serif text-lg font-semibold text-cocoa-700">{o.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-mist-700">{o.text}</p>
               </article>
             </Reveal>

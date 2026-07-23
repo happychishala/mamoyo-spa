@@ -115,7 +115,7 @@ export default function TwangalePage() {
 
       {/* Setting */}
       <section className="mx-auto max-w-3xl px-6 py-16">
-        <h2 className="text-balance text-center font-serif text-3xl font-semibold tracking-tight text-mist-950">
+        <h2 className="text-balance text-center font-serif text-3xl font-semibold tracking-tight text-cocoa-700">
           The setting changes what the body can release
         </h2>
         <div className="mt-6 space-y-4 text-base leading-relaxed text-mist-800">
@@ -140,7 +140,7 @@ export default function TwangalePage() {
             {rhythm.map((r, i) => (
               <Reveal key={r.title} delay={(i % 4) * 70}>
                 <div className="h-full rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
-                  <h3 className="font-serif text-lg font-semibold text-mist-950">{r.title}</h3>
+                  <h3 className="font-serif text-lg font-semibold text-cocoa-700">{r.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-mist-700">{r.text}</p>
                 </div>
               </Reveal>
@@ -155,7 +155,7 @@ export default function TwangalePage() {
           {features.map((f, i) => (
             <Reveal key={f.title} delay={(i % 2) * 80}>
               <div className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                <h3 className="font-serif text-lg font-semibold text-mist-950">{f.title}</h3>
+                <h3 className="font-serif text-lg font-semibold text-cocoa-700">{f.title}</h3>
                 <div className="mt-3 flex-1 space-y-3 text-sm leading-relaxed text-mist-700">
                   {f.paragraphs.map((p) => (
                     <p key={p}>{p}</p>
@@ -198,7 +198,7 @@ export default function TwangalePage() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
-              <h2 className="font-serif text-2xl font-semibold text-mist-950">Best suited to</h2>
+              <h2 className="font-serif text-2xl font-semibold text-cocoa-700">Best suited to</h2>
               <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
                 {bestFor.map((b) => (
                   <li key={b} className="flex items-baseline gap-2.5 text-sm text-mist-700">
@@ -209,7 +209,7 @@ export default function TwangalePage() {
               </ul>
             </div>
             <div className="rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-              <h2 className="font-serif text-xl font-semibold text-mist-950">Practical information</h2>
+              <h2 className="font-serif text-xl font-semibold text-cocoa-700">Practical information</h2>
               <ul className="mt-5 space-y-3 text-sm text-mist-700">
                 <li className="flex items-start gap-3">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-mist-500" aria-hidden="true" />

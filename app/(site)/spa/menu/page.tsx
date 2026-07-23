@@ -30,7 +30,7 @@ function TreatmentCard({ t, dark = false }: { t: MenuTreatment; dark?: boolean }
         dark ? "border-mist-700 bg-mist-800/60" : "border-mist-200 bg-white"
       }`}
     >
-      <h3 className={`font-serif text-lg ${dark ? "text-white" : "text-mist-950"}`}>{t.name}</h3>
+      <h3 className={`font-serif text-lg ${dark ? "text-white" : "text-cocoa-700"}`}>{t.name}</h3>
       {t.description && (
         <p className={`mt-2 text-sm leading-relaxed ${dark ? "text-mist-200" : "text-mist-800"}`}>
           {t.description}
@@ -150,7 +150,7 @@ export default function TreatmentsPage() {
                 <p className={`text-xs font-semibold uppercase tracking-[0.25em] ${dark ? "text-mist-300" : "text-mist-600"}`}>
                   {String(idx + 1).padStart(2, "0")}
                 </p>
-                <h2 className={`mt-2 font-serif text-3xl sm:text-4xl ${dark ? "text-white" : "text-mist-950"}`}>
+                <h2 className={`mt-2 font-serif text-3xl sm:text-4xl ${dark ? "text-white" : "text-cocoa-700"}`}>
                   {section.title}
                 </h2>
                 {section.intro && (
@@ -182,7 +182,7 @@ export default function TreatmentsPage() {
         <div className="mx-auto max-w-6xl px-6 pb-8 pt-6">
           <Reveal>
             <div className="rounded-3xl border border-mist-200 bg-white p-10 text-center shadow-soft">
-              <h2 className="font-serif text-2xl text-mist-950">Ready when you are</h2>
+              <h2 className="font-serif text-2xl text-cocoa-700">Ready when you are</h2>
               <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-mist-800">
                 {`Open ${contactInfo.hours[0].time} weekdays, ${contactInfo.hours[1].time} Saturdays. Advance bookings recommended — we'll confirm within hours.`}
               </p>

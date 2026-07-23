@@ -65,7 +65,7 @@ export default function BookPage() {
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-mist-100 text-mist-600 transition-colors duration-300 group-hover:bg-mist-600 group-hover:text-white">
                   <p.icon className="h-5 w-5" aria-hidden="true" />
                 </span>
-                <h2 className="mt-4 font-serif text-lg font-semibold text-mist-950">{p.name}</h2>
+                <h2 className="mt-4 font-serif text-lg font-semibold text-cocoa-700">{p.name}</h2>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-mist-700">{p.text}</p>
                 <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-mist-700">
                   {p.cta}
@@ -100,7 +100,7 @@ export default function BookPage() {
 
       {/* Support */}
       <section className="mx-auto max-w-3xl px-6 py-16 text-center">
-        <h2 className="font-serif text-2xl font-semibold text-mist-950">Booking support</h2>
+        <h2 className="font-serif text-2xl font-semibold text-cocoa-700">Booking support</h2>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-mist-700">
           For same-day availability, complex groups, pregnancy, advanced skincare, accessibility requirements
           or help choosing between locations, speak to the relevant team directly.

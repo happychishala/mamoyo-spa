@@ -46,7 +46,7 @@ export default function StayBookingForm({
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-mist-100 text-mist-600">
           <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
         </div>
-        <h2 className="mt-5 font-serif text-2xl font-semibold text-mist-950">Stay requested</h2>
+        <h2 className="mt-5 font-serif text-2xl font-semibold text-cocoa-700">Stay requested</h2>
         <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-mist-800">{state.message}</p>
       </div>
     );
@@ -184,7 +184,7 @@ export default function StayBookingForm({
             {suite.name} · {nights} {nights === 1 ? "night" : "nights"} ×{" "}
             {`K${suite.ratePerNight.toLocaleString()}`}
           </p>
-          <p className="font-serif text-xl text-mist-950">{`K${estimate.toLocaleString()}`}</p>
+          <p className="font-serif text-xl text-cocoa-700">{`K${estimate.toLocaleString()}`}</p>
         </div>
       )}
 

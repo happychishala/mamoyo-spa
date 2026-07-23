@@ -49,7 +49,7 @@ export default function ContactPage() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">Contact MaMoyo</p>
-          <h1 className="mt-4 text-balance font-serif text-4xl font-semibold text-mist-950 sm:text-5xl">
+          <h1 className="mt-4 text-balance font-serif text-4xl font-semibold text-cocoa-700 sm:text-5xl">
             Choose the place, then let us help with the details
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-mist-700">
@@ -67,7 +67,7 @@ export default function ContactPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-mist-100 text-mist-600">
                   <MapPin className="h-5 w-5" aria-hidden="true" />
                 </div>
-                <h2 className="mt-4 font-serif text-xl font-semibold text-mist-950">{b.name}</h2>
+                <h2 className="mt-4 font-serif text-xl font-semibold text-cocoa-700">{b.name}</h2>
                 <p className="mt-1 text-sm text-mist-700">{b.blurb}</p>
                 <ul className="mt-4 space-y-2.5 text-sm text-mist-800">
                   <li className="flex items-start gap-2.5">

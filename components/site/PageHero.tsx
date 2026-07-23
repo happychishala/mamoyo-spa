@@ -32,7 +32,7 @@ export default function PageHero({
       </div>
       <div className="mx-auto max-w-3xl px-6 text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">{eyebrow}</p>
-        <h1 className="mt-5 text-balance font-serif text-4xl font-semibold leading-[1.12] text-mist-950 sm:text-5xl">
+        <h1 className="mt-5 text-balance font-serif text-4xl font-semibold leading-[1.12] text-cocoa-700 sm:text-5xl">
           {title}
         </h1>
         <div className="mx-auto mt-6 max-w-xl space-y-4 text-lg leading-relaxed text-mist-700">

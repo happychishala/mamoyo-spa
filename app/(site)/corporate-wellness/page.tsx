@@ -74,7 +74,7 @@ export default function CorporateWellnessPage() {
           {services.map((s, i) => (
             <Reveal key={s.name} delay={(i % 3) * 70}>
               <article className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                <h3 className="font-serif text-lg font-semibold text-mist-950">{s.name}</h3>
+                <h3 className="font-serif text-lg font-semibold text-cocoa-700">{s.name}</h3>
                 <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-mist-600">{s.price}</p>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-mist-700">{s.text}</p>
                 <Link
@@ -104,7 +104,7 @@ export default function CorporateWellnessPage() {
       <section className="bg-mist-50 py-16">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-2">
           <div>
-            <h2 className="font-serif text-2xl font-semibold text-mist-950">Who we work with</h2>
+            <h2 className="font-serif text-2xl font-semibold text-cocoa-700">Who we work with</h2>
             <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
               {sectors.map((s) => (
                 <li key={s} className="flex items-baseline gap-2.5 text-sm text-mist-700">
@@ -115,7 +115,7 @@ export default function CorporateWellnessPage() {
             </ul>
           </div>
           <div className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-            <h2 className="font-serif text-xl font-semibold text-mist-950">Privacy &amp; reporting</h2>
+            <h2 className="font-serif text-xl font-semibold text-cocoa-700">Privacy &amp; reporting</h2>
             <p className="mt-4 text-sm leading-relaxed text-mist-700">
               The organisation may receive aggregate participation, redemption and programme-use information.
               Personal health disclosures, treatment notes and individual preferences remain confidential unless

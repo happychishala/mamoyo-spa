@@ -53,7 +53,7 @@ export default function SpaEtiquettePage() {
                 <s.icon className="h-5 w-5" aria-hidden="true" />
               </span>
               <div>
-                <h2 className="font-serif text-lg font-semibold text-mist-950">{s.title}</h2>
+                <h2 className="font-serif text-lg font-semibold text-cocoa-700">{s.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-mist-700">{s.text}</p>
               </div>
             </div>
