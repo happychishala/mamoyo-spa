@@ -102,13 +102,13 @@ export default function MembershipPage() {
         eyebrow="The MaMoyo Circle"
         title="Belong to a more consistent way of living well"
         intro="Membership is a decision to stop leaving care until everything else has been handled. The MaMoyo Circle creates a monthly rhythm of treatment, priority access, café rituals, selected suite privileges and member gatherings across Kabulonga and Twangale Resort."
-        primary={{ label: "Apply to Join", href: "#apply" }}
-        secondary={{ label: "Ask Our Team", href: "/contact" }}
+        primary={{ label: "Choose Your Membership", href: "#tiers" }}
+        secondary={{ label: "Apply to Join", href: "#apply" }}
         image={{ src: "/photos/interior.jpg", alt: "The calm of a MaMoyo member visit" }}
       />
 
       {/* Tiers */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section id="tiers" className="mx-auto max-w-6xl scroll-mt-28 px-6 py-16">
         <SectionHeading
           overline="Choose Your Membership"
           title="More than a discount programme"

@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 const signature = [
   {
     name: "Executive Reset",
+    cta: "Book Executive Reset",
     price: "K1,650",
     unit: "per person",
     desc: "A focused three-hour sequence for physical tension and mental load. Includes a 60-minute deep tissue massage, 30-minute scalp therapy and a composed wellness lunch with a non-alcoholic drink ritual.",
@@ -28,6 +29,7 @@ const signature = [
   },
   {
     name: "Couples Retreat",
+    cta: "Book Couples Retreat",
     price: "K2,750",
     unit: "per couple",
     desc: "Shared treatment time, two aromatherapy massages, a private tea ritual, a quiet sharing table and a thoughtful parting detail. Treatment pressure may be adapted individually.",
@@ -35,6 +37,7 @@ const signature = [
   },
   {
     name: "Bridal Glow",
+    cta: "Plan Bridal Glow",
     price: "K2,950",
     unit: "per person",
     desc: "Body polishing, professional facial care, finished hands and feet, hydration and refreshments brought together before the celebration. Suitable for the bride alone or a carefully scheduled group.",
@@ -42,6 +45,7 @@ const signature = [
   },
   {
     name: "Girls Wellness Day",
+    cta: "Plan a Girls Wellness Day",
     price: "K1,650",
     unit: "per person",
     desc: "For three or more guests: a treatment, detailed foot care, a wellness lunch, a botanical drink and pool time arranged around a clear group schedule.",
@@ -49,6 +53,7 @@ const signature = [
   },
   {
     name: "Mom To Be",
+    cta: "Book Mom To Be",
     price: "K1,650",
     unit: "per person",
     desc: "Gentle exfoliation, adapted prenatal massage, classic foot care and a calming tea ritual designed around the comfort of the expectant mother. Suitability is confirmed before booking.",
@@ -56,6 +61,7 @@ const signature = [
   },
   {
     name: "Full Day Escape",
+    cta: "Book Full Day Escape",
     price: "K2,625",
     unit: "per person",
     desc: "The Zorora Pano journey: full body polish, nourishing wrap and steam, restorative massage, express facial and a choice of classic hand or foot care — moving the body gradually from tension into renewal.",
@@ -66,12 +72,14 @@ const signature = [
 const recurring = [
   {
     name: "Wellness Wednesdays",
+    cta: "See the Wednesday Calendar",
     price: "K750",
     unit: "per person",
     desc: "A rotating midweek programme combining a focused treatment, useful conversation and a MaMoyo drink ritual. Each release has a defined theme, time, location and capacity.",
   },
   {
     name: "Self Care Sundays",
+    cta: "Book Self Care Sunday",
     price: "K950",
     unit: "per person",
     desc: "A 60-minute Swedish massage, pool time, still water and a signature tea ritual designed to change the way the next week begins.",
@@ -130,7 +138,7 @@ export default function ExperiencesPage() {
                     href={x.href}
                     className="inline-flex items-center gap-1.5 rounded-full bg-mist-600 px-4 py-2 text-xs font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
                   >
-                    Book {x.name}
+                    {x.cta}
                     <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                   </Link>
                   <Link
@@ -169,7 +177,7 @@ export default function ExperiencesPage() {
                   href="/contact"
                   className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-mist-700 transition-colors duration-200 hover:text-mist-900"
                 >
-                  Enquire &amp; join
+                  {x.cta}
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </article>
@@ -227,7 +235,8 @@ export default function ExperiencesPage() {
             {
               title: "Seasonal experiences",
               text: "Limited releases shaped around the season and the Zambian calendar. Each has a defined date, location, capacity, price and booking deadline.",
-              cta: { label: "Join Early Access", href: "/contact" },
+              cta: { label: "View the Current Season", href: "/contact" },
+              secondaryCta: { label: "Join Early Access", href: "/contact" },
             },
           ].map((b, i) => (
             <Reveal key={b.title} delay={i * 80}>
@@ -241,6 +250,14 @@ export default function ExperiencesPage() {
                   {b.cta.label}
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
+                {"secondaryCta" in b && b.secondaryCta && (
+                  <Link
+                    href={b.secondaryCta.href}
+                    className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-mist-600 transition-colors duration-200 hover:text-mist-900"
+                  >
+                    {b.secondaryCta.label}
+                  </Link>
+                )}
               </div>
             </Reveal>
           ))}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { MapPin, Phone, Mail, Clock, Navigation, MessageCircle, AtSign } from "lucide-react";
 import { SectionHeading } from "@/components/site/Section";
 import FaqList from "@/components/site/FaqList";
@@ -92,9 +93,15 @@ export default function ContactPage() {
                   </li>
                 </ul>
                 <div className="mt-6 flex flex-wrap gap-3">
+                  <Link
+                    href={`/booking?location=${key}`}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-mist-600 px-4 py-2 text-xs font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+                  >
+                    {key === "Kabulonga" ? "Book Kabulonga" : "Book Twangale Spa"}
+                  </Link>
                   <a
                     href={`https://wa.me/${digits(b.phone)}?text=${WHATSAPP_TEXT}`}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-mist-600 px-4 py-2 text-xs font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-mist-300 px-4 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
                   >
                     <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
                     WhatsApp {key}

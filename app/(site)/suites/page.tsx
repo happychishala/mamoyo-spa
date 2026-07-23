@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { BedDouble, Ruler, Users, CalendarX2 } from "lucide-react";
+import Link from "next/link";
+import { BedDouble, Ruler, Users, CalendarX2, ArrowRight, MessageCircle } from "lucide-react";
 import { SectionHeading } from "@/components/site/Section";
 import { suites } from "@/lib/content";
 import { readDb } from "@/lib/db";
@@ -105,11 +106,31 @@ export default async function SuitesPage({
         <SectionHeading
           overline="MaMoyo Suites, Kabulonga"
           title="Stay within the rhythm of MaMoyo"
-          description="Fully serviced studio suites set within the MaMoyo Kabulonga property, with the spa, café, pool and gardens close at hand. Designed for short visits and longer assignments — a kitchen, Wi-Fi, parking, supported self check-in and a quiet base in one of Lusaka's most established neighbourhoods."
+          description="A collection of fully serviced studio suites offers a private, composed way to stay in Lusaka, set within the MaMoyo Kabulonga property with the spa, café, pool and gardens close at hand."
         />
+        <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-mist-800">
+          Designed for short visits and longer assignments, the suites give guests the ease of a
+          kitchen, Wi-Fi, parking, self check-in support and a quiet base in one of Lusaka&rsquo;s most
+          established neighbourhoods.
+        </p>
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            href="#book"
+            className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-8 py-4 text-sm font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-mist-700"
+          >
+            Check Direct Availability
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+          <Link
+            href="#suites"
+            className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-8 py-4 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+          >
+            Explore the Suites
+          </Link>
+        </div>
 
         {/* Suite cards */}
-        <div className="mt-16 grid gap-6 md:grid-cols-2">
+        <div id="suites" className="mt-16 grid scroll-mt-28 gap-6 md:grid-cols-2">
           {suites.map((s, i) => {
             const booked = bookedBySuite.get(s.id) ?? [];
             return (
@@ -229,14 +250,29 @@ export default async function SuitesPage({
           </div>
         </div>
 
+        {/* Not a conventional hotel */}
+        <div className="mx-auto mt-20 max-w-3xl text-center">
+          <h2 className="text-balance font-serif text-2xl font-semibold text-mist-950 sm:text-3xl">
+            Everything needed, nothing made complicated
+          </h2>
+          <div className="mt-5 space-y-4 text-base leading-relaxed text-mist-700">
+            <p>
+              MaMoyo Suites are not a conventional hotel. They are self-contained studios created for
+              guests who value privacy, practical comfort and a setting that feels personal. A
+              treatment can be arranged without crossing the city. Shopping, dining, healthcare
+              services and important business areas are within convenient reach.
+            </p>
+            <p>
+              The stay works equally well for a focused business trip, a longer assignment, a bridal
+              weekend, a medical visit, a couple&rsquo;s city break or a quiet staycation.
+            </p>
+          </div>
+        </div>
+
         {/* At a glance + who the suites are for */}
         <div className="mt-20 grid gap-10 lg:grid-cols-2">
           <div>
             <h2 className="font-serif text-2xl font-semibold text-mist-950">At a glance</h2>
-            <p className="mt-3 text-sm leading-relaxed text-mist-700">
-              MaMoyo Suites are not a conventional hotel. They are self-contained studios created for guests
-              who value privacy, practical comfort and a setting that feels personal.
-            </p>
             <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
               {atAGlance.map((a) => (
                 <li key={a} className="flex items-baseline gap-2.5 text-sm text-mist-700">
@@ -259,6 +295,25 @@ export default async function SuitesPage({
           </div>
         </div>
 
+        {/* Privacy with care */}
+        <div className="mx-auto mt-20 max-w-3xl text-center">
+          <h2 className="text-balance font-serif text-2xl font-semibold text-mist-950 sm:text-3xl">
+            Privacy with care close enough to matter
+          </h2>
+          <div className="mt-5 space-y-4 text-base leading-relaxed text-mist-700">
+            <p>
+              A good stay does not need constant ceremony. It needs a room that feels settled,
+              reliable essentials, clean surroundings and help that is easy to reach when it is
+              genuinely useful.
+            </p>
+            <p>
+              MaMoyo Suites balance independence with the warmth of being hosted. Guests can move
+              through the day privately, then ask the team to coordinate treatment, café time, a
+              longer stay or a wellness-focused itinerary.
+            </p>
+          </div>
+        </div>
+
         {/* Book direct */}
         <div className="mt-20">
           <SectionHeading
@@ -275,6 +330,22 @@ export default async function SuitesPage({
                 </div>
               </Reveal>
             ))}
+          </div>
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="#book"
+              className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+            >
+              Book Direct
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <a
+              href="https://wa.me/260967245833?text=Hello%20MaMoyo.%20I%20would%20like%20to%20enquire%20about%20MaMoyo%20Suites."
+              className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              Message Reservations
+            </a>
           </div>
         </div>
 
@@ -294,6 +365,15 @@ export default async function SuitesPage({
                 </div>
               </Reveal>
             ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link
+              href="#book"
+              className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+            >
+              Plan a Wellness Stay
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </div>
         </div>
 

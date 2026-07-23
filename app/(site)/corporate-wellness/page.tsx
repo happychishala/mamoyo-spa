@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
@@ -19,14 +21,14 @@ export const metadata: Metadata = {
 };
 
 const services = [
-  { name: "Employee Wellness Wallet", price: "from K25,000 per organisation", text: "Prepaid, flexible value that approved employees use against eligible MaMoyo treatments — recognition, retention and flexible benefit programmes." },
-  { name: "Executive Care Programme", price: "from K1,500 per participant / month", text: "A monthly treatment and recovery structure for senior leaders and high-responsibility roles: Executive Reset, massage, professional facial care, priority scheduling and quarterly review." },
-  { name: "Employee Reset Vouchers", price: "from K650 per person", text: "Named or open vouchers for selected massage, facial care or a defined MaMoyo experience — delivered digitally or as presentation cards." },
-  { name: "On-Site Wellbeing Activation", price: "from K12,500", text: "A controlled workplace experience: seated back, neck and shoulder care, reflexology, hand and scalp therapy, skin consultation, a drink station and a practical wellbeing talk." },
-  { name: "Team Wellness Day", price: "from K1,450 per person", text: "A half or full day at MaMoyo with rotating treatments, food and structured wellbeing content." },
-  { name: "Twangale Corporate Retreat", price: "from K2,450 per person, excl. accommodation", text: "Meeting space, gardens, dining, treatment and pool time within a complete retreat setting." },
-  { name: "Corporate Gifting", price: "from K500 per recipient", text: "Digital or presented gift cards, executive gift experiences and festive programmes with consolidated invoicing and scheduled delivery." },
-  { name: "Company Membership", price: "Tailored", text: "Named Silver, Gold or Platinum memberships funded by the organisation, or a tailored executive tier managed through one corporate account." },
+  { cta: "Ask About Wellness Wallets", name: "Employee Wellness Wallet", price: "from K25,000 per organisation", text: "Prepaid, flexible value that approved employees use against eligible MaMoyo treatments — recognition, retention and flexible benefit programmes." },
+  { cta: "Build Executive Care", name: "Executive Care Programme", price: "from K1,500 per participant / month", text: "A monthly treatment and recovery structure for senior leaders and high-responsibility roles: Executive Reset, massage, professional facial care, priority scheduling and quarterly review." },
+  { cta: "Purchase Employee Vouchers", name: "Employee Reset Vouchers", price: "from K650 per person", text: "Named or open vouchers for selected massage, facial care or a defined MaMoyo experience — delivered digitally or as presentation cards." },
+  { cta: "Plan an On-Site Activation", name: "On-Site Wellbeing Activation", price: "from K12,500", text: "A controlled workplace experience: seated back, neck and shoulder care, reflexology, hand and scalp therapy, skin consultation, a drink station and a practical wellbeing talk." },
+  { cta: "Plan a Team Day", name: "Team Wellness Day", price: "from K1,450 per person", text: "A half or full day at MaMoyo with rotating treatments, food and structured wellbeing content." },
+  { cta: "Plan a Twangale Retreat", name: "Twangale Corporate Retreat", price: "from K2,450 per person, excl. accommodation", text: "Meeting space, gardens, dining, treatment and pool time within a complete retreat setting." },
+  { cta: "Explore Corporate Gifts", name: "Corporate Gifting", price: "from K500 per recipient", text: "Digital or presented gift cards, executive gift experiences and festive programmes with consolidated invoicing and scheduled delivery." },
+  { cta: "Discuss Company Membership", name: "Company Membership", price: "Tailored", text: "Named Silver, Gold or Platinum memberships funded by the organisation, or a tailored executive tier managed through one corporate account." },
 ];
 
 const sectors = [
@@ -74,6 +76,13 @@ export default function CorporateWellnessPage() {
                 <h3 className="font-serif text-lg font-semibold text-mist-950">{s.name}</h3>
                 <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-mist-600">{s.price}</p>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-mist-700">{s.text}</p>
+                <Link
+                  href="#proposal"
+                  className="mt-5 inline-flex items-center gap-1.5 border-t border-mist-100 pt-5 text-sm font-semibold text-mist-700 transition-colors duration-200 hover:text-mist-900"
+                >
+                  {s.cta}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
               </article>
             </Reveal>
           ))}

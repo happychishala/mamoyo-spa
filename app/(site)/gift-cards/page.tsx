@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
@@ -45,15 +47,18 @@ export default function GiftCardsPage() {
       <PageHero
         eyebrow="The Gift of MaMoyo"
         title="Give time, care and a feeling that lasts"
-        intro="A MaMoyo gift card lets the recipient choose what they need — a massage, facial, full experience, café ritual, direct suite stay or a contribution towards something larger."
-        primary={{ label: "Request a Gift Card", href: "#gift" }}
-        secondary={{ label: "Speak to Our Team", href: "/contact" }}
+        intro={[
+          "A MaMoyo gift card lets the recipient choose what they need: a massage, facial, full experience, café ritual, direct suite stay or a contribution towards something larger.",
+          "Digital delivery is available for immediate gifting. Presentation cards can be collected from Kabulonga or arranged with the team.",
+        ]}
+        primary={{ label: "Buy a Gift Card", href: "#gift" }}
+        secondary={{ label: "Choose an Experience Gift", href: "/experiences" }}
         image={{ src: "/photos/towels-candle.jpg", alt: "A considered MaMoyo gift, wrapped with care" }}
       />
 
       {/* Choose the gift */}
       <section className="mx-auto max-w-6xl px-6 py-16">
-        <SectionHeading overline="Choose the Gift" title="However you'd like to give it" />
+        <SectionHeading overline="Choose the Gift" title="However you&rsquo;d like to give it" />
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {options.map((o, i) => (
             <Reveal key={o.title} delay={(i % 4) * 70}>
@@ -63,6 +68,27 @@ export default function GiftCardsPage() {
               </article>
             </Reveal>
           ))}
+        </div>
+        <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            href="#gift"
+            className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+          >
+            Choose a Value
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+          <Link
+            href="/experiences"
+            className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+          >
+            Gift an Experience
+          </Link>
+          <Link
+            href="/corporate-wellness#proposal"
+            className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+          >
+            Request Corporate Gifting
+          </Link>
         </div>
       </section>
 
