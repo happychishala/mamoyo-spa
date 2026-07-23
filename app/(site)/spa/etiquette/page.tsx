@@ -41,8 +41,8 @@ export default function SpaEtiquettePage() {
         eyebrow="Before Your Visit"
         title="A little preparation protects the quality of your time"
         intro="A few simple things help us give you the calm, unhurried treatment you came for — and keep the day running smoothly for every guest."
-        primary={{ label: "Book Now", href: "/booking" }}
-        secondary={{ label: "Read Booking Terms", href: "/terms" }}
+        primary={{ label: "Read Booking Terms", href: "/terms" }}
+        secondary={{ label: "Book Now", href: "/booking" }}
       />
 
       <section className="mx-auto max-w-3xl px-6 py-16">

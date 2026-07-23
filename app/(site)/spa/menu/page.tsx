@@ -75,10 +75,29 @@ export default function TreatmentsPage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-mist-100 to-mist-50 pb-20 pt-8">
         <div className="mx-auto max-w-6xl px-6">
           <SectionHeading
-            overline="The MaMoyo Spa Menu"
-            title="Choose your ritual"
-            description="Massages, facials, hands & feet, final touches, water & steam, and full-day packages — the complete MaMoyo Spa menu, with prices in Zambian Kwacha."
+            overline="MaMoyo Treatment Menu"
+            title="Choose care with purpose"
+            description="Explore massage, body rituals, facial care, advanced aesthetics, grooming, hand and foot care, hydrotherapy and complete spa packages. Treatment availability may vary by location — select Kabulonga or Twangale Resort during booking for current availability."
           />
+          <p className="mx-auto mt-5 max-w-2xl text-center text-sm leading-relaxed text-mist-700">
+            All prices are shown in Zambian kwacha. The price confirmed at booking applies to the
+            appointment.
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/booking"
+              className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+            >
+              Book a Treatment
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+            >
+              Ask for Guidance
+            </Link>
+          </div>
 
           {/* Category pills — dock to a left rail as you scroll */}
           <SpaMenuNav sections={spaMenu.map((s) => ({ id: s.id, title: s.title }))} />

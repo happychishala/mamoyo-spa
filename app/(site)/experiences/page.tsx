@@ -211,7 +211,7 @@ export default function ExperiencesPage() {
       </section>
 
       {/* Group & seasonal */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section id="private" className="mx-auto max-w-6xl scroll-mt-28 px-6 py-16">
         <div className="grid gap-6 md:grid-cols-3">
           {[
             {

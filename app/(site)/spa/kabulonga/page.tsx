@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MapPin, Phone, Clock, Car, ArrowRight } from "lucide-react";
+import { MapPin, Phone, Clock, Car, ArrowRight, MessageCircle, CalendarClock } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
@@ -24,6 +24,10 @@ export const metadata: Metadata = {
 
 const loc = locationInfo.Kabulonga;
 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.address)}`;
+const whatsappUrl = `https://wa.me/${loc.phone.replace(/[^\d]/g, "")}?text=${encodeURIComponent(
+  "Hello MaMoyo Kabulonga. I would like help with a booking."
+)}`;
+const bookUrl = "/booking?location=Kabulonga";
 
 const ritual = [
   { title: "Arrive gently", text: "Begin with a welcome, a short consultation and water or the day’s MaMoyo tea. Arrive early enough to leave the pace of the road outside." },
@@ -44,18 +48,34 @@ const bestFor = [
 const features = [
   {
     title: "Professional skincare without guesswork",
-    text: "Kabulonga is MaMoyo’s primary destination for professional facials and advanced aesthetic care — peels, dermaplaning, HydraFacial, microneedling, LED and focused eye care. First-time advanced treatment requires consultation.",
-    cta: { label: "View Facial Care", href: "/spa/menu" },
+    paragraphs: [
+      "Kabulonga is MaMoyo’s primary destination for professional facials and advanced aesthetic care. Treatment selection responds to the skin in front of us, supported by consultation, recognised product systems and appropriate aftercare.",
+      "Advanced options may include professional peels, dermaplaning, HydraFacial, microneedling, meso skincare, high frequency, LED light therapy and focused eye care. First-time advanced treatment requires consultation, and treatment may be postponed when it is not appropriate to proceed.",
+    ],
+    ctas: [
+      { label: "View Facial Care", href: "/spa/menu" },
+      { label: "Ask About Your Skin", href: "/contact" },
+    ],
   },
   {
     title: "Let the treatment change the rest of the day",
-    text: "The café lets a Kabulonga visit unfold rather than end abruptly — coffee or breakfast before, a balanced lunch or tea ritual after. The café remains open to guests without spa bookings.",
-    cta: { label: "Explore MaMoyo Café", href: "/cafe" },
+    paragraphs: [
+      "The café allows a Kabulonga visit to unfold rather than end abruptly. Come early for coffee, matcha or breakfast. After treatment, choose a balanced lunch, botanical drink or tea ritual that feels satisfying without heaviness. The café remains open to guests without spa bookings.",
+    ],
+    ctas: [
+      { label: "Explore MaMoyo Café", href: "/cafe" },
+      { label: "Reserve a Table", href: "/cafe#reserve" },
+    ],
   },
   {
     title: "Stay within the grounds",
-    text: "MaMoyo Suites offer a private base for business travellers, bridal parties, medical visitors, couples and residents planning a staycation. Spa timing can be coordinated directly with the team.",
-    cta: { label: "Explore the Suites", href: "/suites" },
+    paragraphs: [
+      "MaMoyo Suites offer a private base for business travellers, diplomats, bridal parties, medical visitors, couples, solo travellers and Lusaka residents planning a staycation. Spa timing can be coordinated directly with the MaMoyo team.",
+    ],
+    ctas: [
+      { label: "Explore the Suites", href: "/suites" },
+      { label: "Check Availability", href: "/suites#book" },
+    ],
   },
 ];
 
@@ -73,48 +93,113 @@ export default function KabulongaPage() {
       <PageHero
         eyebrow="MaMoyo Kabulonga"
         title="A quieter way to move through the city"
-        intro="At 16 Reedbuck Road, MaMoyo Kabulonga brings spa care, professional skincare, nourishing food, calm gardens and serviced suites into one personal city address — an early treatment before the day gets busy, a facial between commitments, or a longer stay when Lusaka needs to feel more settled."
-        primary={{ label: "Book Kabulonga", href: "/booking" }}
+        intro={[
+          "At 16 Reedbuck Road, MaMoyo Kabulonga brings spa care, professional skincare, nourishing food, calm gardens and serviced suites into one personal city address.",
+          "It is designed for the rhythm of real life: an early treatment before the day becomes busy, a facial between commitments, lunch after a massage, a private afternoon with friends or a longer stay when Lusaka needs to feel more settled.",
+        ]}
+        primary={{ label: "Book Kabulonga", href: bookUrl }}
         secondary={{ label: "Get Directions", href: mapsUrl }}
+        note={
+          <>
+            WhatsApp:{" "}
+            <a href={whatsappUrl} className="font-semibold text-mist-800 hover:text-mist-950">
+              {loc.phone}
+            </a>
+          </>
+        }
         image={{ src: "/photos/facial.jpg", alt: "Professional facial care at MaMoyo Kabulonga" }}
       />
 
+      {/* Human scale */}
+      <section className="mx-auto max-w-3xl px-6 py-16">
+        <h2 className="text-balance text-center font-serif text-3xl font-semibold tracking-tight text-mist-950">
+          Personal care, held at a human scale
+        </h2>
+        <div className="mt-6 space-y-4 text-base leading-relaxed text-mist-800">
+          <p>
+            Kabulonga is the everyday heart of MaMoyo. The experience is intimate, composed and
+            attentive without being formal. Our team has time to learn preferences, notice changes and
+            help guests build a rhythm of care that can be maintained.
+          </p>
+          <p>
+            The café is close enough to become part of the treatment journey. The pool and gardens
+            create room to stay. The suites make it possible to sleep within the same calm
+            environment. Each element works on its own; together they create a complete day or stay.
+          </p>
+        </div>
+      </section>
+
       {/* Ritual */}
+      <section className="bg-mist-50 py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <SectionHeading overline="The Kabulonga Ritual" title="How a visit unfolds" />
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {ritual.map((r, i) => (
+              <Reveal key={r.title} delay={(i % 4) * 70}>
+                <div className="h-full rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
+                  <span className="font-serif text-2xl text-mist-400">0{i + 1}</span>
+                  <h3 className="mt-2 font-serif text-lg font-semibold text-mist-950">{r.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-mist-700">{r.text}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
       <section className="mx-auto max-w-6xl px-6 py-16">
-        <SectionHeading overline="The Kabulonga Ritual" title="Personal care, held at a human scale" />
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {ritual.map((r, i) => (
-            <Reveal key={r.title} delay={(i % 4) * 70}>
-              <div className="h-full rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
-                <span className="font-serif text-2xl text-mist-400">0{i + 1}</span>
-                <h3 className="mt-2 font-serif text-lg font-semibold text-mist-950">{r.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-mist-700">{r.text}</p>
+        <div className="grid gap-6 lg:grid-cols-3">
+          {features.map((f, i) => (
+            <Reveal key={f.title} delay={i * 80}>
+              <div className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
+                <h3 className="font-serif text-lg font-semibold text-mist-950">{f.title}</h3>
+                <div className="mt-3 flex-1 space-y-3 text-sm leading-relaxed text-mist-700">
+                  {f.paragraphs.map((p) => (
+                    <p key={p}>{p}</p>
+                  ))}
+                </div>
+                <div className="mt-5 flex flex-wrap gap-3 border-t border-mist-100 pt-5">
+                  {f.ctas.map((c, ci) => (
+                    <Link
+                      key={c.href}
+                      href={c.href}
+                      className={
+                        ci === 0
+                          ? "inline-flex items-center gap-1.5 rounded-full bg-mist-600 px-4 py-2 text-xs font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+                          : "inline-flex items-center gap-1.5 rounded-full border border-mist-300 px-4 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+                      }
+                    >
+                      {c.label}
+                      {ci === 0 && <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </Reveal>
           ))}
         </div>
       </section>
 
-      {/* Features */}
+      {/* Private days */}
       <section className="bg-mist-50 py-16">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="grid gap-6 lg:grid-cols-3">
-            {features.map((f, i) => (
-              <Reveal key={f.title} delay={i * 80}>
-                <div className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
-                  <h3 className="font-serif text-lg font-semibold text-mist-950">{f.title}</h3>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-mist-700">{f.text}</p>
-                  <Link
-                    href={f.cta.href}
-                    className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-mist-700 transition-colors duration-200 hover:text-mist-900"
-                  >
-                    {f.cta.label}
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                </div>
-              </Reveal>
-            ))}
-          </div>
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <h2 className="text-balance font-serif text-3xl font-semibold tracking-tight text-mist-950">
+            Private days at Kabulonga
+          </h2>
+          <p className="mt-5 text-base leading-relaxed text-mist-800">
+            Kabulonga can host smaller wellness occasions with a personal atmosphere: bridal mornings,
+            birthdays, sister days, mother and daughter time, team appreciation and intimate
+            celebrations. Every booking is built around treatment capacity, a clear schedule and food
+            or drink that suits the pace of the group.
+          </p>
+          <Link
+            href="/experiences#private"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+          >
+            Plan a Private Experience
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
       </section>
 
@@ -157,6 +242,11 @@ export default function KabulongaPage() {
                 <Car className="mt-0.5 h-4 w-4 shrink-0 text-mist-500" aria-hidden="true" />
                 Complimentary on-site parking
               </li>
+              <li className="flex items-start gap-3">
+                <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-mist-500" aria-hidden="true" />
+                Arrive 15 minutes before a standard treatment and 20 minutes before a first facial or
+                advanced skin appointment
+              </li>
             </ul>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
@@ -165,19 +255,20 @@ export default function KabulongaPage() {
               >
                 Open in Maps
               </Link>
-              <Link
-                href="/booking"
+              <a
+                href={whatsappUrl}
                 className="inline-flex items-center gap-1.5 rounded-full border border-mist-300 px-4 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
               >
-                Book Kabulonga
-              </Link>
+                <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                WhatsApp Kabulonga
+              </a>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="mx-auto max-w-3xl px-6 py-16">
+      <section className="mx-auto max-w-3xl px-6 pb-20">
         <SectionHeading overline="Kabulonga FAQ" title="Good to know" />
         <div className="mt-8">
           <FaqList items={faqs} />

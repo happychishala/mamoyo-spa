@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPin, Phone, Clock } from "lucide-react";
+import { ArrowRight, MapPin, Phone, Clock, Users, Navigation } from "lucide-react";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 import FaqList from "@/components/site/FaqList";
@@ -23,12 +23,24 @@ export const metadata: Metadata = {
 };
 
 const loc = locationInfo.Kabulonga;
+const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.address)}`;
+
+/** The deck's six menu categories. Individual dishes and prices live in the
+ *  menu data below, so they can change without rewriting this copy. */
+const menuCategories = [
+  { name: "Breakfast", text: "A polished morning offering built around good ingredients, generous flavour and the freedom to begin slowly." },
+  { name: "Lunch", text: "Garden-led plates, warm bowls, composed salads and satisfying mains for a quick weekday visit or a longer table." },
+  { name: "Wellness Bar", text: "Cold-pressed juices, smoothies, botanical tonics and African ingredients presented with flavour first." },
+  { name: "Coffee and Matcha", text: "Well-made coffee, properly prepared matcha and daily rituals that do not need excessive theatre." },
+  { name: "Tea", text: "Fragrant blends, herbs, citrus and spice served with a graceful pour and enough time to enjoy it." },
+  { name: "Sweet Rituals", text: "A concise selection built around fruit, cocoa, honey, coffee and the pleasure of choosing dessert well." },
+];
 
 const rituals = [
-  { name: "The MaMoyo Morning Ritual", text: "A composed breakfast, a fresh drink and a tea or coffee ritual selected to set the tone for the day. For individual guests, suite stays and small morning meetings." },
-  { name: "The MaMoyo Tea Ritual", text: "A deliberate pour, fresh aromatics and a quiet moment at the table — before treatment, after treatment, or as an experience in its own right." },
-  { name: "The MaMoyo Pause", text: "A plate, a botanical drink and a tea or coffee ritual selected according to how you want to feel: restored, balanced, energised or simply well looked after." },
-  { name: "Afternoon Tea", text: "A composed sequence of savoury bites, small sweets, fruit and a signature tea ritual for two or more guests — birthdays, bridal afternoons and quiet celebration." },
+  { name: "The MaMoyo Morning Ritual", text: "A composed breakfast, a fresh drink and a tea or coffee ritual selected to set the tone for the day. Available for individual guests, suite stays and small morning meetings." },
+  { name: "The MaMoyo Tea Ritual", text: "A deliberate pour, fresh aromatics and a quiet moment at the table. The ritual may be served before treatment, after treatment or as an experience in its own right." },
+  { name: "The MaMoyo Pause", text: "A plate, a botanical drink and a tea or coffee ritual selected according to how the guest wants to feel: restored, balanced, energised, renewed or simply well looked after." },
+  { name: "Afternoon Tea", text: "A composed sequence of savoury bites, small sweets, fruit and a signature tea ritual for two or more guests. Designed for birthdays, bridal afternoons, mother and daughter time, quiet celebration and the pleasure of staying at the table." },
   { name: "The Post-Treatment Table", text: "Light nourishment, hydration and unhurried service for guests who want the care of the treatment to continue into the rest of the day." },
 ];
 
@@ -56,8 +68,11 @@ export default function CafePage() {
         <SectionHeading
           overline="MaMoyo Café, Kabulonga"
           title="A beautiful pause in the middle of real life"
-          description="Breakfast after the school run. Coffee before a treatment. A work lunch that does not feel like another meeting. Tea with a friend. MaMoyo Café is open to everyone, whether or not you have a spa booking."
+          description="Breakfast after the school run. Coffee before a treatment. A work lunch that does not feel like another meeting. Tea with a friend. Something bright and satisfying when the body needs care rather than excess."
         />
+        <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-mist-800">
+          MaMoyo Café is open to everyone, whether or not you have a spa booking.
+        </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="#reserve"
@@ -108,12 +123,42 @@ export default function CafePage() {
           <h2 className="font-serif text-2xl font-semibold text-mist-950 sm:text-3xl">
             Food should be wanted before it is explained
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-mist-700">
-            MaMoyo is not a diet café. The menu is not built around restriction, guilt or food that tastes
-            like a compromise. It begins with flavour, freshness, texture, colour and the pleasure of being
-            looked after — with wellness in the balance: seasonal produce, garden herbs, whole grains,
-            considered proteins, African botanicals and sweets made with restraint.
-          </p>
+          <div className="mt-4 space-y-4 text-base leading-relaxed text-mist-700">
+            <p>
+              MaMoyo is not a diet café. The menu is not built around restriction, guilt or food that
+              tastes like a compromise. It begins with flavour, freshness, texture, colour and the
+              pleasure of being looked after.
+            </p>
+            <p>
+              Wellness appears in the balance: seasonal produce, garden herbs, cultured ingredients,
+              whole grains, considered proteins, African botanicals and sweets made with enough
+              restraint to leave room for the rest of the day.
+            </p>
+          </div>
+        </div>
+
+        {/* Menu categories */}
+        <div className="mt-16">
+          <SectionHeading overline="The Menu" title="What you will find on the table" />
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {menuCategories.map((c, i) => (
+              <Reveal key={c.name} delay={(i % 3) * 70}>
+                <article className="h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
+                  <h3 className="font-serif text-lg font-semibold text-mist-950">{c.name}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-mist-700">{c.text}</p>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link
+              href="#menu"
+              className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+            >
+              View the Current Menu
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
 
         {/* Menu */}
@@ -157,17 +202,60 @@ export default function CafePage() {
                 </article>
               </Reveal>
             ))}
-            <Reveal delay={210}>
-              <div className="flex h-full flex-col justify-center rounded-2xl bg-mist-900 p-7 text-white">
-                <h3 className="font-serif text-lg font-semibold">A useful table</h3>
-                <p className="mt-3 text-sm leading-relaxed text-mist-200">
-                  Discreet meetings, interviews, one-to-one sessions and small team lunches. Reserve ahead when
-                  timing, privacy or afternoon tea matters. Smaller celebrations are welcome by prior
-                  arrangement — personal, without turning the café into an event venue.
-                </p>
-              </div>
-            </Reveal>
           </div>
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="#reserve"
+              className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+            >
+              Reserve a Café Ritual
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <Link
+              href="#reserve"
+              className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+            >
+              Plan Afternoon Tea
+            </Link>
+          </div>
+        </div>
+
+        {/* Useful table + celebration */}
+        <div className="mt-20 grid gap-6 lg:grid-cols-2">
+          <Reveal>
+            <div className="flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
+              <h2 className="font-serif text-xl font-semibold text-mist-950">A useful table</h2>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-mist-700">
+                The café welcomes discreet meetings, interviews, one-to-one working sessions and small
+                team lunches. Reserve in advance when timing, privacy, afternoon tea or a set
+                experience matters.
+              </p>
+              <Link
+                href="#reserve"
+                className="mt-6 inline-flex w-fit items-center gap-1.5 rounded-full bg-mist-600 px-5 py-2.5 text-xs font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+              >
+                Reserve a Work Table
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="flex h-full flex-col rounded-2xl bg-mist-900 p-8 text-white shadow-soft">
+              <h2 className="font-serif text-xl font-semibold">Celebration, with restraint</h2>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-mist-200">
+                Small birthdays, bridal mornings and private tables are welcome by prior arrangement.
+                Food, drinks, timing and service are agreed in advance so the occasion feels personal
+                without changing the café into a high-volume event venue.
+              </p>
+              <Link
+                href="#reserve"
+                className="mt-6 inline-flex w-fit items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-xs font-semibold text-mist-900 transition-colors duration-200 hover:bg-mist-100"
+              >
+                Plan a Café Occasion
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+          </Reveal>
         </div>
 
         {/* Reservation + practical info */}
@@ -199,7 +287,18 @@ export default function CafePage() {
                     ))}
                   </span>
                 </li>
+                <li className="flex items-start gap-3">
+                  <Users className="mt-0.5 h-4 w-4 shrink-0 text-mist-500" aria-hidden="true" />
+                  Walk-ins welcome, subject to table availability
+                </li>
               </ul>
+              <a
+                href={mapsUrl}
+                className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-mist-300 px-4 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+              >
+                <Navigation className="h-3.5 w-3.5" aria-hidden="true" />
+                Get Directions
+              </a>
             </div>
           </div>
           <div className="lg:col-span-3">

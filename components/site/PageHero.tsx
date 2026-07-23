@@ -8,17 +8,22 @@ export default function PageHero({
   eyebrow,
   title,
   intro,
+  note,
   primary,
   secondary,
   image,
 }: {
   eyebrow: string;
   title: string;
-  intro: string;
+  /** One paragraph, or several rendered in sequence. */
+  intro: string | string[];
+  /** Small line under the buttons — a phone number, booking line or similar. */
+  note?: React.ReactNode;
   primary?: Cta;
   secondary?: Cta;
   image?: { src: string; alt: string };
 }) {
+  const paragraphs = Array.isArray(intro) ? intro : [intro];
   return (
     <section className="relative overflow-hidden pt-32 pb-14 sm:pt-40">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
@@ -30,7 +35,11 @@ export default function PageHero({
         <h1 className="mt-5 text-balance font-serif text-4xl font-semibold leading-[1.12] text-mist-950 sm:text-5xl">
           {title}
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-mist-700">{intro}</p>
+        <div className="mx-auto mt-6 max-w-xl space-y-4 text-lg leading-relaxed text-mist-700">
+          {paragraphs.map((p) => (
+            <p key={p}>{p}</p>
+          ))}
+        </div>
         {(primary || secondary) && (
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {primary && (
@@ -52,6 +61,7 @@ export default function PageHero({
             )}
           </div>
         )}
+        {note && <p className="mt-5 text-sm text-mist-600">{note}</p>}
       </div>
       {image && (
         <div className="mx-auto mt-12 max-w-5xl px-6">

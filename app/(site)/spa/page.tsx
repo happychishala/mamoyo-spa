@@ -32,6 +32,7 @@ const locations = [
       "Stay and spa combinations",
     ],
     explore: "/spa/kabulonga",
+    book: "/booking?location=Kabulonga",
   },
   {
     name: "Twangale Resort",
@@ -46,6 +47,7 @@ const locations = [
       "Resort stays and weekend visits",
     ],
     explore: "/spa/twangale",
+    book: "/booking?location=Twangale",
   },
 ];
 
@@ -90,14 +92,17 @@ export default function SpaOverviewPage() {
       <PageHero
         eyebrow="The Spa at MaMoyo"
         title="Treatment begins with listening"
-        intro="The best treatment is the one that responds accurately to the body, skin and state of mind in front of us. Across Kabulonga and Twangale Resort, MaMoyo offers massage, body rituals, professional facials, advanced aesthetic care, hand and foot care and hydrotherapy — delivered with warmth and discretion."
-        primary={{ label: "View Treatment Menu", href: "/spa/menu" }}
-        secondary={{ label: "Ask a Treatment Host", href: "/contact" }}
+        intro={[
+          "The best treatment is not always the longest or the most elaborate. It is the one that responds accurately to the body, skin and state of mind in front of us.",
+          "Across Kabulonga and Twangale Resort, MaMoyo offers massage, body rituals, professional facials, advanced aesthetic care, hand and foot care, grooming and hydrotherapy, delivered with warmth, discretion and attention to detail.",
+        ]}
+        primary={{ label: "Choose a Location", href: "#locations" }}
+        secondary={{ label: "View Treatment Menu", href: "/spa/menu" }}
         image={{ src: "/photos/hero-massage.jpg", alt: "Warm oil poured during a MaMoyo massage" }}
       />
 
       {/* Location choice */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section id="locations" className="mx-auto max-w-6xl scroll-mt-28 px-6 py-16">
         <SectionHeading
           overline="Choose a Location"
           title="How would you like to spend your time?"
@@ -126,7 +131,7 @@ export default function SpaOverviewPage() {
                     <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                   </Link>
                   <Link
-                    href="/booking"
+                    href={loc.book}
                     className="inline-flex items-center gap-1.5 rounded-full border border-mist-300 px-4 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
                   >
                     Book {loc.name.split(" ")[0]}
@@ -144,8 +149,20 @@ export default function SpaOverviewPage() {
           <SectionHeading
             overline="Explore Spa Care"
             title="Results and feeling belong in the same room"
-            description="Our menu combines internationally recognised skincare with treatments rooted in touch, African tradition and the realities of modern life."
           />
+          <div className="mx-auto mt-8 max-w-2xl space-y-4 text-center text-base leading-relaxed text-mist-800">
+            <p>
+              Technique matters. Product quality matters. Consultation matters. So do the welcome, the
+              temperature of the room, the confidence of the therapist and the quiet sense that
+              somebody has noticed what you need.
+            </p>
+            <p>
+              Our menu combines internationally recognised skincare with treatments rooted in touch,
+              African tradition and the practical realities of modern life. Some guests come for pain,
+              some for skin, some for rest and some because they want to feel like themselves again.
+              Every reason is valid.
+            </p>
+          </div>
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {care.map((c, i) => (
               <Reveal key={c.name} delay={(i % 3) * 80}>
