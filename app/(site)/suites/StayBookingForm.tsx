@@ -216,7 +216,8 @@ export default function StayBookingForm({
         )}
       </button>
       <p className="mt-4 text-center text-xs text-mist-600">
-        Breakfast at Café MaMoyo included. Free cancellation up to 48 hours before check-in.
+        Breakfast is included only where stated in your confirmed rate. Free cancellation up to 48
+        hours before check-in.
       </p>
     </form>
   );

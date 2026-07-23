@@ -205,6 +205,30 @@ export interface Enquiry {
   createdAt: string;
 }
 
+export type ReviewSource = "Google" | "Facebook" | "TripAdvisor" | "Direct";
+
+export const REVIEW_SOURCES: ReviewSource[] = ["Google", "Facebook", "TripAdvisor", "Direct"];
+
+/**
+ * A guest review copied from a verified platform listing.
+ * Reviews are never generated — each record is transcribed by staff from a real
+ * published review, and only shows on the website once `published` is true.
+ */
+export interface Review {
+  id: string;
+  author: string;
+  rating: number; // 1–5
+  quote: string;
+  source: ReviewSource;
+  /** Link to the original published review or the listing it came from. */
+  sourceUrl?: string;
+  location?: Location;
+  /** Date the guest published the review (YYYY-MM-DD). */
+  reviewedOn: string;
+  published: boolean;
+  createdAt: string;
+}
+
 export interface DB {
   bookings: Booking[];
   invoices: Invoice[];
@@ -218,6 +242,7 @@ export interface DB {
   roles: RoleDefinitionRecord[];
   channelIntegrations: ChannelIntegrationSetting[];
   enquiries: Enquiry[];
+  reviews: Review[];
 }
 
 export function staysOverlap(
@@ -373,6 +398,9 @@ const seed: DB = {
     { provider: "expedia", enabled: false, endpoint: "", apiKey: "", lastStatus: "idle", lastMessage: "Not configured yet." },
   ],
   enquiries: [],
+  // Seeded empty on purpose: reviews must be real, transcribed from a verified
+  // platform listing by staff in the back office. Never seed sample reviews.
+  reviews: [],
 };
 
 /** Backfill arrays added after a stored DB was first written. Mutates in place. */
@@ -410,13 +438,22 @@ function migrate(db: DB): boolean {
     db.enquiries = [];
     migrated = true;
   }
+  if (!Array.isArray(db.reviews)) {
+    db.reviews = [];
+    migrated = true;
+  }
   // Backfill newly added modules into existing system roles so they appear
   // for Owners/Managers/Staff without re-seeding.
   if (Array.isArray(db.roles)) {
     for (const role of db.roles) {
-      if (role.isSystemRole && Array.isArray(role.modules) && !role.modules.includes("enquiries")) {
-        role.modules.push("enquiries");
-        migrated = true;
+      if (!role.isSystemRole || !Array.isArray(role.modules)) continue;
+      // Reviews are published to the public site, so Manager and Owner only.
+      const mods = role.rank >= 1 ? (["enquiries", "reviews"] as const) : (["enquiries"] as const);
+      for (const mod of mods) {
+        if (!role.modules.includes(mod)) {
+          role.modules.push(mod);
+          migrated = true;
+        }
       }
     }
   }

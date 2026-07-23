@@ -17,6 +17,8 @@ import {
   type EnquiryType,
   type EnquiryStatus,
   ENQUIRY_TYPES,
+  type ReviewSource,
+  REVIEW_SOURCES,
   type Booking,
   type BookingStatus,
   type InventoryCategory,
@@ -1005,4 +1007,66 @@ export async function updateEnquiryStatus(formData: FormData): Promise<void> {
   enquiry.status = status;
   await writeDb(db);
   revalidatePath("/admin/enquiries");
+}
+
+// ---------------------------------------------------------------- Reviews
+// Reviews are transcribed by staff from a verified platform listing (Google,
+// Facebook, TripAdvisor) or a written guest note. Nothing here generates a
+// review — every field comes from what the reviewer actually published.
+
+export async function createReview(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const author = String(formData.get("author") ?? "").trim();
+  const quote = String(formData.get("quote") ?? "").trim();
+  const source = String(formData.get("source") ?? "Google") as ReviewSource;
+  const sourceUrl = String(formData.get("sourceUrl") ?? "").trim();
+  const locationRaw = String(formData.get("location") ?? "").trim();
+  const reviewedOn = String(formData.get("reviewedOn") ?? "").trim();
+  const rating = Number(formData.get("rating") ?? 5);
+
+  if (!author || !quote) return;
+  if (!REVIEW_SOURCES.includes(source)) return;
+  if (!Number.isFinite(rating) || rating < 1 || rating > 5) return;
+
+  const db = await readDb();
+  db.reviews.push({
+    id: `rev${Date.now().toString(36)}`,
+    author,
+    rating: Math.round(rating),
+    quote,
+    source,
+    sourceUrl: sourceUrl || undefined,
+    location: LOCATIONS.includes(locationRaw as Location) ? (locationRaw as Location) : undefined,
+    reviewedOn: /^\d{4}-\d{2}-\d{2}$/.test(reviewedOn) ? reviewedOn : new Date().toISOString().slice(0, 10),
+    published: false,
+    createdAt: new Date().toISOString(),
+  });
+  await writeDb(db);
+  revalidatePath("/admin/reviews");
+  revalidatePath("/");
+}
+
+export async function setReviewPublished(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const published = String(formData.get("published") ?? "") === "true";
+  const db = await readDb();
+  const review = db.reviews.find((r) => r.id === id);
+  if (!review) return;
+  review.published = published;
+  await writeDb(db);
+  revalidatePath("/admin/reviews");
+  revalidatePath("/");
+}
+
+export async function deleteReview(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const db = await readDb();
+  const index = db.reviews.findIndex((r) => r.id === id);
+  if (index === -1) return;
+  db.reviews.splice(index, 1);
+  await writeDb(db);
+  revalidatePath("/admin/reviews");
+  revalidatePath("/");
 }

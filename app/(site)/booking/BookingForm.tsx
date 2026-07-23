@@ -12,9 +12,11 @@ const inputClasses =
 export default function BookingForm({
   services,
   preselected,
+  preselectedLocation = "Kabulonga",
 }: {
   services: BookableService[];
   preselected?: string;
+  preselectedLocation?: "Kabulonga" | "Twangale";
 }) {
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     createBooking,
@@ -47,7 +49,7 @@ export default function BookingForm({
                 type="radio"
                 name="location"
                 value="Kabulonga"
-                defaultChecked
+                defaultChecked={preselectedLocation === "Kabulonga"}
                 className="peer sr-only"
               />
               <span className="block rounded-xl border border-mist-200 px-4 py-3 text-center transition-colors duration-200 peer-checked:border-mist-500 peer-checked:bg-mist-50 peer-checked:ring-2 peer-checked:ring-mist-200 hover:border-mist-300">
@@ -56,7 +58,13 @@ export default function BookingForm({
               </span>
             </label>
             <label className="cursor-pointer">
-              <input type="radio" name="location" value="Twangale" className="peer sr-only" />
+              <input
+                type="radio"
+                name="location"
+                value="Twangale"
+                defaultChecked={preselectedLocation === "Twangale"}
+                className="peer sr-only"
+              />
               <span className="block rounded-xl border border-mist-200 px-4 py-3 text-center transition-colors duration-200 peer-checked:border-mist-500 peer-checked:bg-mist-50 peer-checked:ring-2 peer-checked:ring-mist-200 hover:border-mist-300">
                 <span className="block text-sm font-semibold text-mist-950">MaMoyo Twangale</span>
                 <span className="mt-0.5 block text-xs text-mist-600">Spa &amp; wellness</span>

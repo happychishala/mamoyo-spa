@@ -6,6 +6,7 @@ import { SectionHeading, ServiceIcon } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 import Wave from "@/components/site/Wave";
 import SplashScreen from "@/components/site/SplashScreen";
+import Reviews from "@/components/site/Reviews";
 import { services, cafeMenu } from "@/lib/content";
 import { formatMoney } from "@/lib/format";
 import JsonLd from "@/components/site/JsonLd";
@@ -21,28 +22,34 @@ export const metadata: Metadata = {
   },
 };
 
-const pillars = [
+const destinations = [
   {
-    title: "The Spa",
-    text: "Massage, body rituals, professional facials and advanced skincare",
-    image: "/photos/hot-stone.jpg",
-    alt: "Hot stone massage during a treatment at MaMoyo",
-    href: "/spa/menu",
+    name: "Kabulonga",
+    title: "Kabulonga: your city rhythm, made gentler",
+    text: "A quiet boutique destination on Reedbuck Road for regular treatments, professional skincare, unhurried café time and stays within the MaMoyo grounds. Come for an hour, spend the afternoon or make it your address in Lusaka.",
+    image: "/photos/interior.jpg",
+    alt: "The calm, light-filled interior at MaMoyo Kabulonga",
+    href: "/spa/kabulonga",
+    exploreLabel: "Explore Kabulonga",
+    bookLabel: "Book Kabulonga",
   },
   {
-    title: "MaMoyo Café",
-    text: "Considered breakfast, lunch, coffee and tea rituals — open to everyone",
-    image: "/photos/salad-bowl.jpg",
-    alt: "A fresh, garden-led plate at MaMoyo Café",
-    href: "/cafe",
+    name: "Twangale Resort",
+    title: "Twangale Resort: a longer exhale, held by nature",
+    text: "Set within the gardens of Twangale Resort in Lilayi, this is MaMoyo at a more expansive pace. Pair treatment time with the pool, landscape and ease of a full resort day. It is especially suited to couples, families, groups and anyone who needs more than a quick appointment.",
+    image: "/photos/pool.jpg",
+    alt: "The pool and gardens at Twangale Resort",
+    href: "/spa/twangale",
+    exploreLabel: "Explore Twangale",
+    bookLabel: "Book Twangale",
   },
-  {
-    title: "MaMoyo Suites",
-    text: "Fully serviced studio stays within the Kabulonga grounds",
-    image: "/photos/suites/studio-2.jpg",
-    alt: "A MaMoyo Suites studio with lounge, dining table and kitchenette",
-    href: "/suites",
-  },
+];
+
+const homeExperiences = [
+  { name: "Executive Reset", text: "A precise half day for people carrying too much for too long." },
+  { name: "Couples Retreat", text: "Shared treatment time, a private tea ritual and a quiet table for two." },
+  { name: "Bridal Glow", text: "Skin, body, hands, feet and nourishment brought together before the celebration." },
+  { name: "Full Day Escape", text: "A complete face and body journey designed to move the body from tension into renewal." },
 ];
 
 const gallery = [
@@ -197,35 +204,113 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Two settings + offerings */}
+      {/* Philosophy */}
+      <section className="mx-auto max-w-3xl px-6 py-20 text-center">
+        <h2 className="text-balance font-serif text-3xl font-semibold tracking-tight text-mist-950 sm:text-4xl">
+          Wellness becomes meaningful when it becomes part of life
+        </h2>
+        <div className="mt-6 space-y-4 text-base leading-relaxed text-mist-800">
+          <p>
+            A massage can release tension. A facial can restore confidence. A quiet lunch can change
+            the pace of an afternoon. A thoughtful stay can make a demanding week feel possible again.
+          </p>
+          <p>
+            MaMoyo was created to bring these moments together, not as occasional rewards, but as a
+            more consistent way to care for the body, the mind and the life carrying both.
+          </p>
+        </div>
+        <Link
+          href="/wellness"
+          className="mt-8 inline-flex items-center gap-2 rounded-full border border-mist-300 px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+        >
+          Our Philosophy
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      </section>
+
+      {/* Founder story */}
+      <section className="bg-mist-50 py-20">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 lg:grid-cols-2">
+          <Reveal>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-lift">
+              <Image
+                src="/photos/meditation.jpg"
+                alt="A quiet moment of rest at MaMoyo"
+                fill
+                sizes="(min-width: 1024px) 45vw, 90vw"
+                className="object-cover"
+              />
+            </div>
+          </Reveal>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">Our Story</p>
+            <h2 className="mt-3 text-balance font-serif text-3xl font-semibold tracking-tight text-mist-950 sm:text-4xl">
+              Built from a question Lusaka deserved an answer to
+            </h2>
+            <div className="mt-5 space-y-4 text-base leading-relaxed text-mist-800">
+              <p>
+                For years, our founder, Tambudzai Chola, travelled to South Africa for skincare and
+                wellness treatments she felt she could trust completely. When international travel
+                stopped during the pandemic, one question stayed with her: where in Lusaka could a
+                person go knowing that exceptional care would be consistent, personal and beautifully
+                delivered every time?
+              </p>
+              <p>
+                She knew she could not be the only person asking. MaMoyo began with the belief that
+                Lusaka deserved a place built around genuine care, trusted professionals, beautiful
+                surroundings and complete wellbeing. A place to visit before exhaustion, not only
+                after it. A place that could become part of a person&rsquo;s rhythm.
+              </p>
+            </div>
+            <Link
+              href="/about"
+              className="mt-8 inline-flex items-center gap-2 rounded-full border border-mist-300 bg-white px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-100"
+            >
+              Read Our Story
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Two destinations */}
       <section className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           overline="Kabulonga & Twangale Resort"
           title="Two settings, one standard of care"
-          description="MaMoyo brings restorative spa care, professional skincare, nourishing food and considered stays into two distinct destinations across Lusaka — boutique city care in Kabulonga and resort-scale wellness at Twangale."
         />
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {pillars.map((p, i) => (
-            <Reveal key={p.title} delay={(i % 3) * 80}>
-              <Link
-                href={p.href}
-                className="group relative block overflow-hidden rounded-2xl shadow-soft transition-shadow duration-300 hover:shadow-lift"
-              >
-                <div className="relative aspect-[4/5]">
+        <div className="mt-14 grid gap-8 md:grid-cols-2">
+          {destinations.map((d, i) => (
+            <Reveal key={d.name} delay={i * 100}>
+              <article className="flex h-full flex-col overflow-hidden rounded-3xl border border-mist-200 bg-white shadow-soft transition-shadow duration-300 hover:shadow-lift">
+                <div className="relative h-60">
                   <Image
-                    src={p.image}
-                    alt={p.alt}
+                    src={d.image}
+                    alt={d.alt}
                     fill
-                    sizes="(min-width: 1024px) 32vw, (min-width: 640px) 45vw, 90vw"
-                    className="object-cover transition-opacity duration-300 group-hover:opacity-90"
+                    sizes="(min-width: 768px) 45vw, 90vw"
+                    className="object-cover"
                   />
-                  <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-mist-950/85 via-mist-950/20 to-transparent" />
                 </div>
-                <div className="absolute inset-x-0 bottom-0 p-5">
-                  <h3 className="font-serif text-lg text-white">{p.title}</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-mist-200">{p.text}</p>
+                <div className="flex flex-1 flex-col p-7">
+                  <h3 className="font-serif text-xl font-semibold text-mist-950">{d.title}</h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-mist-800">{d.text}</p>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <Link
+                      href={d.href}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-mist-600 px-5 py-2.5 text-xs font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+                    >
+                      {d.exploreLabel}
+                    </Link>
+                    <Link
+                      href={`/booking?location=${encodeURIComponent(d.name === "Kabulonga" ? "Kabulonga" : "Twangale")}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-mist-300 px-5 py-2.5 text-xs font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+                    >
+                      {d.bookLabel}
+                    </Link>
+                  </div>
                 </div>
-              </Link>
+              </article>
             </Reveal>
           ))}
         </div>
@@ -236,7 +321,7 @@ export default function HomePage() {
         <SectionHeading
           overline="The Spa"
           title="Care that is precise, personal and deeply restorative"
-          description="From trusted massage and African-inspired body rituals to professional facials and advanced aesthetic care, every booking begins with what your body or skin needs now."
+          description="Our spa offering moves from trusted massage and African-inspired body rituals to professional facials, advanced aesthetic care, hand and foot care, grooming and hydrotherapy. Every booking begins with what your body or skin needs now, not with a treatment chosen by habit."
         />
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((service, i) => (
@@ -258,13 +343,19 @@ export default function HomePage() {
             </Reveal>
           ))}
         </div>
-        <div className="mt-10 text-center">
+        <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Link
+            href="/spa"
+            className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+          >
+            Explore the Spa
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
           <Link
             href="/spa/menu"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-mist-700 transition-colors duration-200 hover:text-mist-900"
+            className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
           >
             View the Treatment Menu
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
       </section>
@@ -278,18 +369,33 @@ export default function HomePage() {
             <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
               Food that belongs to the way you want to feel
             </h2>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-mist-200">
-              Thoughtful breakfast and lunch plates, excellent coffee, ceremonial teas, matcha,
-              cold-pressed juices and desserts made with restraint. Open to everyone — no spa
-              booking required.
-            </p>
-            <Link
-              href="/cafe"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-mist-900 transition-colors duration-200 hover:bg-mist-100"
-            >
-              Explore the Café
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+            <div className="mt-4 max-w-md space-y-4 text-base leading-relaxed text-mist-200">
+              <p>
+                MaMoyo Café is open to everyone. Come before a treatment, stay afterwards or visit
+                simply because you want a beautiful breakfast, a polished work lunch, a tea ritual or
+                a quiet table with someone you have missed.
+              </p>
+              <p>
+                The menu is generous rather than clinical, with thoughtful breakfast and lunch plates,
+                excellent coffee, ceremonial teas, matcha, cold-pressed juices, botanical drinks and
+                desserts made with restraint.
+              </p>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/cafe"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-mist-900 transition-colors duration-200 hover:bg-mist-100"
+              >
+                Explore the Café
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/cafe#reserve"
+                className="inline-flex items-center gap-2 rounded-full border border-white/40 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white/10"
+              >
+                Reserve a Table
+              </Link>
+            </div>
           </div>
           <div className="relative overflow-hidden rounded-3xl shadow-lift">
             <div className="relative aspect-[4/3]">
@@ -315,6 +421,169 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Suites */}
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">
+              MaMoyo Suites · Kabulonga
+            </p>
+            <h2 className="mt-3 text-balance font-serif text-3xl font-semibold tracking-tight text-mist-950 sm:text-4xl">
+              Stay where wellbeing is already part of the address
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-mist-800">
+              MaMoyo Suites offer fully serviced studio accommodation within the Kabulonga property.
+              Designed for business, longer assignments, medical visits, bridal stays and weekends in
+              the city, each stay can be connected to spa care, the café, pool and gardens.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/suites"
+                className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+              >
+                Explore MaMoyo Suites
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/suites#book"
+                className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+              >
+                Check Direct Availability
+              </Link>
+            </div>
+          </div>
+          <Reveal delay={100}>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-lift">
+              <Image
+                src="/photos/suites/studio-2.jpg"
+                alt="A MaMoyo Suites studio with lounge, dining table and kitchenette"
+                fill
+                sizes="(min-width: 1024px) 45vw, 90vw"
+                className="object-cover"
+              />
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Experiences */}
+      <section className="bg-mist-50 py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <SectionHeading
+            overline="MaMoyo Experiences"
+            title="Make more of the time you set aside"
+            description="Some days need more than one treatment. MaMoyo experiences bring together touch, skincare, food, water, rest and thoughtful details in one clear journey."
+          />
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {homeExperiences.map((e, i) => (
+              <Reveal key={e.name} delay={(i % 4) * 70}>
+                <article className="h-full rounded-2xl border border-mist-200 bg-white p-7 shadow-soft">
+                  <h3 className="font-serif text-lg font-semibold text-mist-950">{e.name}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-mist-700">{e.text}</p>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+          <div className="mt-12 text-center">
+            <Link
+              href="/experiences"
+              className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+            >
+              Explore All Experiences
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Membership + Corporate */}
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Reveal>
+            <article className="flex h-full flex-col rounded-3xl border border-mist-200 bg-white p-8 shadow-soft sm:p-10">
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">
+                The MaMoyo Circle
+              </p>
+              <h2 className="mt-3 font-serif text-2xl font-semibold text-mist-950">
+                Belong to a more consistent way of caring for yourself
+              </h2>
+              <p className="mt-4 flex-1 text-sm leading-relaxed text-mist-800">
+                The MaMoyo Circle creates a regular rhythm of treatment, priority access, café
+                rituals, selected suite privileges and member gatherings across Kabulonga and
+                Twangale Resort.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link
+                  href="/membership"
+                  className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-6 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+                >
+                  Explore Membership
+                </Link>
+                <Link
+                  href="/membership#apply"
+                  className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-6 py-3 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+                >
+                  Apply to Join
+                </Link>
+              </div>
+            </article>
+          </Reveal>
+          <Reveal delay={100}>
+            <article className="flex h-full flex-col rounded-3xl border border-mist-200 bg-white p-8 shadow-soft sm:p-10">
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">
+                Corporate Wellness
+              </p>
+              <h2 className="mt-3 font-serif text-2xl font-semibold text-mist-950">
+                Care for the people carrying the organisation
+              </h2>
+              <p className="mt-4 flex-1 text-sm leading-relaxed text-mist-800">
+                MaMoyo works with banks, embassies, NGOs, mining companies, law firms, international
+                organisations and corporate teams to create wellbeing programmes that feel useful,
+                credible and properly delivered.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link
+                  href="/corporate-wellness"
+                  className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-6 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+                >
+                  Explore Corporate Wellness
+                </Link>
+                <Link
+                  href="/corporate-wellness#proposal"
+                  className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-6 py-3 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+                >
+                  Request a Proposal
+                </Link>
+              </div>
+            </article>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Journal */}
+      <section className="mx-auto max-w-3xl px-6 pb-20 text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">
+          The MaMoyo Journal
+        </p>
+        <h2 className="mt-3 text-balance font-serif text-3xl font-semibold tracking-tight text-mist-950 sm:text-4xl">
+          Useful thinking for living well
+        </h2>
+        <p className="mt-5 text-base leading-relaxed text-mist-800">
+          The MaMoyo Journal brings together grounded guidance across skincare, nutrition, wellbeing,
+          travel, hospitality and the way modern life asks us to care for ourselves.
+        </p>
+        <Link
+          href="/journal"
+          className="mt-8 inline-flex items-center gap-2 rounded-full border border-mist-300 px-7 py-3.5 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+        >
+          Read the Journal
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      </section>
+
+      {/* Reviews — published from the back office, never invented */}
+      <Reviews />
 
       {/* Gallery */}
       <section className="mx-auto max-w-6xl px-6 pt-20 pb-4">

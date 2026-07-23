@@ -29,7 +29,7 @@ export default async function ReceiptPrintPage({
 
   const logoSrc = receipt.invoiceNumber.startsWith("POS-") ? "/cafe-mamoyo-logo.png" : "/logo-mamoyo.png";
   const logoAlt = receipt.invoiceNumber.startsWith("POS-")
-    ? "Café MaMoyo receipt"
+    ? "MaMoyo Café receipt"
     : "MaMoyo Wellness & Beauty receipt";
 
   return (
