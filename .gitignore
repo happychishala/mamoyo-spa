@@ -45,3 +45,8 @@ next-env.d.ts
 
 # local editor/harness config
 /.claude
+
+# Client-facing project documents — this repo is public, and the tracker
+# names unfixed weaknesses. Share these directly, never through git.
+/MaMoyo-Website-Tracker.xlsx
+*.tracker.xlsx
