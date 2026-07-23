@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
+import PhotoStrip from "@/components/site/PhotoStrip";
 import FaqList from "@/components/site/FaqList";
 import EnquiryForm from "@/components/site/EnquiryForm";
 
@@ -53,7 +54,7 @@ export default function GiftCardsPage() {
         ]}
         primary={{ label: "Buy a Gift Card", href: "#gift" }}
         secondary={{ label: "Choose an Experience Gift", href: "/experiences" }}
-        image={{ src: "/photos/towels-candle.jpg", alt: "A considered MaMoyo gift, wrapped with care" }}
+        image={{ src: "/photos/spa-detail.jpg", alt: "Aromatherapy oils and botanicals arranged for a MaMoyo gift" }}
       />
 
       {/* Choose the gift */}
@@ -91,6 +92,16 @@ export default function GiftCardsPage() {
           </Link>
         </div>
       </section>
+
+      {/* Photography */}
+      <PhotoStrip
+        className="py-4"
+        photos={[
+          { src: "/photos/towels-candle.jpg", alt: "Towels and candlelight prepared for a guest" },
+          { src: "/photos/spa-detail.jpg", alt: "Aromatherapy botanicals arranged at MaMoyo" },
+          { src: "/photos/wide-cafe-drinks.jpg", alt: "A café ritual served at MaMoyo" },
+        ]}
+      />
 
       {/* Gift request form → back office */}
       <section id="gift" className="bg-mist-50 py-16 scroll-mt-28">

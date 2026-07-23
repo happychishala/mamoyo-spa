@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
+import PhotoStrip from "@/components/site/PhotoStrip";
 
 export const metadata: Metadata = {
   title: { absolute: "MaMoyo Spa Lusaka | Kabulonga and Twangale Resort" },
@@ -98,7 +99,7 @@ export default function SpaOverviewPage() {
         ]}
         primary={{ label: "Choose a Location", href: "#locations" }}
         secondary={{ label: "View Treatment Menu", href: "/spa/menu" }}
-        image={{ src: "/photos/hero-massage.jpg", alt: "Warm oil poured during a MaMoyo massage" }}
+        image={{ src: "/photos/wide-spa.jpg", alt: "A full-body massage in progress in a MaMoyo treatment room" }}
       />
 
       {/* Location choice */}
@@ -184,6 +185,16 @@ export default function SpaOverviewPage() {
           </div>
         </div>
       </section>
+
+      {/* Photography */}
+      <PhotoStrip
+        className="py-4"
+        photos={[
+          { src: "/photos/wide-massage-oil.jpg", alt: "Warm oil poured during a MaMoyo massage" },
+          { src: "/photos/eye-treatment.jpg", alt: "Eye care during a facial at MaMoyo" },
+          { src: "/photos/hot-stone.jpg", alt: "Hot stone therapy in a MaMoyo treatment room" },
+        ]}
+      />
 
       {/* Treatment ritual */}
       <section className="mx-auto max-w-3xl px-6 py-16">

@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
+import PhotoStrip from "@/components/site/PhotoStrip";
 
 export const metadata: Metadata = {
   title: { absolute: "MaMoyo Wellness Lusaka | A More Complete Way to Live Well" },
@@ -68,7 +69,7 @@ export default function WellnessPage() {
         ]}
         primary={{ label: "Explore Our Approach", href: "#approach" }}
         secondary={{ label: "Book a Starting Point", href: "/booking" }}
-        image={{ src: "/photos/meditation.jpg", alt: "A quiet moment of rest at MaMoyo" }}
+        image={{ src: "/photos/wide-wellness.jpg", alt: "A guest sitting quietly outdoors at the start of the day" }}
       />
 
       {/* Approach */}
@@ -148,6 +149,16 @@ export default function WellnessPage() {
           </div>
         </div>
       </section>
+
+      {/* Photography */}
+      <PhotoStrip
+        className="py-4"
+        photos={[
+          { src: "/photos/yoga-outdoor.jpg", alt: "Gentle movement in the morning sun" },
+          { src: "/photos/tea-ritual.jpg", alt: "A MaMoyo tea ritual poured slowly" },
+          { src: "/photos/meditation.jpg", alt: "A quiet moment of rest at MaMoyo" },
+        ]}
+      />
 
       {/* Promise + scope */}
       <section className="mx-auto max-w-6xl px-6 py-16">

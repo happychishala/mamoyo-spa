@@ -106,8 +106,8 @@ export default function TreatmentsPage() {
             <div className="relative overflow-hidden rounded-3xl shadow-lift">
               <div className="relative h-56 sm:h-72">
                 <Image
-                  src="/photos/hero-massage.jpg"
-                  alt="Warm oil massage in a MaMoyo treatment room"
+                  src="/photos/wide-massage-couple.jpg"
+                  alt="A treatment underway in a MaMoyo room"
                   fill
                   priority
                   sizes="(min-width: 1280px) 72rem, 100vw"

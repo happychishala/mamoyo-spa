@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
+import PhotoStrip from "@/components/site/PhotoStrip";
 import EnquiryForm from "@/components/site/EnquiryForm";
 
 export const metadata: Metadata = {
@@ -104,7 +105,7 @@ export default function MembershipPage() {
         intro="Membership is a decision to stop leaving care until everything else has been handled. The MaMoyo Circle creates a monthly rhythm of treatment, priority access, café rituals, selected suite privileges and member gatherings across Kabulonga and Twangale Resort."
         primary={{ label: "Choose Your Membership", href: "#tiers" }}
         secondary={{ label: "Apply to Join", href: "#apply" }}
-        image={{ src: "/photos/interior.jpg", alt: "The calm of a MaMoyo member visit" }}
+        image={{ src: "/photos/wide-spa-candles.jpg", alt: "Candles, folded towels and flowers set for a member visit" }}
       />
 
       {/* Tiers */}
@@ -159,6 +160,16 @@ export default function MembershipPage() {
           ))}
         </div>
       </section>
+
+      {/* Photography */}
+      <PhotoStrip
+        className="py-4"
+        photos={[
+          { src: "/photos/massage-back.jpg", alt: "A monthly massage at MaMoyo" },
+          { src: "/photos/wide-tea.jpg", alt: "A member tea ritual at MaMoyo Café" },
+          { src: "/photos/facial.jpg", alt: "Professional facial care for members" },
+        ]}
+      />
 
       {/* Ritual credits + belonging */}
       <section className="bg-mist-50 py-16">

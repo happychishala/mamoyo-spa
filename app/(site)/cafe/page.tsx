@@ -94,8 +94,8 @@ export default function CafePage() {
             <div className="relative h-full overflow-hidden rounded-2xl shadow-soft">
               <div className="relative h-64 sm:h-full sm:min-h-72">
                 <Image
-                  src="/photos/coffee.jpg"
-                  alt="A coffee ritual poured at MaMoyo Café"
+                  src="/photos/wide-cafe-outdoor.jpg"
+                  alt="The MaMoyo Café terrace set for the morning"
                   fill
                   sizes="(min-width: 640px) 60vw, 90vw"
                   className="object-cover"
@@ -107,8 +107,8 @@ export default function CafePage() {
             <div className="relative h-full overflow-hidden rounded-2xl shadow-soft">
               <div className="relative h-64 sm:h-full sm:min-h-72">
                 <Image
-                  src="/photos/salad-bowl.jpg"
-                  alt="A garden-led plate at MaMoyo Café"
+                  src="/photos/cafe-breakfast.jpg"
+                  alt="A garden-led plate served at MaMoyo Café"
                   fill
                   sizes="(min-width: 640px) 30vw, 90vw"
                   className="object-cover"

@@ -37,7 +37,7 @@ const destinations = [
     name: "Twangale Resort",
     title: "Twangale Resort: a longer exhale, held by nature",
     text: "Set within the gardens of Twangale Resort in Lilayi, this is MaMoyo at a more expansive pace. Pair treatment time with the pool, landscape and ease of a full resort day. It is especially suited to couples, families, groups and anyone who needs more than a quick appointment.",
-    image: "/photos/pool.jpg",
+    image: "/photos/wide-pool.jpg",
     alt: "The pool and gardens at Twangale Resort",
     href: "/spa/twangale",
     exploreLabel: "Explore Twangale",
@@ -53,10 +53,10 @@ const homeExperiences = [
 ];
 
 const gallery = [
-  { src: "/photos/suites/studio-2.jpg", alt: "The MaMoyo pool and garden terrace" },
-  { src: "/photos/towels-candle.jpg", alt: "Spa towels and candles ready for a treatment" },
-  { src: "/photos/meditation.jpg", alt: "Guest meditating at sunrise" },
-  { src: "/photos/interior.jpg", alt: "Calm, light-filled retreat interior" },
+  { src: "/photos/garden.jpg", alt: "The gardens and pool terrace at MaMoyo" },
+  { src: "/photos/towels-candle.jpg", alt: "Towels and candlelight set for a treatment" },
+  { src: "/photos/meditation.jpg", alt: "A quiet moment before a treatment begins" },
+  { src: "/photos/cafe-table.jpg", alt: "A table laid at MaMoyo Café" },
 ];
 
 export default function HomePage() {
@@ -180,8 +180,8 @@ export default function HomePage() {
               <div className="absolute -bottom-8 -left-4 w-40 overflow-hidden rounded-2xl border-4 border-mist-50 shadow-lift sm:-left-8 sm:w-48">
                 <div className="relative aspect-square">
                   <Image
-                    src="/photos/facial.jpg"
-                    alt="Professional facial treatment in progress at MaMoyo"
+                    src="/photos/eye-treatment.jpg"
+                    alt="Eye care during a facial treatment at MaMoyo"
                     fill
                     sizes="12rem"
                     className="object-cover"
@@ -191,8 +191,8 @@ export default function HomePage() {
               <div className="absolute -top-6 -right-3 w-32 overflow-hidden rounded-2xl border-4 border-mist-50 shadow-lift sm:-right-6 sm:w-40">
                 <div className="relative aspect-square">
                   <Image
-                    src="/photos/coffee.jpg"
-                    alt="A coffee ritual at MaMoyo Café"
+                    src="/photos/tea-ritual.jpg"
+                    alt="A tea ritual poured at MaMoyo Café"
                     fill
                     sizes="10rem"
                     className="object-cover"
@@ -234,8 +234,8 @@ export default function HomePage() {
           <Reveal>
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-lift">
               <Image
-                src="/photos/meditation.jpg"
-                alt="A quiet moment of rest at MaMoyo"
+                src="/photos/yoga-outdoor.jpg"
+                alt="A guest moving gently in the morning sun at MaMoyo"
                 fill
                 sizes="(min-width: 1024px) 45vw, 90vw"
                 className="object-cover"
@@ -400,8 +400,8 @@ export default function HomePage() {
           <div className="relative overflow-hidden rounded-3xl shadow-lift">
             <div className="relative aspect-[4/3]">
               <Image
-                src="/photos/cafe-latte.jpg"
-                alt="A coffee ritual being served at MaMoyo Café"
+                src="/photos/wide-cafe.jpg"
+                alt="A table laid for lunch at MaMoyo Café"
                 fill
                 sizes="(min-width: 1024px) 45vw, 90vw"
                 className="object-cover"
@@ -609,7 +609,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="relative overflow-hidden rounded-3xl px-8 py-20 text-center text-white shadow-lift sm:px-16">
           <Image
-            src="/photos/towels-candle.jpg"
+            src="/photos/wide-massage-oil.jpg"
             alt=""
             aria-hidden="true"
             fill

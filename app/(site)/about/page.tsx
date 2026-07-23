@@ -103,8 +103,8 @@ export default function AboutPage() {
             <div className="relative overflow-hidden rounded-2xl shadow-soft">
               <div className="relative h-72">
                 <Image
-                  src="/photos/meditation.jpg"
-                  alt="A quiet moment in the morning sun at MaMoyo"
+                  src="/photos/massage-shoulder.jpg"
+                  alt="A shoulder massage during a treatment at MaMoyo"
                   fill
                   sizes="(min-width: 640px) 45vw, 90vw"
                   className="object-cover"

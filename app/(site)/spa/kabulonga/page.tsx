@@ -4,6 +4,7 @@ import { MapPin, Phone, Clock, Car, ArrowRight, MessageCircle, CalendarClock } f
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
+import PhotoStrip from "@/components/site/PhotoStrip";
 import FaqList from "@/components/site/FaqList";
 import { locationInfo } from "@/lib/content";
 import JsonLd from "@/components/site/JsonLd";
@@ -107,7 +108,7 @@ export default function KabulongaPage() {
             </a>
           </>
         }
-        image={{ src: "/photos/facial.jpg", alt: "Professional facial care at MaMoyo Kabulonga" }}
+        image={{ src: "/photos/facial-massage.jpg", alt: "A therapist performing a facial massage at MaMoyo Kabulonga" }}
       />
 
       {/* Human scale */}
@@ -180,6 +181,16 @@ export default function KabulongaPage() {
           ))}
         </div>
       </section>
+
+      {/* Photography */}
+      <PhotoStrip
+        className="py-4"
+        photos={[
+          { src: "/photos/wide-skin-consult.jpg", alt: "A professional skin consultation at Kabulonga" },
+          { src: "/photos/manicure.jpg", alt: "Detailed hand care at MaMoyo Kabulonga" },
+          { src: "/photos/cafe-breakfast.jpg", alt: "Breakfast served at MaMoyo Café" },
+        ]}
+      />
 
       {/* Private days */}
       <section className="bg-mist-50 py-16">

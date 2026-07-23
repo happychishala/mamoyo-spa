@@ -4,6 +4,7 @@ import { ArrowRight, Send } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
+import PhotoStrip from "@/components/site/PhotoStrip";
 
 export const metadata: Metadata = {
   title: { absolute: "MaMoyo Wellness Experiences | Couples, Bridal and Spa Days" },
@@ -112,7 +113,7 @@ export default function ExperiencesPage() {
         intro="Our experiences bring together massage, skin, body care, nourishment, tea, water and time in a sequence that makes sense. Choose according to the state you need, the people you are bringing and the time you can protect."
         primary={{ label: "Find Your Experience", href: "/booking" }}
         secondary={{ label: "Ask Our Team", href: "/contact" }}
-        image={{ src: "/photos/hot-stone.jpg", alt: "A restorative MaMoyo treatment in progress" }}
+        image={{ src: "/photos/wide-experiences.jpg", alt: "Two guests receiving treatments side by side at MaMoyo" }}
       />
 
       {/* Signature experiences */}
@@ -185,6 +186,16 @@ export default function ExperiencesPage() {
           ))}
         </div>
       </section>
+
+      {/* Photography */}
+      <PhotoStrip
+        className="py-4"
+        photos={[
+          { src: "/photos/wide-couples.jpg", alt: "A couples treatment at MaMoyo" },
+          { src: "/photos/pedicure.jpg", alt: "Detailed foot care during a MaMoyo experience" },
+          { src: "/photos/wide-foot-massage.jpg", alt: "Foot therapy during a full-day journey" },
+        ]}
+      />
 
       {/* Arrival ritual + booking steps */}
       <section className="bg-mist-50 py-16">

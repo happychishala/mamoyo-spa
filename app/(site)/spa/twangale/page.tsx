@@ -4,6 +4,7 @@ import { MapPin, Phone, Clock, Car, ArrowRight, MessageCircle, CalendarClock } f
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
+import PhotoStrip from "@/components/site/PhotoStrip";
 import FaqList from "@/components/site/FaqList";
 import { locationInfo } from "@/lib/content";
 import JsonLd from "@/components/site/JsonLd";
@@ -109,7 +110,7 @@ export default function TwangalePage() {
             </a>
           </>
         }
-        image={{ src: "/photos/pool.jpg", alt: "The pool and gardens at Twangale Resort" }}
+        image={{ src: "/photos/wide-twangale.jpg", alt: "Loungers beside the pool in the gardens at Twangale Resort" }}
       />
 
       {/* Setting */}
@@ -181,6 +182,16 @@ export default function TwangalePage() {
           ))}
         </div>
       </section>
+
+      {/* Photography */}
+      <PhotoStrip
+        className="py-4"
+        photos={[
+          { src: "/photos/wide-pool.jpg", alt: "The pool and gardens at Twangale Resort" },
+          { src: "/photos/garden.jpg", alt: "Gardens surrounding the spa at Twangale" },
+          { src: "/photos/wide-couples.jpg", alt: "Two guests receiving treatments side by side" },
+        ]}
+      />
 
       {/* Best for + practical info */}
       <section className="bg-mist-50 py-16">

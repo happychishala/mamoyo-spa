@@ -36,7 +36,7 @@ export default function JournalPage() {
         intro="The Journal exists to help readers make better decisions, not to make ordinary life feel inadequate. It covers wellness, beauty, nutrition, lifestyle, skincare, travel, hospitality and corporate wellbeing."
         primary={{ label: "Explore MaMoyo", href: "/" }}
         secondary={{ label: "Notes from MaMoyo", href: "/contact" }}
-        image={{ src: "/photos/coffee.jpg", alt: "A quiet reading moment at MaMoyo Café" }}
+        image={{ src: "/photos/wide-cafe-brunch.jpg", alt: "Coffee and pastries on a quiet cafe table" }}
       />
 
       <section className="mx-auto max-w-6xl px-6 py-16">

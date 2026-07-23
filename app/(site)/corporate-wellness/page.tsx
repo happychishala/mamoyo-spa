@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
+import PhotoStrip from "@/components/site/PhotoStrip";
 import FaqList from "@/components/site/FaqList";
 import EnquiryForm from "@/components/site/EnquiryForm";
 
@@ -59,7 +60,7 @@ export default function CorporateWellnessPage() {
         intro="MaMoyo creates credible, well-delivered wellbeing programmes for banks, embassies, NGOs, mining companies, law firms, international organisations and corporate offices across Zambia — built around the workforce, the pressure pattern and the practical constraints of delivery."
         primary={{ label: "Request a Proposal", href: "#proposal" }}
         secondary={{ label: "Speak to Our Team", href: "/contact" }}
-        image={{ src: "/photos/interior.jpg", alt: "A calm MaMoyo interior set for a corporate wellbeing session" }}
+        image={{ src: "/photos/wide-group.jpg", alt: "A MaMoyo wellbeing session arranged for a visiting team" }}
       />
 
       {/* Services */}
@@ -88,6 +89,16 @@ export default function CorporateWellnessPage() {
           ))}
         </div>
       </section>
+
+      {/* Photography */}
+      <PhotoStrip
+        className="py-4"
+        photos={[
+          { src: "/photos/massage-shoulder.jpg", alt: "Seated shoulder care during a workplace activation" },
+          { src: "/photos/wide-cafe.jpg", alt: "A working lunch laid at MaMoyo Café" },
+          { src: "/photos/wide-twangale.jpg", alt: "The retreat setting at Twangale Resort" },
+        ]}
+      />
 
       {/* Sectors + privacy */}
       <section className="bg-mist-50 py-16">
