@@ -81,7 +81,7 @@ export default function Navbar() {
 
   const linkClass = (active: boolean) =>
     `rounded-full px-2.5 py-2 text-[0.8rem] font-medium transition-colors duration-200 ${
-      active ? "bg-mist-100 text-mist-800" : "text-mist-700 hover:bg-mist-50 hover:text-mist-900"
+      active ? "bg-mist-100 text-mist-800" : "text-mist-700 hover:bg-mist-50 hover:text-cocoa-700"
     }`;
 
   return (
@@ -142,7 +142,7 @@ export default function Navbar() {
                           className={`block rounded-lg px-3 py-2 text-sm transition-colors duration-200 ${
                             isActive(l.href)
                               ? "bg-mist-100 text-mist-900"
-                              : "text-mist-700 hover:bg-mist-50 hover:text-mist-900"
+                              : "text-mist-700 hover:bg-mist-50 hover:text-cocoa-700"
                           }`}
                         >
                           {l.label}
@@ -193,7 +193,7 @@ export default function Navbar() {
                 <Link
                   key={a.label}
                   href={a.href}
-                  className="flex items-center gap-3 rounded-xl border border-mist-200 bg-white px-4 py-3 text-sm font-medium text-mist-900 transition-colors duration-200 hover:border-mist-300 hover:bg-mist-50"
+                  className="flex items-center gap-3 rounded-xl border border-mist-200 bg-white px-4 py-3 text-sm font-medium text-mist-900 transition-colors duration-200 hover:border-mist-300 hover:bg-mist-50 hover:text-cocoa-700"
                 >
                   <a.icon className="h-4.5 w-4.5 text-mist-600" aria-hidden="true" />
                   {a.label}
@@ -203,7 +203,7 @@ export default function Navbar() {
 
             <div className="mt-5 border-t border-mist-100 pt-4">
               <div className="flex flex-col gap-0.5">
-                <Link href="/" className={`rounded-xl px-4 py-3 text-sm font-medium ${isActive("/") ? "bg-mist-100 text-mist-800" : "text-mist-700 hover:bg-mist-50"}`}>
+                <Link href="/" className={`rounded-xl px-4 py-3 text-sm font-medium ${isActive("/") ? "bg-mist-100 text-mist-800" : "text-mist-700 hover:bg-mist-50 hover:text-cocoa-700"}`}>
                   Home
                 </Link>
                 <p className="px-4 pb-1 pt-3 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-mist-500">Spa</p>
@@ -211,7 +211,7 @@ export default function Navbar() {
                   <Link
                     key={l.href}
                     href={l.href}
-                    className={`rounded-xl px-4 py-2.5 pl-6 text-sm font-medium ${isActive(l.href) ? "bg-mist-100 text-mist-800" : "text-mist-700 hover:bg-mist-50"}`}
+                    className={`rounded-xl px-4 py-2.5 pl-6 text-sm font-medium ${isActive(l.href) ? "bg-mist-100 text-mist-800" : "text-mist-700 hover:bg-mist-50 hover:text-cocoa-700"}`}
                   >
                     {l.label}
                   </Link>
@@ -221,7 +221,7 @@ export default function Navbar() {
                   <Link
                     key={l.href}
                     href={l.href}
-                    className={`rounded-xl px-4 py-3 text-sm font-medium ${isActive(l.href) ? "bg-mist-100 text-mist-800" : "text-mist-700 hover:bg-mist-50"}`}
+                    className={`rounded-xl px-4 py-3 text-sm font-medium ${isActive(l.href) ? "bg-mist-100 text-mist-800" : "text-mist-700 hover:bg-mist-50 hover:text-cocoa-700"}`}
                   >
                     {l.label === "Corporate" ? "Corporate Wellness" : l.label}
                   </Link>
@@ -231,7 +231,7 @@ export default function Navbar() {
 
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-mist-100 px-1 pt-4 text-sm text-mist-600">
               {utilityLinks.map((l) => (
-                <Link key={l.href} href={l.href} className="hover:text-mist-900">
+                <Link key={l.href} href={l.href} className="transition-colors duration-200 hover:text-cocoa-700">
                   {l.label}
                 </Link>
               ))}
