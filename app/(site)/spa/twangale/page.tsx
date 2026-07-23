@@ -187,9 +187,9 @@ export default function TwangalePage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/wide-pool.jpg", alt: "The pool and gardens at Twangale Resort" },
-          { src: "/photos/garden.jpg", alt: "Gardens surrounding the spa at Twangale" },
-          { src: "/photos/wide-couples.jpg", alt: "Two guests receiving treatments side by side" },
+          { src: "/photos/twangale-terrace.jpg", alt: "The poolside terrace in the grounds at Twangale Resort" },
+          { src: "/photos/twangale-peacock.jpg", alt: "One of the resident peacocks on the lawns at Twangale Resort" },
+          { src: "/photos/twangale-grounds.jpg", alt: "Loungers set among the gardens at Twangale Resort" },
         ]}
       />
 
