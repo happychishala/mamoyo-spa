@@ -36,6 +36,7 @@ import {
   type ChannelProviderName,
 } from "./db";
 import { suites, bookablePriceMap } from "./content";
+import { allow, LIMITS } from "./rate-limit";
 import { formatDate, todayISO, addDaysISO } from "./format";
 import { requireAdmin, requireRole } from "./auth";
 import { hashPassword } from "./auth-token";
@@ -150,6 +151,10 @@ export async function createBooking(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
+  if (!(await allow("booking", LIMITS.publicForm.limit, LIMITS.publicForm.windowSeconds))) {
+    return { ok: false, message: "You have made several booking requests already. Please wait a few minutes, or WhatsApp us if it is urgent." };
+  }
+
   const customer = String(formData.get("customer") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
@@ -385,6 +390,10 @@ export async function createStayBooking(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
+  if (!(await allow("stay", LIMITS.publicForm.limit, LIMITS.publicForm.windowSeconds))) {
+    return { ok: false, message: "You have sent several stay requests already. Please wait a few minutes, or WhatsApp us if it is urgent." };
+  }
+
   const suiteId = String(formData.get("suiteId") ?? "");
   const guest = String(formData.get("guest") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
@@ -945,6 +954,10 @@ export async function createEnquiry(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
+  if (!(await allow("enquiry", LIMITS.publicForm.limit, LIMITS.publicForm.windowSeconds))) {
+    return { ok: false, message: "You have sent several messages already. Please wait a few minutes, or WhatsApp us if it is urgent." };
+  }
+
   const rawType = String(formData.get("type") ?? "General") as EnquiryType;
   const type: EnquiryType = ENQUIRY_TYPES.includes(rawType) ? rawType : "General";
   const name = String(formData.get("name") ?? "").trim();

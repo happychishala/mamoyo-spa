@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { passwordMatches, passwordHashMatches } from "./auth-token";
 import { endSession, startSession } from "./auth";
 import { readDb } from "./db";
+import { allow, LIMITS } from "./rate-limit";
 
 export interface LoginState {
   message: string;
@@ -16,6 +17,10 @@ export async function login(
   const username = String(formData.get("username") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const from = String(formData.get("from") ?? "");
+
+  if (!(await allow("login", LIMITS.login.limit, LIMITS.login.windowSeconds))) {
+    return { message: "Too many sign-in attempts. Wait a few minutes and try again." };
+  }
 
   if (!process.env.ADMIN_PASSWORD) {
     return {
