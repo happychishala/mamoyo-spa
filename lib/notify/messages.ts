@@ -1,7 +1,8 @@
-import type { Booking, Invoice, Receipt, Location } from "../db";
+import type { Booking, Invoice, Receipt, Location, GiftCard } from "../db";
 import { invoiceTotal, invoicePaid, invoiceBalance } from "../db";
 import { locationInfo } from "../content";
 import { formatMoney, formatDate } from "../format";
+import { giftValueLabel } from "../gift-cards";
 
 /** A message rendered for both channels: email gets subject + html, WhatsApp gets text. */
 export interface Message {
@@ -203,6 +204,62 @@ export function receiptMessage(receipt: Receipt): Message {
      </table>
      <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:#166f7a;">We look forward to seeing you again.</p>`,
     receipt.location
+  );
+
+  return { subject, text, html };
+}
+
+/** The gift card itself, for the recipient. */
+export function giftCardMessage(card: GiftCard): Message {
+  const b = branch(card.location);
+  const worth = giftValueLabel(card);
+  const first = card.recipientName.split(" ")[0];
+  const subject = `${card.senderName} has sent you a MaMoyo gift card`;
+
+  const text = [
+    `Hello ${first},`,
+    ``,
+    `${card.senderName} has sent you a MaMoyo gift card.`,
+    card.message ? `\n"${card.message}"\n` : "",
+    card.experience ? `Experience: ${card.experience}` : `Value: ${worth}`,
+    `Card code: ${card.code}`,
+    `Valid until: ${formatDate(card.expiresOn)}`,
+    ``,
+    `To use it, book at ${b.name} and give the code when you book.`,
+    `${b.phone} · info@mamoyospa.com`,
+    ``,
+    `Not exchangeable for cash.${card.experience ? " Any upgrade is payable on the day." : " Any remaining value stays on the card until it expires."}`,
+    ``,
+    `MaMoyo`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  // The card is drawn in the email itself — no attachment to open, and it
+  // survives clients that block remote images because it is all table markup.
+  const html = shell(
+    `A gift from ${card.senderName}`,
+    `<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hello ${first}, ${card.senderName} has sent you a MaMoyo gift card.</p>
+
+     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-radius:18px;overflow:hidden;background:${BRAND_TEAL};background-image:linear-gradient(135deg,#1CA3B1 0%,#178995 45%,#166F7A 100%);">
+       <tr><td style="padding:26px 24px;">
+         <p style="margin:0;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.8);">MaMoyo Gift Card</p>
+         <p style="margin:14px 0 0;font-size:${card.experience ? "22px" : "34px"};color:#ffffff;font-weight:600;line-height:1.1;">${worth}</p>
+         <p style="margin:18px 0 0;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.7);">For</p>
+         <p style="margin:2px 0 0;font-size:20px;color:#ffffff;">${card.recipientName}</p>
+         ${card.message ? `<p style="margin:12px 0 0;font-size:13px;font-style:italic;line-height:1.5;color:rgba(255,255,255,.92);">&ldquo;${card.message}&rdquo;</p>` : ""}
+         <p style="margin:16px 0 0;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.65);">Card code</p>
+         <p style="margin:2px 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:18px;letter-spacing:.14em;color:#ffffff;font-weight:600;">${card.code}</p>
+         <p style="margin:16px 0 0;font-size:12px;color:rgba(255,255,255,.78);">Valid until ${formatDate(card.expiresOn)}</p>
+       </td></tr>
+     </table>
+
+     <p style="margin:20px 0 0;font-size:14px;line-height:1.6;">To use it, book at <strong>${b.name}</strong> and give the code when you book.</p>
+     <p style="margin:12px 0 0;font-size:12px;line-height:1.6;color:#166f7a;">
+       Not exchangeable for cash.${card.experience ? " Any upgrade is payable on the day." : " Any remaining value stays on the card until it expires."}
+       Standard booking and cancellation terms apply.
+     </p>`,
+    card.location
   );
 
   return { subject, text, html };

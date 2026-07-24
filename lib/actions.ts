@@ -34,6 +34,9 @@ import {
   type UserRole,
   type RoleDefinitionRecord,
   type ChannelProviderName,
+  type GiftCard,
+  type GiftCardStatus,
+  type GiftCardDelivery,
 } from "./db";
 import { suites, bookablePriceMap } from "./content";
 import { allow, LIMITS } from "./rate-limit";
@@ -43,7 +46,9 @@ import {
   logNotification,
   invoiceMessage,
   receiptMessage,
+  giftCardMessage,
 } from "./notify";
+import { generateCode, expiryFrom, GIFT_EXPERIENCES, GIFT_MIN_CUSTOM } from "./gift-cards";
 import { formatDate, todayISO, addDaysISO } from "./format";
 import { requireAdmin, requireRole } from "./auth";
 import { hashPassword } from "./auth-token";
@@ -1242,4 +1247,130 @@ export async function updateTherapistContact(formData: FormData): Promise<void> 
   await writeDb(db);
   revalidatePath("/admin/team");
   revalidatePath("/admin/notifications");
+}
+
+// -------------------------------------------------------- Gift cards
+// Issued from the back office, delivered by email or WhatsApp through the same
+// notification layer as invoices and receipts, or printed as a presentation card.
+
+export async function issueGiftCard(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireRole("Owner", "Manager");
+
+  const recipientName = String(formData.get("recipientName") ?? "").trim();
+  const senderName = String(formData.get("senderName") ?? "").trim();
+  if (!recipientName || !senderName) {
+    return { ok: false, message: "Who the card is for and who it is from are both needed." };
+  }
+
+  const experience = String(formData.get("experience") ?? "").trim();
+  const rawValue = Number(formData.get("value") ?? 0);
+  const value = experience ? 0 : Math.round(rawValue);
+
+  if (!experience) {
+    if (!Number.isFinite(value) || value < GIFT_MIN_CUSTOM) {
+      return { ok: false, message: `Choose an experience, or a value of at least K${GIFT_MIN_CUSTOM}.` };
+    }
+  } else if (!GIFT_EXPERIENCES.includes(experience as (typeof GIFT_EXPERIENCES)[number])) {
+    return { ok: false, message: "That experience is not on the gift list." };
+  }
+
+  const rawDelivery = String(formData.get("delivery") ?? "Email");
+  const delivery: GiftCardDelivery = ["Email", "WhatsApp", "Presentation card"].includes(rawDelivery)
+    ? (rawDelivery as GiftCardDelivery)
+    : "Email";
+
+  const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
+  const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
+
+  const db = await readDb();
+  const issuedOn = todayISO();
+  const card: GiftCard = {
+    id: crypto.randomUUID(),
+    code: generateCode(db),
+    value,
+    experience: experience || undefined,
+    balance: value,
+    recipientName,
+    recipientEmail: String(formData.get("recipientEmail") ?? "").trim() || undefined,
+    recipientPhone: String(formData.get("recipientPhone") ?? "").trim() || undefined,
+    senderName,
+    message: String(formData.get("message") ?? "").trim() || undefined,
+    occasion: String(formData.get("occasion") ?? "").trim() || undefined,
+    delivery,
+    status: "Active",
+    issuedOn,
+    expiresOn: expiryFrom(issuedOn),
+    location,
+    corporateAccount: String(formData.get("corporateAccount") ?? "").trim() || undefined,
+    redemptions: [],
+    createdAt: new Date().toISOString(),
+  };
+
+  db.giftCards.unshift(card);
+  await writeDb(db);
+  revalidatePath("/admin/gift-cards");
+
+  return {
+    ok: true,
+    message: `Gift card ${card.code} issued for ${recipientName}. Send it, or print it as a presentation card.`,
+  };
+}
+
+export async function emailGiftCard(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  const db = await readDb();
+  const card = db.giftCards.find((c) => c.id === id);
+  if (!card) return;
+
+  const to = String(formData.get("to") ?? "").trim() || card.recipientEmail || "";
+  if (to && to !== card.recipientEmail) card.recipientEmail = to;
+
+  await sendEmail(db, to, giftCardMessage(card), { kind: "gift-card", reference: card.code });
+  await writeDb(db);
+  revalidatePath("/admin/gift-cards");
+  revalidatePath("/admin/notifications");
+}
+
+/** Record a redemption — full for an experience card, partial for a value card. */
+export async function redeemGiftCard(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  const amount = Number(formData.get("amount") ?? 0);
+  const note = String(formData.get("note") ?? "").trim();
+
+  const db = await readDb();
+  const card = db.giftCards.find((c) => c.id === id);
+  if (!card || card.status !== "Active") return;
+
+  if (card.experience) {
+    card.redemptions.push({ date: todayISO(), amount: 0, note: note || card.experience });
+    card.status = "Redeemed";
+  } else {
+    const applied = Math.min(card.balance, Math.max(0, Math.round(amount)));
+    if (applied <= 0) return;
+    card.balance -= applied;
+    card.redemptions.push({ date: todayISO(), amount: applied, note: note || undefined });
+    if (card.balance <= 0) card.status = "Redeemed";
+  }
+
+  await writeDb(db);
+  revalidatePath("/admin/gift-cards");
+}
+
+export async function setGiftCardStatus(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "") as GiftCardStatus;
+  if (!["Active", "Redeemed", "Expired", "Void"].includes(status)) return;
+
+  const db = await readDb();
+  const card = db.giftCards.find((c) => c.id === id);
+  if (!card) return;
+  card.status = status;
+  await writeDb(db);
+  revalidatePath("/admin/gift-cards");
 }

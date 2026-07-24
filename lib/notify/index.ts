@@ -11,10 +11,16 @@ import {
   type NotificationStatus,
 } from "../db";
 import { locationInfo } from "../content";
-import { bookingAlert, invoiceMessage, receiptMessage, type Message } from "./messages";
+import {
+  bookingAlert,
+  invoiceMessage,
+  receiptMessage,
+  giftCardMessage,
+  type Message,
+} from "./messages";
 
 export type { Message };
-export { bookingAlert, invoiceMessage, receiptMessage };
+export { bookingAlert, invoiceMessage, receiptMessage, giftCardMessage };
 
 export interface SendOutcome {
   status: NotificationStatus;

@@ -54,7 +54,7 @@ export default function PrintDocument({
         {children}
 
         <p className="mt-10 border-t border-mist-200 pt-4 text-center text-xs text-mist-600">
-          Thank you for choosing MaMoyo — spa · salon &amp; barber · health café · events · suites
+          Thank you for choosing MaMoyo — spa · café · suites · wellness experiences
         </p>
       </div>
     </div>

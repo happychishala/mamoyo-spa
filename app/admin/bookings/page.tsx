@@ -220,7 +220,7 @@ export default async function BookingsPage({
         <Card className="h-fit p-6 2xl:col-span-1">
           <h2 className="font-serif text-lg font-semibold text-mist-950">Walk-in / phone booking</h2>
           <p className="mt-1 text-sm text-mist-700">
-            Salon chairs, barber cuts, phone reservations — everything gets a booking so the revenue is traceable.
+            Walk-ins, phone reservations, treatments added on the day — everything gets a booking so the revenue is traceable.
           </p>
           <div className="mt-5">
             <NewBookingForm

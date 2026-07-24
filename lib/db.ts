@@ -238,7 +238,7 @@ export interface Review {
 }
 
 export type NotificationChannel = "email" | "whatsapp";
-export type NotificationKind = "booking-alert" | "invoice" | "receipt";
+export type NotificationKind = "booking-alert" | "invoice" | "receipt" | "gift-card";
 export type NotificationStatus = "sent" | "failed" | "not-configured" | "manual";
 
 /**
@@ -275,6 +275,42 @@ export interface NotificationLog {
   createdAt: string;
 }
 
+export type GiftCardStatus = "Active" | "Redeemed" | "Expired" | "Void";
+export type GiftCardDelivery = "Email" | "WhatsApp" | "Presentation card";
+
+/**
+ * A MaMoyo gift card. Value cards carry an amount; experience cards name a
+ * treatment instead. `balance` tracks part-redemption — the deck says any
+ * remaining value stays on the card until it expires.
+ */
+export interface GiftCard {
+  id: string;
+  /** Printed on the card, e.g. "MM-7Q4K-2XPA". Unique. */
+  code: string;
+  /** Face value in kwacha. Zero for a named-experience card. */
+  value: number;
+  /** Set instead of a value for experience cards, e.g. "Couples Retreat". */
+  experience?: string;
+  /** Remaining value after part-redemption. Mirrors value on issue. */
+  balance: number;
+  recipientName: string;
+  recipientEmail?: string;
+  recipientPhone?: string;
+  senderName: string;
+  /** The dedication printed on the card. */
+  message?: string;
+  occasion?: string;
+  delivery: GiftCardDelivery;
+  status: GiftCardStatus;
+  issuedOn: string; // YYYY-MM-DD
+  expiresOn: string; // YYYY-MM-DD — six months by default
+  location?: Location;
+  /** Set when a corporate buyer ordered a batch. */
+  corporateAccount?: string;
+  redemptions: { date: string; amount: number; note?: string }[];
+  createdAt: string;
+}
+
 export interface DB {
   bookings: Booking[];
   invoices: Invoice[];
@@ -291,6 +327,7 @@ export interface DB {
   reviews: Review[];
   emailSettings: EmailSettings;
   notifications: NotificationLog[];
+  giftCards: GiftCard[];
 }
 
 export function staysOverlap(
@@ -460,6 +497,7 @@ const seed: DB = {
     lastMessage: "Not configured yet.",
   },
   notifications: [],
+  giftCards: [],
 };
 
 /** Backfill arrays added after a stored DB was first written. Mutates in place. */
@@ -509,13 +547,17 @@ function migrate(db: DB): boolean {
     db.notifications = [];
     migrated = true;
   }
+  if (!Array.isArray(db.giftCards)) {
+    db.giftCards = [];
+    migrated = true;
+  }
   // Backfill newly added modules into existing system roles so they appear
   // for Owners/Managers/Staff without re-seeding.
   if (Array.isArray(db.roles)) {
     for (const role of db.roles) {
       if (!role.isSystemRole || !Array.isArray(role.modules)) continue;
       // Reviews are published to the public site, so Manager and Owner only.
-      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications"] as const) : (["enquiries"] as const);
+      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards"] as const) : (["enquiries"] as const);
       for (const mod of mods) {
         if (!role.modules.includes(mod)) {
           role.modules.push(mod);

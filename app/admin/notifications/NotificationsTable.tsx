@@ -22,6 +22,7 @@ const kindLabels: Record<string, string> = {
   "booking-alert": "Booking alert",
   invoice: "Invoice",
   receipt: "Receipt",
+  "gift-card": "Gift card",
 };
 
 const columns: DataColumn<NotificationLog>[] = [

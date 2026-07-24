@@ -14,7 +14,8 @@ export type AdminModule =
   | "integrations"
   | "enquiries"
   | "reviews"
-  | "notifications";
+  | "notifications"
+  | "gift-cards";
 
 export interface RoleDefinition {
   id: string;
@@ -42,6 +43,7 @@ export const ADMIN_MODULES: Array<{ id: AdminModule; label: string; description:
   { id: "enquiries", label: "Enquiries", description: "Website enquiries and applications" },
   { id: "reviews", label: "Reviews", description: "Verified guest reviews shown on the website" },
   { id: "notifications", label: "Notifications", description: "Email and WhatsApp delivery settings and history" },
+  { id: "gift-cards", label: "Gift Cards", description: "Issue, send and redeem MaMoyo gift cards" },
 ];
 
 export function normalizeRoleName(value: string): string {
@@ -79,6 +81,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "enquiries",
         "reviews",
         "notifications",
+        "gift-cards",
       ],
       rank: 1,
       isSystemRole: true,
@@ -104,6 +107,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "enquiries",
         "reviews",
         "notifications",
+        "gift-cards",
       ],
       rank: 2,
       isSystemRole: true,
