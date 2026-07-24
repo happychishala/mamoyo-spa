@@ -60,6 +60,18 @@ export function AddTherapistForm() {
         <input id="th-name" name="name" type="text" required placeholder="Therapist name" className={inputClasses} />
       </div>
       <div>
+        <label htmlFor="th-email" className="mb-1 block text-xs font-medium text-mist-800">
+          Email <span className="font-normal text-mist-500">(for booking alerts)</span>
+        </label>
+        <input id="th-email" name="email" type="email" placeholder="name@mamoyospa.com" className={inputClasses} />
+      </div>
+      <div>
+        <label htmlFor="th-phone" className="mb-1 block text-xs font-medium text-mist-800">
+          Phone <span className="font-normal text-mist-500">(optional)</span>
+        </label>
+        <input id="th-phone" name="phone" type="tel" placeholder="+260 …" className={inputClasses} />
+      </div>
+      <div>
         <label htmlFor="th-target" className="mb-1 block text-xs font-medium text-mist-800">
           Monthly target (K)
         </label>

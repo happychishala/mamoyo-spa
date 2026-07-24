@@ -37,6 +37,13 @@ import {
 } from "./db";
 import { suites, bookablePriceMap } from "./content";
 import { allow, LIMITS } from "./rate-limit";
+import {
+  alertBooking,
+  sendEmail,
+  logNotification,
+  invoiceMessage,
+  receiptMessage,
+} from "./notify";
 import { formatDate, todayISO, addDaysISO } from "./format";
 import { requireAdmin, requireRole } from "./auth";
 import { hashPassword } from "./auth-token";
@@ -70,6 +77,8 @@ function applyInvoicePayment(db: DB, invoice: Invoice, amount: number, method: s
     date: todayISO(),
     location: invoice.location ?? "Kabulonga",
     items: invoice.items,
+    customerEmail: invoice.customerEmail,
+    customerPhone: invoice.customerPhone,
   });
   db.transactions.unshift({
     id: crypto.randomUUID(),
@@ -196,6 +205,15 @@ export async function createBooking(
 
   db.bookings.unshift(booking);
   await writeDb(db);
+
+  // Tell the team a booking has landed. Never let a notification failure lose
+  // the booking — it is already saved above.
+  try {
+    await alertBooking(booking);
+  } catch {
+    // alertBooking logs its own failures; nothing more to do here.
+  }
+
   revalidatePath("/admin/bookings");
   revalidatePath("/admin");
 
@@ -249,6 +267,9 @@ export async function updateBookingStatus(formData: FormData): Promise<void> {
         number: nextInvoiceNumber(db),
         customer: booking.customer,
         bookingRef: booking.ref,
+        // Carried so the invoice and its receipts can be sent to the guest.
+        customerEmail: booking.email || undefined,
+        customerPhone: booking.phone || undefined,
         items: [
           {
             // Menu names already carry their duration (e.g. "— 90 min"); only
@@ -291,8 +312,19 @@ export async function assignBookingTherapist(formData: FormData): Promise<void> 
   const booking = db.bookings.find((b) => b.id === id);
   if (!booking) return;
   if (therapist && !db.therapists.some((t) => t.active && t.name === therapist)) return;
+  const changed = booking.therapist !== (therapist || undefined);
   booking.therapist = therapist || undefined;
   await writeDb(db);
+
+  // Let the therapist know the job is theirs.
+  if (changed && booking.therapist) {
+    try {
+      await alertBooking(booking);
+    } catch {
+      /* logged by alertBooking */
+    }
+  }
+
   revalidatePath("/admin/bookings");
 }
 
@@ -755,6 +787,8 @@ export async function addTherapist(
   await requireRole("Owner", "Manager");
   const name = String(formData.get("name") ?? "").trim();
   const monthlyTarget = Number(formData.get("monthlyTarget") ?? 0);
+  const email = String(formData.get("email") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
 
   if (!name) return { ok: false, message: "Please give the therapist a name." };
   if (!(monthlyTarget >= 0)) return { ok: false, message: "Target must be zero or more." };
@@ -768,6 +802,8 @@ export async function addTherapist(
     name,
     monthlyTarget: Math.round(monthlyTarget),
     active: true,
+    email: email || undefined,
+    phone: phone || undefined,
   });
   await writeDb(db);
   revalidatePath("/admin/team");
@@ -1082,4 +1118,128 @@ export async function deleteReview(formData: FormData): Promise<void> {
   await writeDb(db);
   revalidatePath("/admin/reviews");
   revalidatePath("/");
+}
+
+// ------------------------------------------------------- Notifications
+// Email goes out through the provider configured in Back office →
+// Notifications. WhatsApp is click-to-send: the back office builds a wa.me
+// link and a member of staff presses send, so MaMoyo's numbers stay usable in
+// the WhatsApp app. See lib/notify/README.md.
+
+export async function updateEmailSettings(formData: FormData): Promise<ActionResult> {
+  await requireRole("Owner", "Manager");
+  const db = await readDb();
+  const s = db.emailSettings;
+
+  s.enabled = formData.get("enabled") === "on";
+  s.fromAddress = String(formData.get("fromAddress") ?? "").trim();
+  s.alertKabulonga = String(formData.get("alertKabulonga") ?? "").trim();
+  s.alertTwangale = String(formData.get("alertTwangale") ?? "").trim();
+
+  // Blank means "leave the stored key alone" — the form never renders it back.
+  const key = String(formData.get("apiKey") ?? "").trim();
+  if (key) s.apiKey = key;
+
+  await writeDb(db);
+  revalidatePath("/admin/notifications");
+  return { ok: true, message: "Notification settings saved." };
+}
+
+export async function sendTestEmail(formData: FormData): Promise<ActionResult> {
+  await requireRole("Owner", "Manager");
+  const to = String(formData.get("to") ?? "").trim();
+  if (!to) return { ok: false, message: "Enter an address to send the test to." };
+
+  const db = await readDb();
+  const outcome = await sendEmail(
+    db,
+    to,
+    {
+      subject: "MaMoyo test email",
+      text: "This is a test from the MaMoyo back office. If you are reading it, email notifications are working.",
+      html: `<p style="font-family:sans-serif;font-size:14px;">This is a test from the MaMoyo back office.<br>If you are reading it, email notifications are working.</p>`,
+    },
+    { kind: "booking-alert", reference: "TEST" }
+  );
+  await writeDb(db);
+  revalidatePath("/admin/notifications");
+
+  return outcome.status === "sent"
+    ? { ok: true, message: `Test sent to ${to}.` }
+    : { ok: false, message: outcome.detail };
+}
+
+export async function emailInvoice(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  const db = await readDb();
+  const invoice = db.invoices.find((i) => i.id === id);
+  if (!invoice) return;
+
+  const to = String(formData.get("to") ?? "").trim() || invoice.customerEmail || "";
+  if (to && to !== invoice.customerEmail) invoice.customerEmail = to;
+
+  await sendEmail(db, to, invoiceMessage(invoice), {
+    kind: "invoice",
+    reference: invoice.number,
+  });
+  await writeDb(db);
+  revalidatePath("/admin/invoices");
+  revalidatePath("/admin/notifications");
+}
+
+export async function emailReceipt(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  const db = await readDb();
+  const receipt = db.receipts.find((r) => r.id === id);
+  if (!receipt) return;
+
+  const to = String(formData.get("to") ?? "").trim() || receipt.customerEmail || "";
+  if (to && to !== receipt.customerEmail) receipt.customerEmail = to;
+
+  await sendEmail(db, to, receiptMessage(receipt), {
+    kind: "receipt",
+    reference: receipt.number,
+  });
+  await writeDb(db);
+  revalidatePath("/admin/receipts");
+  revalidatePath("/admin/notifications");
+}
+
+/** Record that staff sent something by WhatsApp, so the log stays complete. */
+export async function logWhatsappSend(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const kind = String(formData.get("kind") ?? "invoice") as "invoice" | "receipt" | "booking-alert";
+  const reference = String(formData.get("reference") ?? "");
+  const recipient = String(formData.get("recipient") ?? "");
+  if (!reference) return;
+
+  const db = await readDb();
+  logNotification(db, {
+    kind,
+    channel: "whatsapp",
+    recipient,
+    subject: `${kind === "receipt" ? "Receipt" : kind === "invoice" ? "Invoice" : "Booking"} ${reference}`,
+    reference,
+    outcome: { status: "manual", detail: "Opened in WhatsApp for a member of staff to send." },
+  });
+  await writeDb(db);
+  revalidatePath("/admin/notifications");
+}
+
+export async function updateTherapistContact(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  const email = String(formData.get("email") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+
+  const db = await readDb();
+  const therapist = db.therapists.find((t) => t.id === id);
+  if (!therapist) return;
+  therapist.email = email || undefined;
+  therapist.phone = phone || undefined;
+  await writeDb(db);
+  revalidatePath("/admin/team");
+  revalidatePath("/admin/notifications");
 }

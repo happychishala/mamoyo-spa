@@ -13,7 +13,8 @@ export type AdminModule =
   | "team"
   | "integrations"
   | "enquiries"
-  | "reviews";
+  | "reviews"
+  | "notifications";
 
 export interface RoleDefinition {
   id: string;
@@ -40,6 +41,7 @@ export const ADMIN_MODULES: Array<{ id: AdminModule; label: string; description:
   { id: "integrations", label: "Integrations", description: "Third-party booking connectors" },
   { id: "enquiries", label: "Enquiries", description: "Website enquiries and applications" },
   { id: "reviews", label: "Reviews", description: "Verified guest reviews shown on the website" },
+  { id: "notifications", label: "Notifications", description: "Email and WhatsApp delivery settings and history" },
 ];
 
 export function normalizeRoleName(value: string): string {
@@ -76,6 +78,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "integrations",
         "enquiries",
         "reviews",
+        "notifications",
       ],
       rank: 1,
       isSystemRole: true,
@@ -100,6 +103,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "integrations",
         "enquiries",
         "reviews",
+        "notifications",
       ],
       rank: 2,
       isSystemRole: true,

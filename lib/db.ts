@@ -47,6 +47,8 @@ export interface Invoice {
   status: InvoiceStatus;
   location?: Location; // branch the work was booked at; defaults to Kabulonga
   amountPaid?: number; // running total of payments; missing on pre-partial-payment records
+  customerEmail?: string; // copied from the booking so the invoice can be emailed
+  customerPhone?: string; // copied from the booking so the invoice can be sent on WhatsApp
 }
 
 export interface Receipt {
@@ -59,6 +61,8 @@ export interface Receipt {
   date: string;
   location?: Location; // copied from the invoice for the printed address
   items?: InvoiceItem[]; // copied from the invoice so the receipt is self-contained
+  customerEmail?: string;
+  customerPhone?: string;
 }
 
 export interface Transaction {
@@ -117,6 +121,10 @@ export interface Therapist {
   name: string;
   monthlyTarget: number;
   active: boolean;
+  /** Where booking alerts for this therapist are sent. Both optional — a
+   *  therapist with neither simply falls back to the branch inbox. */
+  email?: string;
+  phone?: string;
 }
 
 export type InventoryCategory = "Spa products" | "Café";
@@ -229,6 +237,44 @@ export interface Review {
   createdAt: string;
 }
 
+export type NotificationChannel = "email" | "whatsapp";
+export type NotificationKind = "booking-alert" | "invoice" | "receipt";
+export type NotificationStatus = "sent" | "failed" | "not-configured" | "manual";
+
+/**
+ * Email delivery settings. The API key is stored here rather than in an env var
+ * so a manager can rotate it from the back office without a redeploy; it is
+ * never sent to the browser (the settings form writes, it does not read back).
+ */
+export interface EmailSettings {
+  enabled: boolean;
+  provider: "resend" | "smtp-relay";
+  apiKey: string;
+  /** Must be a verified sender on the provider, e.g. "MaMoyo <noreply@mamoyospa.com>". */
+  fromAddress: string;
+  /** Branch inboxes that receive a copy of every new booking. */
+  alertKabulonga: string;
+  alertTwangale: string;
+  lastStatus: "idle" | "sent" | "failed";
+  lastMessage: string;
+  lastSentAt?: string;
+}
+
+/** A record of every notification attempt, so staff can see what went out. */
+export interface NotificationLog {
+  id: string;
+  kind: NotificationKind;
+  channel: NotificationChannel;
+  /** Who it was addressed to — an email address or a phone number. */
+  recipient: string;
+  subject: string;
+  /** Reference of the thing it relates to: booking ref, invoice or receipt number. */
+  reference: string;
+  status: NotificationStatus;
+  detail: string;
+  createdAt: string;
+}
+
 export interface DB {
   bookings: Booking[];
   invoices: Invoice[];
@@ -243,6 +289,8 @@ export interface DB {
   channelIntegrations: ChannelIntegrationSetting[];
   enquiries: Enquiry[];
   reviews: Review[];
+  emailSettings: EmailSettings;
+  notifications: NotificationLog[];
 }
 
 export function staysOverlap(
@@ -401,6 +449,17 @@ const seed: DB = {
   // Seeded empty on purpose: reviews must be real, transcribed from a verified
   // platform listing by staff in the back office. Never seed sample reviews.
   reviews: [],
+  emailSettings: {
+    enabled: false,
+    provider: "resend",
+    apiKey: "",
+    fromAddress: "",
+    alertKabulonga: "",
+    alertTwangale: "",
+    lastStatus: "idle",
+    lastMessage: "Not configured yet.",
+  },
+  notifications: [],
 };
 
 /** Backfill arrays added after a stored DB was first written. Mutates in place. */
@@ -442,13 +501,21 @@ function migrate(db: DB): boolean {
     db.reviews = [];
     migrated = true;
   }
+  if (!db.emailSettings) {
+    db.emailSettings = seed.emailSettings;
+    migrated = true;
+  }
+  if (!Array.isArray(db.notifications)) {
+    db.notifications = [];
+    migrated = true;
+  }
   // Backfill newly added modules into existing system roles so they appear
   // for Owners/Managers/Staff without re-seeding.
   if (Array.isArray(db.roles)) {
     for (const role of db.roles) {
       if (!role.isSystemRole || !Array.isArray(role.modules)) continue;
       // Reviews are published to the public site, so Manager and Owner only.
-      const mods = role.rank >= 1 ? (["enquiries", "reviews"] as const) : (["enquiries"] as const);
+      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications"] as const) : (["enquiries"] as const);
       for (const mod of mods) {
         if (!role.modules.includes(mod)) {
           role.modules.push(mod);

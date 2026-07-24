@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Star,
+  BellRing,
   CalendarCheck,
   CalendarDays,
   BedDouble,
@@ -36,6 +37,7 @@ const nav = [
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck, minRank: 0, module: "bookings" },
   { href: "/admin/enquiries", label: "Enquiries", icon: Inbox, minRank: 0, module: "enquiries" },
   { href: "/admin/reviews", label: "Reviews", icon: Star, minRank: 1, module: "reviews" },
+  { href: "/admin/notifications", label: "Notifications", icon: BellRing, minRank: 1, module: "notifications" },
   { href: "/admin/pos", label: "POS", icon: ShoppingCart, minRank: 0, module: "pos" },
   { href: "/admin/stays", label: "Stays", icon: BedDouble, minRank: 0, module: "stays" },
   { href: "/admin/reports", label: "Reports", icon: BarChart3, minRank: 0, module: "reports" },

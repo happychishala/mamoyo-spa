@@ -4,6 +4,7 @@ import { formatMoney } from "@/lib/format";
 import { PageHeader, Card, NoAccess } from "@/components/admin/ui";
 import { getSession } from "@/lib/auth";
 import ReceiptsTable from "./ReceiptsTable";
+import { receiptMessage } from "@/lib/notify";
 
 export const metadata: Metadata = { title: "Receipts" };
 export const dynamic = "force-dynamic";
@@ -33,7 +34,9 @@ export default async function ReceiptsPage() {
           </p>
         </div>
         <div className="mt-5">
-          <ReceiptsTable receipts={receipts} />
+          <ReceiptsTable
+            receipts={receipts.map((r) => ({ ...r, whatsappBody: receiptMessage(r).text }))}
+          />
         </div>
       </Card>
     </div>

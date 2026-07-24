@@ -2,11 +2,16 @@
 
 import Link from "next/link";
 import { Printer } from "lucide-react";
+import SendButtons from "@/components/admin/SendButtons";
 import type { Receipt } from "@/lib/db";
+
+/** Receipt plus the WhatsApp text, rendered on the server so this client
+ *  component never imports lib/notify (which reaches into the database). */
+export type ReceiptRow = Receipt & { whatsappBody: string };
 import { formatMoney, formatDate } from "@/lib/format";
 import { DataTable, type DataColumn } from "@/components/admin/DataTable";
 
-const columns: DataColumn<Receipt>[] = [
+const columns: DataColumn<ReceiptRow>[] = [
   { key: "number", header: "Receipt №", cellClassName: "font-medium text-mist-950" },
   { key: "invoiceNumber", header: "Invoice" },
   { key: "customer", header: "Customer" },
@@ -48,9 +53,27 @@ const columns: DataColumn<Receipt>[] = [
       </Link>
     ),
   },
+  {
+    key: "send",
+    header: "Send",
+    align: "right",
+    sortable: false,
+    searchable: false,
+    exportable: false,
+    cell: (r) => (
+      <SendButtons
+        kind="receipt"
+        id={r.id}
+        reference={r.number}
+        email={r.customerEmail}
+        phone={r.customerPhone}
+        whatsappBody={r.whatsappBody}
+      />
+    ),
+  },
 ];
 
-export default function ReceiptsTable({ receipts }: { receipts: Receipt[] }) {
+export default function ReceiptsTable({ receipts }: { receipts: ReceiptRow[] }) {
   return (
     <DataTable
       rows={receipts}

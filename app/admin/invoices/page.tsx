@@ -5,6 +5,8 @@ import { readDb, invoiceTotal, invoicePaid, invoiceBalance } from "@/lib/db";
 import { updateInvoiceStatus, recordInvoicePayment } from "@/lib/actions";
 import { formatMoney, formatDate } from "@/lib/format";
 import { PageHeader, Card, StatusBadge, NoAccess } from "@/components/admin/ui";
+import SendButtons from "@/components/admin/SendButtons";
+import { invoiceMessage } from "@/lib/notify";
 import { getSession } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Invoices" };
@@ -70,6 +72,17 @@ export default async function InvoicesPage() {
                   </Link>
                   <p className="font-serif text-2xl font-semibold text-mist-950">{formatMoney(total)}</p>
                 </div>
+              </div>
+
+              <div className="mt-4 border-t border-mist-100 pt-4">
+                <SendButtons
+                  kind="invoice"
+                  id={inv.id}
+                  reference={inv.number}
+                  email={inv.customerEmail}
+                  phone={inv.customerPhone}
+                  whatsappBody={invoiceMessage(inv).text}
+                />
               </div>
 
               {paid > 0 && balance > 0 && (
