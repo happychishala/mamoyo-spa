@@ -5,6 +5,7 @@ import PageHero from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 import PhotoStrip from "@/components/site/PhotoStrip";
+import BrandStrip from "@/components/site/BrandStrip";
 
 export const metadata: Metadata = {
   title: { absolute: "MaMoyo Spa Lusaka | Kabulonga and Twangale Resort" },
@@ -195,6 +196,9 @@ export default function SpaOverviewPage() {
           { src: "/photos/hot-stone.jpg", alt: "Hot stone therapy in a MaMoyo treatment room" },
         ]}
       />
+
+      {/* Professional brand partners */}
+      <BrandStrip />
 
       {/* Treatment ritual */}
       <section className="mx-auto max-w-3xl px-6 py-16">

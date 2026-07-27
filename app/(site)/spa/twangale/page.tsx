@@ -98,6 +98,7 @@ export default function TwangalePage() {
       <JsonLd data={branchSchema("Twangale")} />
       <PageHero
         eyebrow="MaMoyo at Twangale Resort"
+        logo={{ src: "/logo-mamoyo-twangale.png", alt: "MaMoyo Spa Twangale", width: 4274, height: 1294 }}
         title="Let the day become larger than the appointment"
         intro="Within the gardens of Twangale Resort in Lilayi, MaMoyo unfolds at a slower, more expansive pace. Treatment rooms, pool time, open air, resort facilities and the landscape around them create space for a complete day rather than a single hour."
         primary={{ label: "Book Twangale", href: bookUrl }}
@@ -110,7 +111,7 @@ export default function TwangalePage() {
             </a>
           </>
         }
-        image={{ src: "/photos/wide-twangale.jpg", alt: "Loungers beside the pool in the gardens at Twangale Resort" }}
+        image={{ src: "/photos/twangale/hero-couples.jpg", alt: "The couples treatment room at MaMoyo Twangale, framed by sheer curtains and garden" }}
       />
 
       {/* Setting */}
@@ -187,9 +188,9 @@ export default function TwangalePage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/twangale-terrace.jpg", alt: "The poolside terrace in the grounds at Twangale Resort" },
-          { src: "/photos/twangale-peacock.jpg", alt: "One of the resident peacocks on the lawns at Twangale Resort" },
-          { src: "/photos/twangale-grounds.jpg", alt: "Loungers set among the gardens at Twangale Resort" },
+          { src: "/photos/twangale/manicure-area.jpg", alt: "The manicure and skincare area at MaMoyo Twangale, with garden light" },
+          { src: "/photos/twangale/pedicure-client.jpg", alt: "A guest receiving a pedicure at MaMoyo Twangale" },
+          { src: "/photos/twangale/products.jpg", alt: "MaMoyo spa products on a wooden trolley beside the gardens" },
         ]}
       />
 

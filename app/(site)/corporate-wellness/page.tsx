@@ -96,7 +96,7 @@ export default function CorporateWellnessPage() {
         photos={[
           { src: "/photos/massage-shoulder.jpg", alt: "Seated shoulder care during a workplace activation" },
           { src: "/photos/wide-cafe.jpg", alt: "A working lunch laid at MaMoyo Café" },
-          { src: "/photos/wide-twangale.jpg", alt: "The retreat setting at Twangale Resort" },
+          { src: "/photos/twangale/treatment-room.jpg", alt: "A garden-view treatment room at MaMoyo Twangale" },
         ]}
       />
 

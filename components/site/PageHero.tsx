@@ -6,6 +6,7 @@ type Cta = { label: string; href: string };
 
 export default function PageHero({
   eyebrow,
+  logo,
   title,
   intro,
   note,
@@ -14,6 +15,8 @@ export default function PageHero({
   image,
 }: {
   eyebrow: string;
+  /** A branch logo shown above the title, in place of the eyebrow text. */
+  logo?: { src: string; alt: string; width: number; height: number };
   title: string;
   /** One paragraph, or several rendered in sequence. */
   intro: string | string[];
@@ -31,7 +34,18 @@ export default function PageHero({
         <div className="absolute -top-24 right-0 h-80 w-80 rounded-full bg-mist-200/60 blur-3xl" />
       </div>
       <div className="mx-auto max-w-3xl px-6 text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">{eyebrow}</p>
+        {logo ? (
+          <Image
+            src={logo.src}
+            alt={logo.alt}
+            width={logo.width}
+            height={logo.height}
+            priority
+            className="mx-auto h-auto w-64 sm:w-72"
+          />
+        ) : (
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-mist-600">{eyebrow}</p>
+        )}
         <h1 className="mt-5 text-balance font-serif text-4xl font-semibold leading-[1.12] text-cocoa-700 sm:text-5xl">
           {title}
         </h1>
