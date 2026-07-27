@@ -18,7 +18,8 @@ export const brands: Brand[] = [
   { name: "Esse Skincare", src: "/brands/esse.png" },
   { name: "Elim", src: "/brands/elim.png" },
   { name: "SknLogic", src: "/brands/sknlogic.png" },
-  // Gelish and OPI drop in here once their logo files are supplied.
+  { name: "Gelish", src: "/brands/gelish.png" },
+  { name: "OPI", src: "/brands/opi.jpg" },
 ];
 
 export default function BrandStrip({
@@ -33,7 +34,7 @@ export default function BrandStrip({
   return (
     <section className="mx-auto max-w-6xl px-6 py-16">
       <SectionHeading overline={overline} title={title} description={description} />
-      <ul className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
+      <ul className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {brands.map((b) => (
           <li
             key={b.name}
