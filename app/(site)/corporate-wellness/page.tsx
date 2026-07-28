@@ -60,7 +60,7 @@ export default function CorporateWellnessPage() {
         intro="MaMoyo creates credible, well-delivered wellbeing programmes for banks, embassies, NGOs, mining companies, law firms, international organisations and corporate offices across Zambia — built around the workforce, the pressure pattern and the practical constraints of delivery."
         primary={{ label: "Request a Proposal", href: "#proposal" }}
         secondary={{ label: "Speak to Our Team", href: "/contact" }}
-        image={{ src: "/photos/wide-group.jpg", alt: "A MaMoyo wellbeing session arranged for a visiting team" }}
+        image={{ src: "/photos/wide-group.jpg", alt: "Guests together at a MaMoyo event" }}
       />
 
       {/* Services */}
@@ -94,7 +94,7 @@ export default function CorporateWellnessPage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/massage-shoulder.jpg", alt: "Seated shoulder care during a workplace activation" },
+          { src: "/photos/massage-shoulder.jpg", alt: "A MaMoyo skincare masterclass" },
           { src: "/photos/wide-cafe.jpg", alt: "A working lunch laid at MaMoyo Café" },
           { src: "/photos/twangale/treatment-room.jpg", alt: "A garden-view treatment room at MaMoyo Twangale" },
         ]}

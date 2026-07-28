@@ -100,7 +100,7 @@ export default function SpaOverviewPage() {
         ]}
         primary={{ label: "Choose a Location", href: "#locations" }}
         secondary={{ label: "View Treatment Menu", href: "/spa/menu" }}
-        image={{ src: "/photos/wide-spa.jpg", alt: "A full-body massage in progress in a MaMoyo treatment room" }}
+        image={{ src: "/photos/wide-spa.jpg", alt: "A treatment room at MaMoyo" }}
       />
 
       {/* Location choice */}
@@ -191,8 +191,8 @@ export default function SpaOverviewPage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/wide-massage-oil.jpg", alt: "Warm oil poured during a MaMoyo massage" },
-          { src: "/photos/eye-treatment.jpg", alt: "Eye care during a facial at MaMoyo" },
+          { src: "/photos/wide-massage-oil.jpg", alt: "A treatment room at MaMoyo" },
+          { src: "/photos/eye-treatment.jpg", alt: "A guest relaxing by the pool at MaMoyo" },
           { src: "/photos/hot-stone.jpg", alt: "Hot stone therapy in a MaMoyo treatment room" },
         ]}
       />

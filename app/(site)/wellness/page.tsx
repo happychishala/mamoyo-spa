@@ -69,7 +69,7 @@ export default function WellnessPage() {
         ]}
         primary={{ label: "Explore Our Approach", href: "#approach" }}
         secondary={{ label: "Book a Starting Point", href: "/booking" }}
-        image={{ src: "/photos/wide-wellness.jpg", alt: "A guest sitting quietly outdoors at the start of the day" }}
+        image={{ src: "/photos/wide-wellness.jpg", alt: "A MaMoyo therapist welcomes a guest" }}
       />
 
       {/* Approach */}

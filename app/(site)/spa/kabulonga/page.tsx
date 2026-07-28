@@ -108,7 +108,7 @@ export default function KabulongaPage() {
             </a>
           </>
         }
-        image={{ src: "/photos/facial-massage.jpg", alt: "A therapist performing a facial massage at MaMoyo Kabulonga" }}
+        image={{ src: "/photos/facial-massage.jpg", alt: "A treatment room at MaMoyo Kabulonga" }}
       />
 
       {/* Human scale */}
@@ -186,8 +186,8 @@ export default function KabulongaPage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/wide-skin-consult.jpg", alt: "A professional skin consultation at Kabulonga" },
-          { src: "/photos/manicure.jpg", alt: "Detailed hand care at MaMoyo Kabulonga" },
+          { src: "/photos/wide-skin-consult.jpg", alt: "The skincare product area at MaMoyo Kabulonga" },
+          { src: "/photos/manicure.jpg", alt: "MaMoyo salt scrubs and body products" },
           { src: "/photos/cafe-breakfast.jpg", alt: "Breakfast served at MaMoyo Café" },
         ]}
       />

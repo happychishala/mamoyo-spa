@@ -107,7 +107,7 @@ export default function TreatmentsPage() {
               <div className="relative h-56 sm:h-72">
                 <Image
                   src="/photos/wide-massage-couple.jpg"
-                  alt="A treatment underway in a MaMoyo room"
+                  alt="A treatment room at MaMoyo"
                   fill
                   priority
                   sizes="(min-width: 1280px) 72rem, 100vw"

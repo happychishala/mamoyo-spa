@@ -113,7 +113,7 @@ export default function ExperiencesPage() {
         intro="Our experiences bring together massage, skin, body care, nourishment, tea, water and time in a sequence that makes sense. Choose according to the state you need, the people you are bringing and the time you can protect."
         primary={{ label: "Find Your Experience", href: "/booking" }}
         secondary={{ label: "Ask Our Team", href: "/contact" }}
-        image={{ src: "/photos/wide-experiences.jpg", alt: "Two guests receiving treatments side by side at MaMoyo" }}
+        image={{ src: "/photos/wide-experiences.jpg", alt: "Two guests toasting by the pool at MaMoyo" }}
       />
 
       {/* Signature experiences */}
@@ -191,9 +191,9 @@ export default function ExperiencesPage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/wide-couples.jpg", alt: "A couples treatment at MaMoyo" },
-          { src: "/photos/pedicure.jpg", alt: "Detailed foot care during a MaMoyo experience" },
-          { src: "/photos/wide-foot-massage.jpg", alt: "Foot therapy during a full-day journey" },
+          { src: "/photos/wide-couples.jpg", alt: "MaMoyo professional skincare products" },
+          { src: "/photos/pedicure.jpg", alt: "The pedicure suite at MaMoyo" },
+          { src: "/photos/wide-foot-massage.jpg", alt: "A pedicure at MaMoyo" },
         ]}
       />
 

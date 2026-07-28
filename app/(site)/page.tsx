@@ -28,7 +28,7 @@ const destinations = [
     title: "Kabulonga: your city rhythm, made gentler",
     text: "A quiet boutique destination on Reedbuck Road for regular treatments, professional skincare, unhurried café time and stays within the MaMoyo grounds. Come for an hour, spend the afternoon or make it your address in Lusaka.",
     image: "/photos/interior.jpg",
-    alt: "The calm, light-filled interior at MaMoyo Kabulonga",
+    alt: "The nail and skincare studio at MaMoyo Kabulonga",
     href: "/spa/kabulonga",
     exploreLabel: "Explore Kabulonga",
     bookLabel: "Book Kabulonga",
@@ -53,9 +53,9 @@ const homeExperiences = [
 ];
 
 const gallery = [
-  { src: "/photos/garden.jpg", alt: "The gardens and pool terrace at MaMoyo" },
+  { src: "/photos/garden.jpg", alt: "A guest at MaMoyo" },
   { src: "/photos/towels-candle.jpg", alt: "Towels and candlelight set for a treatment" },
-  { src: "/photos/meditation.jpg", alt: "A quiet moment before a treatment begins" },
+  { src: "/photos/meditation.jpg", alt: "A quiet poolside moment at MaMoyo" },
   { src: "/photos/cafe-table.jpg", alt: "A table laid at MaMoyo Café" },
 ];
 
@@ -170,7 +170,7 @@ export default function HomePage() {
               <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-lift sm:aspect-[5/5]">
                 <Image
                   src="/photos/hero-massage.jpg"
-                  alt="Therapist pouring warm oil during a massage at MaMoyo"
+                  alt="A guest enjoying a moment at MaMoyo"
                   fill
                   priority
                   sizes="(min-width: 1024px) 45vw, 90vw"
@@ -181,7 +181,7 @@ export default function HomePage() {
                 <div className="relative aspect-square">
                   <Image
                     src="/photos/eye-treatment.jpg"
-                    alt="Eye care during a facial treatment at MaMoyo"
+                    alt="A guest relaxing by the pool at MaMoyo"
                     fill
                     sizes="12rem"
                     className="object-cover"
@@ -235,7 +235,7 @@ export default function HomePage() {
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-lift">
               <Image
                 src="/photos/yoga-outdoor.jpg"
-                alt="A guest moving gently in the morning sun at MaMoyo"
+                alt="A guest relaxing poolside at MaMoyo"
                 fill
                 sizes="(min-width: 1024px) 45vw, 90vw"
                 className="object-cover"
