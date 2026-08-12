@@ -7,7 +7,7 @@ import Reveal from "@/components/site/Reveal";
 import Wave from "@/components/site/Wave";
 import SplashScreen from "@/components/site/SplashScreen";
 import Reviews from "@/components/site/Reviews";
-import { services, cafeMenu } from "@/lib/content";
+import { services } from "@/lib/content";
 import { formatMoney } from "@/lib/format";
 import JsonLd from "@/components/site/JsonLd";
 import { homeGraphSchema } from "@/lib/schema";
@@ -408,15 +408,8 @@ export default function HomePage() {
               />
             </div>
             <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-mist-950/75 p-5 backdrop-blur">
-              <ul className="space-y-2 text-sm">
-                {cafeMenu[0].items.slice(0, 2).map((item) => (
-                  <li key={item.name} className="flex items-baseline justify-between gap-3">
-                    <span className="font-medium text-white">{item.name}</span>
-                    <span className="shrink-0 text-mist-300">{formatMoney(item.price)}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-3 text-xs text-mist-300">Made fresh, every morning.</p>
+              <p className="font-serif text-lg text-white">Breakfast, lunch &amp; tea rituals</p>
+              <p className="mt-1.5 text-xs text-mist-300">Made fresh, every morning.</p>
             </div>
           </div>
         </div>

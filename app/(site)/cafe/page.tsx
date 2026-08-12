@@ -6,8 +6,7 @@ import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 import FaqList from "@/components/site/FaqList";
 import EnquiryForm from "@/components/site/EnquiryForm";
-import { cafeMenu, locationInfo } from "@/lib/content";
-import { formatMoney } from "@/lib/format";
+import { locationInfo } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: { absolute: "MaMoyo Café Kabulonga | Breakfast, Lunch and Tea Rituals" },
@@ -73,19 +72,13 @@ export default function CafePage() {
         <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-mist-800">
           MaMoyo Café is open to everyone, whether or not you have a spa booking.
         </p>
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <div className="mt-8 flex justify-center">
           <Link
             href="#reserve"
             className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-8 py-4 text-sm font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-mist-700"
           >
             Reserve a Table
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-          <Link
-            href="#menu"
-            className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-8 py-4 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
-          >
-            View the Menu
           </Link>
         </div>
 
@@ -150,40 +143,6 @@ export default function CafePage() {
               </Reveal>
             ))}
           </div>
-          <div className="mt-10 text-center">
-            <Link
-              href="#menu"
-              className="inline-flex items-center gap-2 rounded-full bg-mist-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
-            >
-              View the Current Menu
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Menu */}
-        <div id="menu" className="mt-16 scroll-mt-28 grid gap-8 md:grid-cols-2">
-          {cafeMenu.map((section, i) => (
-            <Reveal key={section.title} delay={(i % 2) * 100}>
-              <section className="h-full rounded-2xl border border-mist-200 bg-white p-8 shadow-soft">
-                <div className="flex items-baseline justify-between gap-3 border-b border-mist-100 pb-4">
-                  <h2 className="font-serif text-2xl font-semibold text-cocoa-700">{section.title}</h2>
-                  <p className="text-xs font-medium uppercase tracking-wide text-mist-600">{section.note}</p>
-                </div>
-                <ul className="mt-5 space-y-5">
-                  {section.items.map((item) => (
-                    <li key={item.name} className="flex items-baseline justify-between gap-4">
-                      <div>
-                        <p className="font-medium text-mist-950">{item.name}</p>
-                        <p className="mt-0.5 text-sm text-mist-700">{item.description}</p>
-                      </div>
-                      <span className="shrink-0 font-semibold text-mist-700">{formatMoney(item.price)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </Reveal>
-          ))}
         </div>
 
         {/* Signature rituals */}
