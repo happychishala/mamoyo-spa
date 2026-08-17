@@ -75,5 +75,6 @@ export async function allow(
 /** Budgets, tuned so a real guest never notices and a script gives up quickly. */
 export const LIMITS = {
   login: { limit: 8, windowSeconds: 15 * 60 },
+  twofa: { limit: 12, windowSeconds: 15 * 60 },
   publicForm: { limit: 6, windowSeconds: 10 * 60 },
 } as const;

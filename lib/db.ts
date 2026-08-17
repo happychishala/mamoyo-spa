@@ -153,6 +153,23 @@ export interface User {
   passwordHash: string; // "{saltHex}:{scryptHex}"
   active: boolean;
   createdAt: string;
+  /** Mobile/WhatsApp number captured during 2FA enrollment. */
+  phone?: string;
+  /** Base32 TOTP secret, set once the user confirms their authenticator. */
+  totpSecret?: string;
+  /** True after enrollment is confirmed; false/undefined forces enrollment. */
+  totpEnabled?: boolean;
+}
+
+/**
+ * Security state for the virtual root "admin" owner account, which is
+ * authenticated by ADMIN_PASSWORD and has no row in `users`. Its 2FA
+ * enrollment lives here instead.
+ */
+export interface SecuritySettings {
+  adminTotpSecret?: string;
+  adminTotpEnabled?: boolean;
+  adminPhone?: string;
 }
 
 export interface RoleDefinitionRecord {
@@ -328,6 +345,7 @@ export interface DB {
   emailSettings: EmailSettings;
   notifications: NotificationLog[];
   giftCards: GiftCard[];
+  security: SecuritySettings;
 }
 
 export function staysOverlap(
@@ -498,6 +516,7 @@ const seed: DB = {
   },
   notifications: [],
   giftCards: [],
+  security: {},
 };
 
 /** Backfill arrays added after a stored DB was first written. Mutates in place. */
@@ -549,6 +568,10 @@ function migrate(db: DB): boolean {
   }
   if (!Array.isArray(db.giftCards)) {
     db.giftCards = [];
+    migrated = true;
+  }
+  if (!db.security || typeof db.security !== "object") {
+    db.security = {};
     migrated = true;
   }
   // Backfill newly added modules into existing system roles so they appear

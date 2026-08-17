@@ -2,9 +2,14 @@ import { cookies } from "next/headers";
 import {
   SESSION_COOKIE,
   SESSION_MAX_AGE_SECONDS,
+  PENDING_COOKIE,
+  PENDING_MAX_AGE_SECONDS,
   createSessionToken,
   verifySessionToken,
+  createPendingToken,
+  verifyPendingToken,
   type Session,
+  type PendingAuth,
 } from "./auth-token";
 import type { UserRole } from "./db";
 import { getAllowedModules } from "./permissions";
@@ -77,4 +82,27 @@ export async function startSession(session: Session): Promise<void> {
 export async function endSession(): Promise<void> {
   const store = await cookies();
   store.delete(SESSION_COOKIE);
+}
+
+// --- Half-authenticated 2FA step (between password and code) ---
+
+export async function startPending(pending: PendingAuth): Promise<void> {
+  const store = await cookies();
+  store.set(PENDING_COOKIE, createPendingToken(pending), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: PENDING_MAX_AGE_SECONDS,
+  });
+}
+
+export async function getPending(): Promise<PendingAuth | null> {
+  const store = await cookies();
+  return verifyPendingToken(store.get(PENDING_COOKIE)?.value);
+}
+
+export async function endPending(): Promise<void> {
+  const store = await cookies();
+  store.delete(PENDING_COOKIE);
 }

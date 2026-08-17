@@ -887,6 +887,23 @@ export async function setUserActive(formData: FormData): Promise<void> {
   revalidatePath("/admin/team");
 }
 
+/**
+ * Clear a user's 2FA enrollment so they set up a new authenticator on their
+ * next sign-in — used when a staff member loses or replaces their phone.
+ */
+export async function resetUserTotp(formData: FormData): Promise<void> {
+  await requireRole("Owner");
+  const id = String(formData.get("id") ?? "");
+
+  const db = await readDb();
+  const user = db.users.find((u) => u.id === id);
+  if (!user) return;
+  user.totpEnabled = false;
+  user.totpSecret = undefined;
+  await writeDb(db);
+  revalidatePath("/admin/team");
+}
+
 export async function updateTherapistTarget(formData: FormData): Promise<void> {
   await requireRole("Owner", "Manager");
   const id = String(formData.get("id") ?? "");

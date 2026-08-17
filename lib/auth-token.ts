@@ -7,9 +7,25 @@ import type { UserRole } from "./db";
 export const SESSION_COOKIE = "mamoyo_admin_session";
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
+// Between a correct password and a correct 2FA code the user is only half
+// authenticated: no session yet, just a short-lived signed cookie holding who
+// they are and what step is next. It carries the proposed TOTP secret during
+// first-time enrollment so the confirm step is stateless.
+export const PENDING_COOKIE = "mamoyo_2fa_pending";
+export const PENDING_MAX_AGE_SECONDS = 60 * 10; // 10 minutes to finish 2FA
+
 export interface Session {
   username: string;
   role: UserRole;
+}
+
+export interface PendingAuth {
+  username: string;
+  role: UserRole;
+  /** `enroll` = first login, set up an authenticator; `verify` = enter a code. */
+  stage: "enroll" | "verify";
+  /** Proposed base32 secret, present only while enrolling (not yet stored). */
+  secret?: string;
 }
 
 // Deriving the signing key from ADMIN_PASSWORD means rotating the password
@@ -56,6 +72,42 @@ export function verifySessionToken(token: string | undefined): Session | null {
       username: Buffer.from(user, "base64url").toString("utf8"),
       role: role as UserRole,
     };
+  } catch {
+    return null;
+  }
+}
+
+/** Signed cookie value for the half-authenticated 2FA step. */
+export function createPendingToken(pending: PendingAuth): string {
+  const key = signingKey();
+  if (!key) throw new Error("ADMIN_PASSWORD env var is not set.");
+  const expiresAt = String(Date.now() + PENDING_MAX_AGE_SECONDS * 1000);
+  const body = Buffer.from(JSON.stringify(pending), "utf8").toString("base64url");
+  const payload = `${expiresAt}.${body}`;
+  return `${payload}.${sign(payload, key)}`;
+}
+
+export function verifyPendingToken(token: string | undefined): PendingAuth | null {
+  const key = signingKey();
+  if (!key || !token) return null;
+
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  const [expires, body, signature] = parts;
+  const payload = `${expires}.${body}`;
+
+  const expiresAt = Number(expires);
+  if (!Number.isFinite(expiresAt) || expiresAt < Date.now()) return null;
+
+  const expected = Buffer.from(sign(payload, key), "hex");
+  const actual = Buffer.from(signature, "hex");
+  if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) return null;
+
+  try {
+    const pending = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as PendingAuth;
+    if (pending.stage !== "enroll" && pending.stage !== "verify") return null;
+    if (typeof pending.username !== "string" || typeof pending.role !== "string") return null;
+    return pending;
   } catch {
     return null;
   }

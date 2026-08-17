@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { UserCheck, UserX, ShieldAlert } from "lucide-react";
+import { UserCheck, UserX, ShieldAlert, ShieldCheck, KeyRound } from "lucide-react";
 import { readDb } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { setTherapistStatus, setUserActive } from "@/lib/actions";
+import { setTherapistStatus, setUserActive, resetUserTotp } from "@/lib/actions";
 import { formatMoney } from "@/lib/format";
 import { PageHeader, Card } from "@/components/admin/ui";
 import { AddTherapistForm, AddUserForm } from "./TeamForms";
@@ -124,7 +124,7 @@ export default async function TeamPage() {
             <Card className="p-6 xl:col-span-2">
             <h2 className="font-serif text-lg font-semibold text-mist-950">Back-office users</h2>
             <p className="mt-1 text-sm text-mist-700">
-              Staff see bookings, stays, reports and inventory. Managers also get invoices, receipts, finance and this team page. Owners manage users. The root <span className="font-medium">admin</span> account always works with the password in <code className="rounded bg-mist-100 px-1">.env.local</code>.
+              Staff see bookings, stays, reports and inventory. Managers also get invoices, receipts, finance and this team page. Owners manage users. Everyone sets up a free authenticator app on their first sign-in — use <span className="font-medium">Reset 2FA</span> if someone loses their phone. The root <span className="font-medium">admin</span> account uses the password in <code className="rounded bg-mist-100 px-1">.env.local</code>; if it's locked out of 2FA, set <code className="rounded bg-mist-100 px-1">RESET_ADMIN_2FA=1</code> and sign in to re-enroll.
             </p>
             <div className="mt-4 overflow-x-auto">
               <table className="w-full min-w-[560px] text-left text-sm">
@@ -134,6 +134,7 @@ export default async function TeamPage() {
                     <th className="pb-3 pr-4">Username</th>
                     <th className="pb-3 pr-4">Role</th>
                     <th className="pb-3 pr-4">Status</th>
+                    <th className="pb-3 pr-4">2FA</th>
                     <th className="pb-3 text-right">Action</th>
                   </tr>
                 </thead>
@@ -154,37 +155,64 @@ export default async function TeamPage() {
                           {u.active ? "Active" : "Disabled"}
                         </span>
                       </td>
+                      <td className="py-3.5 pr-4">
+                        {u.totpEnabled ? (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+                            <ShieldCheck className="h-3 w-3" aria-hidden="true" />
+                            On
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                            Setup pending
+                          </span>
+                        )}
+                      </td>
                       <td className="py-3.5">
-                        <form action={setUserActive} className="flex justify-end">
-                          <input type="hidden" name="id" value={u.id} />
-                          <input type="hidden" name="active" value={String(!u.active)} />
-                          <button
-                            type="submit"
-                            className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition-colors duration-200 ${
-                              u.active
-                                ? "border border-mist-300 text-mist-700 hover:border-red-300 hover:bg-red-50 hover:text-red-700"
-                                : "bg-mist-600 text-white hover:bg-mist-700"
-                            }`}
-                          >
-                            {u.active ? (
-                              <>
-                                <UserX className="h-3.5 w-3.5" aria-hidden="true" />
-                                Disable
-                              </>
-                            ) : (
-                              <>
-                                <UserCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                                Enable
-                              </>
-                            )}
-                          </button>
-                        </form>
+                        <div className="flex justify-end gap-2">
+                          {u.totpEnabled && (
+                            <form action={resetUserTotp}>
+                              <input type="hidden" name="id" value={u.id} />
+                              <button
+                                type="submit"
+                                title="Clear this user's authenticator so they set up a new one at next sign-in"
+                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-mist-300 px-3.5 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700"
+                              >
+                                <KeyRound className="h-3.5 w-3.5" aria-hidden="true" />
+                                Reset 2FA
+                              </button>
+                            </form>
+                          )}
+                          <form action={setUserActive}>
+                            <input type="hidden" name="id" value={u.id} />
+                            <input type="hidden" name="active" value={String(!u.active)} />
+                            <button
+                              type="submit"
+                              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition-colors duration-200 ${
+                                u.active
+                                  ? "border border-mist-300 text-mist-700 hover:border-red-300 hover:bg-red-50 hover:text-red-700"
+                                  : "bg-mist-600 text-white hover:bg-mist-700"
+                              }`}
+                            >
+                              {u.active ? (
+                                <>
+                                  <UserX className="h-3.5 w-3.5" aria-hidden="true" />
+                                  Disable
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                                  Enable
+                                </>
+                              )}
+                            </button>
+                          </form>
+                        </div>
                       </td>
                     </tr>
                   ))}
                   {db.users.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="py-8 text-center text-mist-600">
+                      <td colSpan={6} className="py-8 text-center text-mist-600">
                         No extra users yet — only the root admin account.
                       </td>
                     </tr>
