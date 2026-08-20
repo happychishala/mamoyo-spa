@@ -154,9 +154,9 @@ export default function WellnessPage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/yoga-outdoor.jpg", alt: "Gentle movement in the morning sun" },
+          { src: "/photos/massage-shoulder.jpg", alt: "A MaMoyo skincare masterclass" },
           { src: "/photos/tea-ritual.jpg", alt: "A MaMoyo tea ritual poured slowly" },
-          { src: "/photos/meditation.jpg", alt: "A quiet moment of rest at MaMoyo" },
+          { src: "/photos/hot-stone.jpg", alt: "Hot stone therapy at MaMoyo" },
         ]}
       />
 

@@ -53,9 +53,9 @@ const homeExperiences = [
 ];
 
 const gallery = [
-  { src: "/photos/garden.jpg", alt: "A guest at MaMoyo" },
+  { src: "/photos/facial.jpg", alt: "A professional facial at MaMoyo" },
   { src: "/photos/towels-candle.jpg", alt: "Towels and candlelight set for a treatment" },
-  { src: "/photos/meditation.jpg", alt: "A quiet poolside moment at MaMoyo" },
+  { src: "/photos/spa-detail.jpg", alt: "Handmade African soaps at MaMoyo" },
   { src: "/photos/cafe-table.jpg", alt: "A table laid at MaMoyo Café" },
 ];
 
@@ -169,8 +169,8 @@ export default function HomePage() {
             <div className="animate-rise relative mx-auto w-full max-w-lg lg:max-w-none" style={{ animationDelay: "200ms" }}>
               <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-lift sm:aspect-[5/5]">
                 <Image
-                  src="/photos/hero-massage.jpg"
-                  alt="A guest enjoying a moment at MaMoyo"
+                  src="/photos/facial-massage.jpg"
+                  alt="A treatment room at MaMoyo Kabulonga"
                   fill
                   priority
                   sizes="(min-width: 1024px) 45vw, 90vw"
@@ -180,8 +180,8 @@ export default function HomePage() {
               <div className="absolute -bottom-8 -left-4 w-40 overflow-hidden rounded-2xl border-4 border-mist-50 shadow-lift sm:-left-8 sm:w-48">
                 <div className="relative aspect-square">
                   <Image
-                    src="/photos/eye-treatment.jpg"
-                    alt="A guest relaxing by the pool at MaMoyo"
+                    src="/photos/hot-stone.jpg"
+                    alt="Hot stone therapy at MaMoyo"
                     fill
                     sizes="12rem"
                     className="object-cover"
@@ -234,8 +234,8 @@ export default function HomePage() {
           <Reveal>
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-lift">
               <Image
-                src="/photos/yoga-outdoor.jpg"
-                alt="A guest relaxing poolside at MaMoyo"
+                src="/photos/twangale/treatment-room.jpg"
+                alt="A garden-view treatment room at MaMoyo Twangale"
                 fill
                 sizes="(min-width: 1024px) 45vw, 90vw"
                 className="object-cover"
@@ -602,7 +602,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="relative overflow-hidden rounded-3xl px-8 py-20 text-center text-white shadow-lift sm:px-16">
           <Image
-            src="/photos/wide-massage-oil.jpg"
+            src="/photos/wide-skin-consult.jpg"
             alt=""
             aria-hidden="true"
             fill

@@ -191,8 +191,8 @@ export default function SpaOverviewPage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/wide-massage-oil.jpg", alt: "A treatment room at MaMoyo" },
-          { src: "/photos/eye-treatment.jpg", alt: "A guest relaxing by the pool at MaMoyo" },
+          { src: "/photos/facial-massage.jpg", alt: "A treatment room at MaMoyo" },
+          { src: "/photos/wide-skin-consult.jpg", alt: "A skincare consultation at MaMoyo" },
           { src: "/photos/hot-stone.jpg", alt: "Hot stone therapy in a MaMoyo treatment room" },
         ]}
       />

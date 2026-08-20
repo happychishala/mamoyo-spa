@@ -113,7 +113,7 @@ export default function ExperiencesPage() {
         intro="Our experiences bring together massage, skin, body care, nourishment, tea, water and time in a sequence that makes sense. Choose according to the state you need, the people you are bringing and the time you can protect."
         primary={{ label: "Find Your Experience", href: "/booking" }}
         secondary={{ label: "Ask Our Team", href: "/contact" }}
-        image={{ src: "/photos/wide-experiences.jpg", alt: "Two guests toasting by the pool at MaMoyo" }}
+        image={{ src: "/photos/twangale/hero-couples.jpg", alt: "Guests at MaMoyo Twangale Resort" }}
       />
 
       {/* Signature experiences */}
