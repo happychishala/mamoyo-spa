@@ -53,7 +53,7 @@ const homeExperiences = [
 ];
 
 const gallery = [
-  { src: "/photos/facial.jpg", alt: "A professional facial at MaMoyo" },
+  { src: "/photos/twangale/nail-bar.jpg", alt: "The nail colour bar at MaMoyo Twangale" },
   { src: "/photos/towels-candle.jpg", alt: "Towels and candlelight set for a treatment" },
   { src: "/photos/spa-detail.jpg", alt: "Handmade African soaps at MaMoyo" },
   { src: "/photos/cafe-table.jpg", alt: "A table laid at MaMoyo Café" },

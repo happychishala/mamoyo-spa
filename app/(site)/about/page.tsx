@@ -90,8 +90,8 @@ export default function AboutPage() {
             <div className="relative overflow-hidden rounded-2xl shadow-soft">
               <div className="relative h-72">
                 <Image
-                  src="/photos/interior.jpg"
-                  alt="Light-filled interior at MaMoyo"
+                  src="/photos/twangale/nail-studio.jpg"
+                  alt="The light-filled nail and skincare studio at MaMoyo"
                   fill
                   sizes="(min-width: 640px) 45vw, 90vw"
                   className="object-cover"
@@ -104,7 +104,7 @@ export default function AboutPage() {
               <div className="relative h-72">
                 <Image
                   src="/photos/massage-shoulder.jpg"
-                  alt="A shoulder massage during a treatment at MaMoyo"
+                  alt="A MaMoyo skincare masterclass"
                   fill
                   sizes="(min-width: 640px) 45vw, 90vw"
                   className="object-cover"

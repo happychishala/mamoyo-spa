@@ -165,9 +165,9 @@ export default function MembershipPage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/manicure.jpg", alt: "Manicure care at MaMoyo" },
+          { src: "/photos/manicure.jpg", alt: "MaMoyo body scrubs and skincare products" },
           { src: "/photos/wide-tea.jpg", alt: "A member tea ritual at MaMoyo Café" },
-          { src: "/photos/facial.jpg", alt: "A guest enjoying a moment at MaMoyo" },
+          { src: "/photos/facial.jpg", alt: "The nail and skincare studio at MaMoyo" },
         ]}
       />
 

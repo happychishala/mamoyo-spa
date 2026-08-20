@@ -191,9 +191,9 @@ export default function ExperiencesPage() {
       <PhotoStrip
         className="py-4"
         photos={[
-          { src: "/photos/wide-couples.jpg", alt: "MaMoyo professional skincare products" },
+          { src: "/photos/twangale/pedicure-service.jpg", alt: "A pedicure in progress at MaMoyo Twangale" },
           { src: "/photos/pedicure.jpg", alt: "The pedicure suite at MaMoyo" },
-          { src: "/photos/wide-foot-massage.jpg", alt: "A pedicure at MaMoyo" },
+          { src: "/photos/wide-couples.jpg", alt: "MaMoyo professional foot-care products" },
         ]}
       />
 
