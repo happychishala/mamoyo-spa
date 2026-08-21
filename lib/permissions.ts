@@ -4,6 +4,8 @@ export type AdminModule =
   | "bookings"
   | "stays"
   | "reports"
+  | "daysheet"
+  | "expenses"
   | "inventory"
   | "pos"
   | "invoices"
@@ -32,8 +34,10 @@ export const ADMIN_MODULES: Array<{ id: AdminModule; label: string; description:
   { id: "bookings", label: "Bookings", description: "Treatments and bookings" },
   { id: "stays", label: "Stays", description: "Suite stays" },
   { id: "reports", label: "Reports", description: "Reports and therapist view" },
+  { id: "daysheet", label: "Day Sheet", description: "Log daily treatments and view product sales" },
+  { id: "expenses", label: "Expenses", description: "Record and review business expenses" },
   { id: "inventory", label: "Inventory", description: "Stock and supplies" },
-  { id: "pos", label: "POS", description: "Cafe point of sale" },
+  { id: "pos", label: "POS", description: "Café and product point of sale" },
   { id: "invoices", label: "Invoices", description: "Billing and invoice management" },
   { id: "receipts", label: "Receipts", description: "Receipt records and printing" },
   { id: "finance", label: "Finance", description: "Transactions and finance" },
@@ -56,7 +60,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
       id: "role-staff",
       name: "Staff",
       description: "Front-line operations access",
-      modules: ["dashboard", "calendar", "bookings", "stays", "reports", "inventory", "pos", "enquiries"],
+      modules: ["dashboard", "calendar", "bookings", "stays", "reports", "daysheet", "inventory", "pos", "enquiries"],
       rank: 0,
       isSystemRole: true,
     },
@@ -70,6 +74,8 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "bookings",
         "stays",
         "reports",
+        "daysheet",
+        "expenses",
         "inventory",
         "pos",
         "invoices",
@@ -96,6 +102,8 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "bookings",
         "stays",
         "reports",
+        "daysheet",
+        "expenses",
         "inventory",
         "pos",
         "invoices",

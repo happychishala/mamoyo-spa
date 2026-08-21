@@ -77,6 +77,21 @@ export default function InventoryItemForm() {
         </div>
       </div>
 
+      <div>
+        <label htmlFor="inv-retail" className="mb-1 block text-xs font-medium text-mist-800">
+          Retail price (K) <span className="font-normal text-mist-500">— set to sell this item in POS → Products</span>
+        </label>
+        <input
+          id="inv-retail"
+          name="retailPrice"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Leave blank for back-of-house stock"
+          className={inputClasses}
+        />
+      </div>
+
       {state && (
         <p
           role="status"

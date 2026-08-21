@@ -4,9 +4,10 @@ import { useMemo, useState } from "react";
 import { createCafeSale } from "@/lib/actions";
 import { cafeMenu } from "@/lib/content";
 import { formatMoney } from "@/lib/format";
-import type { Location, PaymentMethod } from "@/lib/db";
+import type { Location } from "@/lib/db";
+import PaymentSplitFields from "./PaymentSplitFields";
 
-const methods: PaymentMethod[] = ["Cash", "Card", "Mobile Money", "Bank Transfer"];
+const methods: string[] = ["Cash", "Card", "Mobile Money", "Bank Transfer"];
 const locations: Location[] = ["Kabulonga", "Twangale"];
 
 type CartItem = {
@@ -21,9 +22,9 @@ function findCartItem(cart: CartItem[], description: string) {
 
 export default function CafePOS() {
   const [customer, setCustomer] = useState("");
-  const [method, setMethod] = useState<PaymentMethod>("Cash");
   const [location, setLocation] = useState<Location>("Kabulonga");
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [balanced, setBalanced] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const total = useMemo(
@@ -74,21 +75,6 @@ export default function CafePOS() {
                 placeholder="Walk-in customer"
                 className="mt-2 w-full rounded-2xl border border-mist-200 bg-mist-50 px-4 py-3 text-sm text-mist-900 outline-none transition duration-200 focus:border-mist-400 focus:bg-white"
               />
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-medium text-mist-700">Payment method</span>
-              <select
-                value={method}
-                onChange={(event) => setMethod(event.target.value as PaymentMethod)}
-                className="mt-2 w-full rounded-2xl border border-mist-200 bg-white px-4 py-3 text-sm text-mist-900 outline-none transition duration-200 focus:border-mist-400"
-              >
-                {methods.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
             </label>
 
             <label className="block">
@@ -176,12 +162,14 @@ export default function CafePOS() {
               </div>
             ))}
             <input type="hidden" name="customer" value={customer} />
-            <input type="hidden" name="method" value={method} />
             <input type="hidden" name="location" value={location} />
+            <div className="mb-4">
+              <PaymentSplitFields total={total} methods={methods} onBalancedChange={setBalanced} />
+            </div>
             <button
               type="submit"
-              disabled={cart.length === 0 || isSubmitting}
-              className="mt-4 inline-flex w-full items-center justify-center rounded-2xl bg-mist-600 px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-mist-700 disabled:cursor-not-allowed disabled:bg-mist-300"
+              disabled={cart.length === 0 || !balanced || isSubmitting}
+              className="mt-1 inline-flex w-full items-center justify-center rounded-2xl bg-mist-600 px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-mist-700 disabled:cursor-not-allowed disabled:bg-mist-300"
             >
               {isSubmitting ? "Processing…" : "Complete sale and print receipt"}
             </button>

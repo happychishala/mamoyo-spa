@@ -50,7 +50,18 @@ export default async function ReceiptPrintPage({
           <p className="text-xs font-semibold uppercase tracking-wide text-mist-600">Received from</p>
           <p className="mt-1 font-medium text-mist-950">{receipt.customer}</p>
           <p className="mt-3 text-xs text-mist-600">{formatDate(receipt.date)}</p>
-          <p className="text-xs text-mist-600">Paid by {receipt.method}</p>
+          {receipt.payments && receipt.payments.length > 1 ? (
+            <div className="mt-1 text-xs text-mist-600">
+              <p>Paid by:</p>
+              {receipt.payments.map((p, i) => (
+                <p key={i} className="font-medium text-mist-800">
+                  {p.method}: {formatMoney(p.amount)}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-mist-600">Paid by {receipt.method}</p>
+          )}
         </div>
       </div>
 

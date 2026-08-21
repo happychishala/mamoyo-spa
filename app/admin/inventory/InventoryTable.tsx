@@ -1,8 +1,8 @@
 "use client";
 
-import { PackagePlus, PackageMinus, AlertTriangle } from "lucide-react";
+import { PackagePlus, PackageMinus, AlertTriangle, Tag } from "lucide-react";
 import type { InventoryItem } from "@/lib/db";
-import { adjustInventory } from "@/lib/actions";
+import { adjustInventory, setRetailPrice } from "@/lib/actions";
 import { formatDate } from "@/lib/format";
 import { DataTable, type DataColumn } from "@/components/admin/DataTable";
 
@@ -43,6 +43,41 @@ const columns: DataColumn<InventoryItem>[] = [
     header: "Reorder at",
     value: (i) => i.reorderLevel,
     cell: (i) => `${i.reorderLevel} ${i.unit}`,
+  },
+  {
+    key: "retailPrice",
+    header: "Retail price",
+    value: (i) => i.retailPrice ?? 0,
+    sortable: true,
+    searchable: false,
+    exportable: true,
+    cell: (item) => (
+      <form action={setRetailPrice} className="flex items-center gap-1.5">
+        <input type="hidden" name="id" value={item.id} />
+        <label htmlFor={`price-${item.id}`} className="sr-only">
+          Retail price for {item.name}
+        </label>
+        <span className="text-xs text-mist-500">K</span>
+        <input
+          id={`price-${item.id}`}
+          name="retailPrice"
+          type="number"
+          min="0"
+          step="0.01"
+          defaultValue={item.retailPrice ?? ""}
+          placeholder="—"
+          className="w-20 rounded-lg border border-mist-200 bg-white px-2.5 py-1.5 text-right text-xs text-mist-950 focus:border-mist-500 focus:outline-none"
+        />
+        <button
+          type="submit"
+          aria-label={`Save retail price for ${item.name}`}
+          title="Save retail price (enables selling in POS → Products)"
+          className="inline-flex cursor-pointer items-center rounded-full bg-mist-100 p-1.5 text-mist-700 transition-colors duration-200 hover:bg-mist-600 hover:text-white"
+        >
+          <Tag className="h-3.5 w-3.5" aria-hidden="true" />
+        </button>
+      </form>
+    ),
   },
   {
     key: "updatedAt",

@@ -63,6 +63,9 @@ export interface Receipt {
   items?: InvoiceItem[]; // copied from the invoice so the receipt is self-contained
   customerEmail?: string;
   customerPhone?: string;
+  /** Set when the guest settled with more than one method; `method` then holds
+   *  a short summary ("Split payment"). Single-method sales leave this empty. */
+  payments?: PaymentSplit[];
 }
 
 export interface Transaction {
@@ -139,6 +142,15 @@ export interface InventoryItem {
   quantity: number;
   reorderLevel: number;
   updatedAt: string;
+  /** Per-unit retail price. Set only on items sold to guests over the counter;
+   *  items with a positive retailPrice appear in the product POS. */
+  retailPrice?: number;
+}
+
+/** One tender in a payment. A sale can be settled with several of these. */
+export interface PaymentSplit {
+  method: PaymentMethod | string;
+  amount: number;
 }
 
 export type UserRole = "Owner" | "Manager" | "Staff" | (string & {});
@@ -481,15 +493,15 @@ const seed: DB = {
   ],
   inventory: [
     { id: "inv1", name: "Massage oil", brand: "Sensations", volume: "5L", category: "Spa products", unit: "bottle", quantity: 7, reorderLevel: 3, updatedAt: "2026-07-04" },
-    { id: "inv2", name: "Aromatherapy essential oils", brand: "SOiL Organics", volume: "50ml", category: "Spa products", unit: "bottle", quantity: 12, reorderLevel: 6, updatedAt: "2026-07-01" },
-    { id: "inv3", name: "Facial mask sachets", brand: "Dermalogica", volume: "30ml", category: "Spa products", unit: "pcs", quantity: 24, reorderLevel: 15, updatedAt: "2026-07-06" },
+    { id: "inv2", name: "Aromatherapy essential oils", brand: "SOiL Organics", volume: "50ml", category: "Spa products", unit: "bottle", quantity: 12, reorderLevel: 6, updatedAt: "2026-07-01", retailPrice: 320 },
+    { id: "inv3", name: "Facial mask sachets", brand: "Dermalogica", volume: "30ml", category: "Spa products", unit: "pcs", quantity: 24, reorderLevel: 15, updatedAt: "2026-07-06", retailPrice: 180 },
     { id: "inv4", name: "Body scrub salts", brand: "Marula Naturals", volume: "2kg", category: "Spa products", unit: "tub", quantity: 2, reorderLevel: 3, updatedAt: "2026-07-07" },
     { id: "inv5", name: "Treatment towels", brand: "Glodina", volume: "70×140cm", category: "Spa products", unit: "pcs", quantity: 48, reorderLevel: 30, updatedAt: "2026-06-28" },
-    { id: "inv6", name: "Nail polish sets", brand: "OPI", volume: "15ml", category: "Spa products", unit: "set", quantity: 9, reorderLevel: 4, updatedAt: "2026-06-30" },
-    { id: "inv7", name: "Coffee beans", brand: "Munali Coffee", volume: "1kg", category: "Café", unit: "bag", quantity: 4, reorderLevel: 6, updatedAt: "2026-07-08" },
-    { id: "inv8", name: "Rooibos & herbal teas", brand: "Freshpak", volume: "80 bags", category: "Café", unit: "box", quantity: 11, reorderLevel: 5, updatedAt: "2026-07-02" },
+    { id: "inv6", name: "Nail polish sets", brand: "OPI", volume: "15ml", category: "Spa products", unit: "set", quantity: 9, reorderLevel: 4, updatedAt: "2026-06-30", retailPrice: 260 },
+    { id: "inv7", name: "Coffee beans", brand: "Munali Coffee", volume: "1kg", category: "Café", unit: "bag", quantity: 4, reorderLevel: 6, updatedAt: "2026-07-08", retailPrice: 220 },
+    { id: "inv8", name: "Rooibos & herbal teas", brand: "Freshpak", volume: "80 bags", category: "Café", unit: "box", quantity: 11, reorderLevel: 5, updatedAt: "2026-07-02", retailPrice: 90 },
     { id: "inv9", name: "Oat milk", brand: "Alpro", volume: "1L", category: "Café", unit: "carton", quantity: 18, reorderLevel: 10, updatedAt: "2026-07-08" },
-    { id: "inv10", name: "Raw honey", brand: "Forest Fruits Zambia", volume: "500ml", category: "Café", unit: "jar", quantity: 6, reorderLevel: 4, updatedAt: "2026-07-05" },
+    { id: "inv10", name: "Raw honey", brand: "Forest Fruits Zambia", volume: "500ml", category: "Café", unit: "jar", quantity: 6, reorderLevel: 4, updatedAt: "2026-07-05", retailPrice: 150 },
     { id: "inv11", name: "Sourdough flour", brand: "Antonio", volume: "12.5kg", category: "Café", unit: "bag", quantity: 3, reorderLevel: 2, updatedAt: "2026-07-03" },
     { id: "inv12", name: "Fresh juice fruit crate", brand: "Soweto Market", volume: "±15kg", category: "Café", unit: "crate", quantity: 1, reorderLevel: 2, updatedAt: "2026-07-09" },
   ],
@@ -574,13 +586,28 @@ function migrate(db: DB): boolean {
     db.security = {};
     migrated = true;
   }
+  // Seed starter retail prices onto matching inventory items that don't have
+  // one yet, so the product POS is usable out of the box. Never overwrites a
+  // price the user has already set, and skips items the user renamed.
+  if (Array.isArray(db.inventory)) {
+    const seedPrices = new Map(
+      seed.inventory.filter((i) => i.retailPrice).map((i) => [i.name.toLowerCase(), i.retailPrice as number])
+    );
+    for (const item of db.inventory) {
+      if (item.retailPrice === undefined && seedPrices.has(item.name.toLowerCase())) {
+        item.retailPrice = seedPrices.get(item.name.toLowerCase());
+        migrated = true;
+      }
+    }
+  }
   // Backfill newly added modules into existing system roles so they appear
   // for Owners/Managers/Staff without re-seeding.
   if (Array.isArray(db.roles)) {
     for (const role of db.roles) {
       if (!role.isSystemRole || !Array.isArray(role.modules)) continue;
       // Reviews are published to the public site, so Manager and Owner only.
-      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards"] as const) : (["enquiries"] as const);
+      // Day Sheet is front-line (all roles); Expenses is Manager and Owner only.
+      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards", "daysheet", "expenses"] as const) : (["enquiries", "daysheet"] as const);
       for (const mod of mods) {
         if (!role.modules.includes(mod)) {
           role.modules.push(mod);

@@ -25,6 +25,8 @@ import {
   X,
   ShoppingCart,
   Inbox,
+  ClipboardList,
+  TrendingDown,
 } from "lucide-react";
 import { logout } from "@/lib/auth-actions";
 import type { UserRole } from "@/lib/db";
@@ -43,6 +45,8 @@ const nav = [
   { href: "/admin/pos", label: "POS", icon: ShoppingCart, minRank: 0, module: "pos" },
   { href: "/admin/stays", label: "Stays", icon: BedDouble, minRank: 0, module: "stays" },
   { href: "/admin/reports", label: "Reports", icon: BarChart3, minRank: 0, module: "reports" },
+  { href: "/admin/daysheet", label: "Day Sheet", icon: ClipboardList, minRank: 0, module: "daysheet" },
+  { href: "/admin/expenses", label: "Expenses", icon: TrendingDown, minRank: 1, module: "expenses" },
   { href: "/admin/inventory", label: "Inventory", icon: Boxes, minRank: 0, module: "inventory" },
   { href: "/admin/invoices", label: "Invoices", icon: FileText, minRank: 1, module: "invoices" },
   { href: "/admin/receipts", label: "Receipts", icon: ReceiptText, minRank: 1, module: "receipts" },

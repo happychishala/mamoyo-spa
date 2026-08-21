@@ -12,6 +12,7 @@ import {
   type Invoice,
   type InvoiceItem,
   type Receipt,
+  type PaymentSplit,
   TREATMENT_PAYMENTS,
   type Enquiry,
   type EnquiryType,
@@ -49,7 +50,7 @@ import {
   giftCardMessage,
 } from "./notify";
 import { generateCode, expiryFrom, GIFT_EXPERIENCES, GIFT_MIN_CUSTOM } from "./gift-cards";
-import { formatDate, todayISO, addDaysISO } from "./format";
+import { formatDate, formatMoney, todayISO, addDaysISO } from "./format";
 import { requireAdmin, requireRole } from "./auth";
 import { hashPassword } from "./auth-token";
 import { syncStayToChannels } from "./channel-manager";
@@ -60,9 +61,51 @@ export interface ActionResult {
   message: string;
 }
 
+/**
+ * Read a split payment out of a submitted form. The client posts parallel
+ * `payMethod` / `payAmount` fields — one pair per tender. Falls back to a
+ * single `method` covering the whole `total` when no split was entered.
+ * Returns the tenders plus a `summary` string for the receipt's `method` field.
+ */
+function readPayments(
+  formData: FormData,
+  total: number
+): { payments: PaymentSplit[]; summary: string } {
+  const methods = formData.getAll("payMethod").map((v) => String(v).trim()).filter(Boolean);
+  const amounts = formData.getAll("payAmount").map((v) => Number(v));
+
+  const tenders: PaymentSplit[] = methods
+    .map((method, i) => ({ method, amount: Number.isFinite(amounts[i]) ? amounts[i] : 0 }))
+    .filter((t) => t.amount > 0);
+
+  // Merge duplicate methods so "Cash + Cash" reads as one line.
+  const merged: PaymentSplit[] = [];
+  for (const t of tenders) {
+    const existing = merged.find((m) => m.method === t.method);
+    if (existing) existing.amount += t.amount;
+    else merged.push({ ...t });
+  }
+
+  if (merged.length === 0) {
+    const single = String(formData.get("method") ?? "Cash") || "Cash";
+    return { payments: [{ method: single, amount: total }], summary: single };
+  }
+  if (merged.length === 1) {
+    return { payments: merged, summary: merged[0].method };
+  }
+  return { payments: merged, summary: "Split payment" };
+}
+
 // Applies a payment to an invoice inside an already-read db: bumps amountPaid,
 // flips status to Paid when settled, and issues the receipt + income entry.
-function applyInvoicePayment(db: DB, invoice: Invoice, amount: number, method: string): void {
+// `payments` optionally records the tender breakdown for a split settlement.
+function applyInvoicePayment(
+  db: DB,
+  invoice: Invoice,
+  amount: number,
+  method: string,
+  payments?: PaymentSplit[]
+): void {
   const total = invoiceTotal(invoice);
   const paid = Math.min(total, invoicePaid(invoice) + amount);
   invoice.amountPaid = paid;
@@ -84,6 +127,7 @@ function applyInvoicePayment(db: DB, invoice: Invoice, amount: number, method: s
     items: invoice.items,
     customerEmail: invoice.customerEmail,
     customerPhone: invoice.customerPhone,
+    payments: payments && payments.length > 1 ? payments : undefined,
   });
   db.transactions.unshift({
     id: crypto.randomUUID(),
@@ -114,12 +158,26 @@ function nextSaleRef(db: DB): string {
   return `POS-${year}-${String(max + 1).padStart(4, "0")}`;
 }
 
-function createCafeReceipt(
+function nextProductRef(db: DB): string {
+  const year = new Date().getFullYear();
+  const max = db.receipts.reduce((m, r) => {
+    const match = /^PRD-\d{4}-(\d{4})$/.exec(r.invoiceNumber);
+    const n = match ? Number(match[1]) : NaN;
+    return Number.isFinite(n) && n > m ? n : m;
+  }, 0);
+  return `PRD-${year}-${String(max + 1).padStart(4, "0")}`;
+}
+
+/** Build an over-the-counter receipt + income line for a café or product sale. */
+function createCounterReceipt(
   db: DB,
   items: Invoice["items"],
   customer: string,
-  method: PaymentMethod,
-  location: Location = "Kabulonga"
+  method: string,
+  location: Location,
+  ref: string,
+  incomeCategory: "Café" | "Retail products",
+  payments?: PaymentSplit[]
 ): Receipt {
   const total = items.reduce((sum, item) => sum + item.qty * item.unitPrice, 0);
   const maxRct = db.receipts.reduce((max, r) => {
@@ -129,24 +187,36 @@ function createCafeReceipt(
   const receipt: Receipt = {
     id: crypto.randomUUID(),
     number: `RCT-${new Date().getFullYear()}-${String(maxRct + 1).padStart(4, "0")}`,
-    invoiceNumber: nextSaleRef(db),
+    invoiceNumber: ref,
     customer: customer.trim() || "Walk-in customer",
     amount: total,
     method,
     date: todayISO(),
     location,
     items,
+    payments: payments && payments.length > 1 ? payments : undefined,
   };
   db.receipts.unshift(receipt);
   db.transactions.unshift({
     id: crypto.randomUUID(),
     date: todayISO(),
     type: "Income",
-    category: "Café",
-    description: `Café sale — ${receipt.invoiceNumber} (${receipt.customer})`,
+    category: incomeCategory,
+    description: `${incomeCategory === "Café" ? "Café" : "Product"} sale — ${receipt.invoiceNumber} (${receipt.customer})`,
     amount: total,
   });
   return receipt;
+}
+
+function createCafeReceipt(
+  db: DB,
+  items: Invoice["items"],
+  customer: string,
+  method: string,
+  location: Location = "Kabulonga",
+  payments?: PaymentSplit[]
+): Receipt {
+  return createCounterReceipt(db, items, customer, method, location, nextSaleRef(db), "Café", payments);
 }
 
 function bookingStartsAt(booking: Pick<Booking, "date" | "time">): Date {
@@ -360,7 +430,9 @@ export async function recordInvoicePayment(formData: FormData): Promise<void> {
   const invoice = db.invoices.find((i) => i.id === id);
   if (!invoice || invoice.status === "Paid") return;
 
-  applyInvoicePayment(db, invoice, Math.min(amount, invoiceTotal(invoice) - invoicePaid(invoice)), method);
+  const due = Math.min(amount, invoiceTotal(invoice) - invoicePaid(invoice));
+  const { payments, summary } = readPayments(formData, due);
+  applyInvoicePayment(db, invoice, due, summary || method, payments);
 
   await writeDb(db);
   revalidatePath("/admin/invoices");
@@ -397,7 +469,6 @@ export async function createCafeSale(formData: FormData): Promise<void> {
   await requireAdmin();
 
   const customer = String(formData.get("customer") ?? "").trim() || "Walk-in customer";
-  const method = (String(formData.get("method") ?? "Cash") || "Cash") as PaymentMethod;
   const location = (String(formData.get("location") ?? "Kabulonga") as Location);
   const descriptions = formData.getAll("description").map(String).filter(Boolean);
   const qtys = formData.getAll("qty").map((value) => Number(value));
@@ -413,13 +484,154 @@ export async function createCafeSale(formData: FormData): Promise<void> {
 
   if (items.length === 0) return;
 
+  const total = items.reduce((sum, item) => sum + item.qty * item.unitPrice, 0);
+  const { payments, summary } = readPayments(formData, total);
+
   const db = await readDb();
-  const receipt = createCafeReceipt(db, items, customer, method, location);
+  const receipt = createCafeReceipt(db, items, customer, summary, location, payments);
   await writeDb(db);
   revalidatePath("/admin/receipts");
   revalidatePath("/admin/finance");
   revalidatePath("/admin");
   redirect(`/admin/receipts/${receipt.id}/print`);
+}
+
+/**
+ * Sell products from inventory over the counter: validates stock, decrements it,
+ * records the sale as income and prints a receipt. Accepts split payments.
+ */
+export async function createProductSale(formData: FormData): Promise<void> {
+  await requireAdmin();
+
+  const customer = String(formData.get("customer") ?? "").trim() || "Walk-in customer";
+  const location = String(formData.get("location") ?? "Kabulonga") as Location;
+  const ids = formData.getAll("itemId").map(String);
+  const qtys = formData.getAll("qty").map((value) => Number(value));
+
+  const db = await readDb();
+
+  const lines: { item: (typeof db.inventory)[number]; qty: number }[] = [];
+  for (let i = 0; i < ids.length; i++) {
+    const item = db.inventory.find((it) => it.id === ids[i]);
+    const qty = Number.isFinite(qtys[i]) && qtys[i] > 0 ? Math.round(qtys[i]) : 0;
+    if (!item || !item.retailPrice || item.retailPrice <= 0 || qty <= 0) continue;
+    // Never sell more than we hold in stock.
+    const sellable = Math.min(qty, item.quantity);
+    if (sellable <= 0) continue;
+    lines.push({ item, qty: sellable });
+  }
+
+  if (lines.length === 0) return;
+
+  const items: InvoiceItem[] = lines.map(({ item, qty }) => ({
+    description: `${item.name}${item.brand ? ` — ${item.brand}` : ""}`,
+    qty,
+    unitPrice: item.retailPrice ?? 0,
+  }));
+  const total = items.reduce((sum, item) => sum + item.qty * item.unitPrice, 0);
+  const { payments, summary } = readPayments(formData, total);
+
+  // Decrement stock now that the sale is confirmed.
+  for (const { item, qty } of lines) {
+    item.quantity = Math.max(0, item.quantity - qty);
+    item.updatedAt = todayISO();
+  }
+
+  const receipt = createCounterReceipt(db, items, customer, summary, location, nextProductRef(db), "Retail products", payments);
+  await writeDb(db);
+  revalidatePath("/admin/receipts");
+  revalidatePath("/admin/inventory");
+  revalidatePath("/admin/finance");
+  revalidatePath("/admin/daysheet");
+  revalidatePath("/admin");
+  redirect(`/admin/receipts/${receipt.id}/print`);
+}
+
+/**
+ * Log a treatment done by a therapist (e.g. a walk-in), feeding the daily and
+ * monthly reports. Bookings still log their own treatment on completion.
+ */
+export async function logTreatment(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireAdmin();
+  const therapist = String(formData.get("therapist") ?? "").trim();
+  const service = String(formData.get("service") ?? "").trim();
+  const amount = Number(formData.get("amount") ?? 0);
+  const payment = String(formData.get("payment") ?? "Cash") as TreatmentPayment;
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(String(formData.get("date"))) ? String(formData.get("date")) : todayISO();
+  const location = String(formData.get("location") ?? "Kabulonga") as Location;
+  const notes = String(formData.get("notes") ?? "").trim();
+
+  if (!therapist || !service || !(amount > 0)) {
+    return { ok: false, message: "Please choose a therapist and enter the service and amount." };
+  }
+  if (!TREATMENT_PAYMENTS.includes(payment)) {
+    return { ok: false, message: "Pick a valid payment method." };
+  }
+
+  const db = await readDb();
+  if (!db.therapists.some((t) => t.name === therapist)) {
+    return { ok: false, message: "That therapist isn't on the team list." };
+  }
+  db.treatments.unshift({
+    id: crypto.randomUUID(),
+    date,
+    therapist,
+    service,
+    amount,
+    payment,
+    location,
+    notes: notes || undefined,
+  });
+  // A logged treatment is money in — mirror it into the finance ledger.
+  db.transactions.unshift({
+    id: crypto.randomUUID(),
+    date,
+    type: "Income",
+    category: "Spa services",
+    description: `${service} — ${therapist}${payment === "Comp" ? " (comp)" : ""}`,
+    amount: payment === "Comp" ? 0 : amount,
+  });
+  await writeDb(db);
+  revalidatePath("/admin/daysheet");
+  revalidatePath("/admin/reports");
+  revalidatePath("/admin/finance");
+  revalidatePath("/admin");
+  return { ok: true, message: `Logged ${service} for ${therapist} (${formatMoney(amount)}).` };
+}
+
+/** Record a business expense. Flows into the finance ledger like any outgoing. */
+export async function addExpense(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireRole("Owner", "Manager");
+  const category = String(formData.get("category") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const amount = Number(formData.get("amount") ?? 0);
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(String(formData.get("date"))) ? String(formData.get("date")) : todayISO();
+  const method = String(formData.get("method") ?? "").trim();
+
+  if (!category || !description || !(amount > 0)) {
+    return { ok: false, message: "Please provide a category, description and a positive amount." };
+  }
+
+  const db = await readDb();
+  db.transactions.unshift({
+    id: crypto.randomUUID(),
+    date,
+    type: "Expense",
+    category,
+    description: method ? `${description} (${method})` : description,
+    amount,
+  });
+  await writeDb(db);
+  revalidatePath("/admin/expenses");
+  revalidatePath("/admin/finance");
+  revalidatePath("/admin");
+  return { ok: true, message: `Expense of ${formatMoney(amount)} recorded under ${category}.` };
 }
 
 // Intentionally public: this backs the customer-facing stay request form.
@@ -930,12 +1142,17 @@ export async function addInventoryItem(
   const unit = String(formData.get("unit") ?? "").trim() || "pcs";
   const quantity = Number(formData.get("quantity") ?? 0);
   const reorderLevel = Number(formData.get("reorderLevel") ?? 0);
+  const retailRaw = String(formData.get("retailPrice") ?? "").trim();
+  const retailPrice = retailRaw ? Number(retailRaw) : undefined;
 
   if (!name || !["Spa products", "Café"].includes(category)) {
     return { ok: false, message: "Please provide a name and pick a category." };
   }
   if (!(quantity >= 0) || !(reorderLevel >= 0)) {
     return { ok: false, message: "Quantity and reorder level must be zero or more." };
+  }
+  if (retailPrice !== undefined && !(retailPrice >= 0)) {
+    return { ok: false, message: "Retail price must be zero or more, or left blank." };
   }
 
   const db = await readDb();
@@ -952,10 +1169,29 @@ export async function addInventoryItem(
     quantity: Math.round(quantity),
     reorderLevel: Math.round(reorderLevel),
     updatedAt: todayISO(),
+    retailPrice: retailPrice && retailPrice > 0 ? retailPrice : undefined,
   });
   await writeDb(db);
   revalidatePath("/admin/inventory");
   return { ok: true, message: `${name} added to ${category}.` };
+}
+
+/** Set (or clear, with 0/blank) the over-the-counter retail price of an item. */
+export async function setRetailPrice(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const raw = String(formData.get("retailPrice") ?? "").trim();
+  const price = raw ? Number(raw) : 0;
+  if (!id || !Number.isFinite(price) || price < 0) return;
+
+  const db = await readDb();
+  const item = db.inventory.find((i) => i.id === id);
+  if (!item) return;
+  item.retailPrice = price > 0 ? Math.round(price * 100) / 100 : undefined;
+  item.updatedAt = todayISO();
+  await writeDb(db);
+  revalidatePath("/admin/inventory");
+  revalidatePath("/admin/pos");
 }
 
 export async function adjustInventory(formData: FormData): Promise<void> {
