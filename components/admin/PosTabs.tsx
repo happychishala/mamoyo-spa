@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { Coffee, ShoppingBag } from "lucide-react";
+import type { MenuSection } from "@/lib/content";
 import CafePOS from "./CafePOS";
 import ProductPOS, { type RetailItem } from "./ProductPOS";
 
-export default function PosTabs({ products }: { products: RetailItem[] }) {
+export default function PosTabs({ products, menu }: { products: RetailItem[]; menu: MenuSection[] }) {
   const [tab, setTab] = useState<"cafe" | "products">("cafe");
 
   const tabCls = (active: boolean) =>
@@ -26,7 +27,7 @@ export default function PosTabs({ products }: { products: RetailItem[] }) {
         </button>
       </div>
 
-      {tab === "cafe" ? <CafePOS /> : <ProductPOS items={products} />}
+      {tab === "cafe" ? <CafePOS menu={menu} /> : <ProductPOS items={products} />}
     </div>
   );
 }

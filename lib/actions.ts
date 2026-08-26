@@ -40,9 +40,12 @@ import {
   type GiftCardDelivery,
   type Quotation,
   type QuotationStatus,
+  type CafeMenuItem,
+  type Recipe,
+  type RecipeIngredient,
 } from "./db";
 import { savePop } from "./pop-store";
-import { suites, bookablePriceMap } from "./content";
+import { suites, bookablePriceMap, cafeMenu } from "./content";
 import { allow, LIMITS } from "./rate-limit";
 import {
   alertBooking,
@@ -54,7 +57,7 @@ import {
 } from "./notify";
 import { generateCode, expiryFrom, GIFT_EXPERIENCES, GIFT_MIN_CUSTOM } from "./gift-cards";
 import { formatDate, formatMoney, todayISO, addDaysISO } from "./format";
-import { requireAdmin, requireRole } from "./auth";
+import { requireAdmin, requireRole, requireModule } from "./auth";
 import { hashPassword } from "./auth-token";
 import { syncStayToChannels } from "./channel-manager";
 import { normalizeRoleName } from "./permissions";
@@ -839,6 +842,158 @@ export async function deleteQuotation(formData: FormData): Promise<void> {
   if (db.quotations.length !== before) {
     await writeDb(db);
     revalidatePath("/admin/quotations");
+  }
+}
+
+// ---------- Chef: café menu + recipes ----------
+
+function revalidateChef() {
+  revalidatePath("/admin/chef");
+  revalidatePath("/admin/pos");
+}
+
+/** One-time: seed the editable café menu from the built-in menu so the chef
+ *  starts from the current offering instead of a blank slate. */
+export async function importCafeMenu(): Promise<void> {
+  await requireModule("chef");
+  const db = await readDb();
+  if (db.cafeMenuItems.length > 0) return; // never clobber edits
+  const now = todayISO();
+  for (const section of cafeMenu) {
+    for (const item of section.items) {
+      db.cafeMenuItems.push({
+        id: crypto.randomUUID(),
+        section: section.title,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        available: true,
+        createdAt: now,
+      });
+    }
+  }
+  await writeDb(db);
+  revalidateChef();
+}
+
+export async function addCafeMenuItem(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireModule("chef");
+  const section = String(formData.get("section") ?? "").trim() || "Other";
+  const name = String(formData.get("name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const price = Number(formData.get("price") ?? 0);
+
+  if (!name || !(price >= 0)) {
+    return { ok: false, message: "Give the item a name and a price." };
+  }
+
+  const db = await readDb();
+  db.cafeMenuItems.push({
+    id: crypto.randomUUID(),
+    section,
+    name,
+    description: description || undefined,
+    price: Math.round(price * 100) / 100,
+    available: true,
+    createdAt: todayISO(),
+  });
+  await writeDb(db);
+  revalidateChef();
+  return { ok: true, message: `Added “${name}” to ${section}.` };
+}
+
+export async function updateCafeMenuItem(formData: FormData): Promise<void> {
+  await requireModule("chef");
+  const id = String(formData.get("id") ?? "");
+  const db = await readDb();
+  const item = db.cafeMenuItems.find((m) => m.id === id);
+  if (!item) return;
+
+  // Availability toggle …
+  const toggle = String(formData.get("toggle") ?? "");
+  if (toggle === "available") {
+    item.available = !item.available;
+    await writeDb(db);
+    revalidateChef();
+    return;
+  }
+  // … or a field edit.
+  const price = Number(formData.get("price") ?? NaN);
+  if (Number.isFinite(price) && price >= 0) item.price = Math.round(price * 100) / 100;
+  const section = String(formData.get("section") ?? "").trim();
+  if (section) item.section = section;
+  const description = formData.get("description");
+  if (description !== null) {
+    const d = String(description).trim();
+    item.description = d || undefined;
+  }
+  await writeDb(db);
+  revalidateChef();
+}
+
+export async function deleteCafeMenuItem(formData: FormData): Promise<void> {
+  await requireModule("chef");
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  const db = await readDb();
+  const before = db.cafeMenuItems.length;
+  db.cafeMenuItems = db.cafeMenuItems.filter((m) => m.id !== id);
+  if (db.cafeMenuItems.length !== before) {
+    await writeDb(db);
+    revalidateChef();
+  }
+}
+
+export async function addRecipe(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireModule("chef");
+  const name = String(formData.get("name") ?? "").trim();
+  const category = String(formData.get("category") ?? "").trim();
+  const yieldText = String(formData.get("yield") ?? "").trim();
+  const method = String(formData.get("method") ?? "").trim();
+  const notes = String(formData.get("notes") ?? "").trim();
+
+  const names = formData.getAll("ingredientName").map((v) => String(v).trim());
+  const qtys = formData.getAll("ingredientQty").map((v) => String(v).trim());
+  const units = formData.getAll("ingredientUnit").map((v) => String(v).trim());
+  const ingredients: RecipeIngredient[] = names
+    .map((n, i) => ({ name: n, qty: qtys[i] || undefined, unit: units[i] || undefined }))
+    .filter((ing) => ing.name);
+
+  if (!name) return { ok: false, message: "Give the recipe a name." };
+  if (ingredients.length === 0) return { ok: false, message: "Add at least one ingredient." };
+
+  const db = await readDb();
+  db.recipes.unshift({
+    id: crypto.randomUUID(),
+    name,
+    category: category || undefined,
+    yield: yieldText || undefined,
+    ingredients,
+    method: method || undefined,
+    notes: notes || undefined,
+    createdAt: todayISO(),
+  });
+  await writeDb(db);
+  revalidatePath("/admin/chef");
+  return { ok: true, message: `Recipe “${name}” saved.` };
+}
+
+export async function deleteRecipe(formData: FormData): Promise<void> {
+  await requireModule("chef");
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  const db = await readDb();
+  const before = db.recipes.length;
+  db.recipes = db.recipes.filter((r) => r.id !== id);
+  if (db.recipes.length !== before) {
+    await writeDb(db);
+    revalidatePath("/admin/chef");
   }
 }
 

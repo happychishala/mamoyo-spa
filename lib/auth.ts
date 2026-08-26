@@ -62,6 +62,17 @@ export async function requireRole(...roles: UserRole[]): Promise<Session> {
   return session;
 }
 
+/** Guard for actions gated by module access rather than a fixed role, so custom
+ *  roles (e.g. a "Chef" role) can be granted just the modules they need. */
+export async function requireModule(module: string): Promise<Session> {
+  const session = await requireAdmin();
+  if (session.role === "Owner") return session;
+  if (!(await canAccessModule(module, session.role))) {
+    throw new Error(`Unauthorized: this needs access to the ${module} module.`);
+  }
+  return session;
+}
+
 export async function canAccessModule(module: string, role: UserRole): Promise<boolean> {
   const db = await readDb();
   const customRoles = db.roles ?? [];

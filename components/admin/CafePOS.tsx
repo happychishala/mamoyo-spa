@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { createCafeSale } from "@/lib/actions";
-import { cafeMenu } from "@/lib/content";
+import type { MenuSection } from "@/lib/content";
 import { formatMoney } from "@/lib/format";
 import type { Location } from "@/lib/db";
 import PaymentSplitFields from "./PaymentSplitFields";
@@ -21,7 +21,7 @@ function findCartItem(cart: CartItem[], description: string) {
   return cart.find((item) => item.description === description);
 }
 
-export default function CafePOS() {
+export default function CafePOS({ menu }: { menu: MenuSection[] }) {
   const [customer, setCustomer] = useState("");
   const [location, setLocation] = useState<Location>("Kabulonga");
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -180,7 +180,7 @@ export default function CafePOS() {
       <section className="space-y-4 rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
         <h3 className="font-serif text-xl font-semibold text-mist-950">Café menu</h3>
         <div className="grid gap-5 lg:grid-cols-2">
-          {cafeMenu.map((section) => (
+          {menu.map((section) => (
             <div key={section.title} className="rounded-2xl border border-mist-100 bg-mist-50 p-4">
               <div className="flex items-center justify-between gap-3 border-b border-mist-200 pb-3">
                 <div>

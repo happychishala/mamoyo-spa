@@ -106,6 +106,35 @@ export interface Quotation {
   createdAt: string;
 }
 
+/** A café menu item the chef manages from the back office. */
+export interface CafeMenuItem {
+  id: string;
+  section: string; // menu grouping, e.g. "Breakfast", "Teas & Coffee"
+  name: string;
+  description?: string;
+  price: number;
+  available: boolean;
+  createdAt: string;
+}
+
+export interface RecipeIngredient {
+  name: string;
+  qty?: string;
+  unit?: string;
+}
+
+/** A kitchen recipe kept by the chef. */
+export interface Recipe {
+  id: string;
+  name: string;
+  category?: string;
+  yield?: string; // e.g. "10 portions", "1 litre"
+  ingredients: RecipeIngredient[];
+  method?: string;
+  notes?: string;
+  createdAt: string;
+}
+
 /** A tip received by a therapist. Tracked apart from house revenue. */
 export interface TipEntry {
   id: string;
@@ -401,6 +430,8 @@ export interface DB {
   security: SecuritySettings;
   quotations: Quotation[];
   tips: TipEntry[];
+  cafeMenuItems: CafeMenuItem[];
+  recipes: Recipe[];
 }
 
 export function staysOverlap(
@@ -574,6 +605,8 @@ const seed: DB = {
   security: {},
   quotations: [],
   tips: [],
+  cafeMenuItems: [],
+  recipes: [],
 };
 
 /** Backfill arrays added after a stored DB was first written. Mutates in place. */
@@ -639,6 +672,14 @@ function migrate(db: DB): boolean {
     db.tips = [];
     migrated = true;
   }
+  if (!Array.isArray(db.cafeMenuItems)) {
+    db.cafeMenuItems = [];
+    migrated = true;
+  }
+  if (!Array.isArray(db.recipes)) {
+    db.recipes = [];
+    migrated = true;
+  }
   // Seed starter retail prices onto matching inventory items that don't have
   // one yet, so the product POS is usable out of the box. Never overwrites a
   // price the user has already set, and skips items the user renamed.
@@ -660,7 +701,7 @@ function migrate(db: DB): boolean {
       if (!role.isSystemRole || !Array.isArray(role.modules)) continue;
       // Reviews are published to the public site, so Manager and Owner only.
       // Day Sheet is front-line (all roles); Expenses is Manager and Owner only.
-      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards", "daysheet", "expenses", "quotations"] as const) : (["enquiries", "daysheet"] as const);
+      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards", "daysheet", "expenses", "quotations", "chef"] as const) : (["enquiries", "daysheet"] as const);
       for (const mod of mods) {
         if (!role.modules.includes(mod)) {
           role.modules.push(mod);
