@@ -27,6 +27,7 @@ import {
   Inbox,
   ClipboardList,
   TrendingDown,
+  FileSignature,
 } from "lucide-react";
 import { logout } from "@/lib/auth-actions";
 import type { UserRole } from "@/lib/db";
@@ -48,6 +49,7 @@ const nav = [
   { href: "/admin/daysheet", label: "Day Sheet", icon: ClipboardList, minRank: 0, module: "daysheet" },
   { href: "/admin/expenses", label: "Expenses", icon: TrendingDown, minRank: 1, module: "expenses" },
   { href: "/admin/inventory", label: "Inventory", icon: Boxes, minRank: 0, module: "inventory" },
+  { href: "/admin/quotations", label: "Quotations", icon: FileSignature, minRank: 1, module: "quotations" },
   { href: "/admin/invoices", label: "Invoices", icon: FileText, minRank: 1, module: "invoices" },
   { href: "/admin/receipts", label: "Receipts", icon: ReceiptText, minRank: 1, module: "receipts" },
   { href: "/admin/finance", label: "Finance", icon: Wallet, minRank: 1, module: "finance" },

@@ -75,6 +75,47 @@ export interface Transaction {
   category: string;
   description: string;
   amount: number;
+  /** Id of an attached proof-of-payment (receipt photo / screenshot), stored
+   *  separately from the main DB blob and served via /admin/expenses/pop/{id}. */
+  popId?: string;
+}
+
+export type QuotationStatus =
+  | "Draft"
+  | "Sent"
+  | "Accepted"
+  | "Declined"
+  | "Expired"
+  | "Converted";
+
+/** A price quote sent to a prospective client, convertible into an invoice. */
+export interface Quotation {
+  id: string;
+  number: string; // QUO-YYYY-NNNN
+  customer: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  items: InvoiceItem[];
+  issueDate: string;
+  validUntil: string;
+  status: QuotationStatus;
+  location?: Location;
+  notes?: string;
+  /** Invoice number this quote became, once accepted and converted. */
+  convertedInvoice?: string;
+  createdAt: string;
+}
+
+/** A tip received by a therapist. Tracked apart from house revenue. */
+export interface TipEntry {
+  id: string;
+  date: string; // YYYY-MM-DD
+  therapist: string;
+  amount: number;
+  method?: string;
+  note?: string;
+  location?: Location;
+  createdAt: string;
 }
 
 export type StayStatus = "Pending" | "Confirmed" | "CheckedIn" | "CheckedOut" | "Cancelled";
@@ -358,6 +399,8 @@ export interface DB {
   notifications: NotificationLog[];
   giftCards: GiftCard[];
   security: SecuritySettings;
+  quotations: Quotation[];
+  tips: TipEntry[];
 }
 
 export function staysOverlap(
@@ -529,6 +572,8 @@ const seed: DB = {
   notifications: [],
   giftCards: [],
   security: {},
+  quotations: [],
+  tips: [],
 };
 
 /** Backfill arrays added after a stored DB was first written. Mutates in place. */
@@ -586,6 +631,14 @@ function migrate(db: DB): boolean {
     db.security = {};
     migrated = true;
   }
+  if (!Array.isArray(db.quotations)) {
+    db.quotations = [];
+    migrated = true;
+  }
+  if (!Array.isArray(db.tips)) {
+    db.tips = [];
+    migrated = true;
+  }
   // Seed starter retail prices onto matching inventory items that don't have
   // one yet, so the product POS is usable out of the box. Never overwrites a
   // price the user has already set, and skips items the user renamed.
@@ -607,7 +660,7 @@ function migrate(db: DB): boolean {
       if (!role.isSystemRole || !Array.isArray(role.modules)) continue;
       // Reviews are published to the public site, so Manager and Owner only.
       // Day Sheet is front-line (all roles); Expenses is Manager and Owner only.
-      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards", "daysheet", "expenses"] as const) : (["enquiries", "daysheet"] as const);
+      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards", "daysheet", "expenses", "quotations"] as const) : (["enquiries", "daysheet"] as const);
       for (const mod of mods) {
         if (!role.modules.includes(mod)) {
           role.modules.push(mod);

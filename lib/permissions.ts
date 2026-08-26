@@ -8,6 +8,7 @@ export type AdminModule =
   | "expenses"
   | "inventory"
   | "pos"
+  | "quotations"
   | "invoices"
   | "receipts"
   | "finance"
@@ -38,6 +39,7 @@ export const ADMIN_MODULES: Array<{ id: AdminModule; label: string; description:
   { id: "expenses", label: "Expenses", description: "Record and review business expenses" },
   { id: "inventory", label: "Inventory", description: "Stock and supplies" },
   { id: "pos", label: "POS", description: "Café and product point of sale" },
+  { id: "quotations", label: "Quotations", description: "Client price quotes, convertible to invoices" },
   { id: "invoices", label: "Invoices", description: "Billing and invoice management" },
   { id: "receipts", label: "Receipts", description: "Receipt records and printing" },
   { id: "finance", label: "Finance", description: "Transactions and finance" },
@@ -78,6 +80,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "expenses",
         "inventory",
         "pos",
+        "quotations",
         "invoices",
         "receipts",
         "finance",
@@ -106,6 +109,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "expenses",
         "inventory",
         "pos",
+        "quotations",
         "invoices",
         "receipts",
         "finance",

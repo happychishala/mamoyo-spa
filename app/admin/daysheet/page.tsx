@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ClipboardList, ShoppingBag } from "lucide-react";
+import { ClipboardList, ShoppingBag, HandCoins } from "lucide-react";
 import { readDb, TREATMENT_PAYMENTS, LOCATIONS } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { deleteTip } from "@/lib/actions";
 import { formatMoney, formatDate, todayISO } from "@/lib/format";
 import { PageHeader, Card } from "@/components/admin/ui";
 import LogTreatmentForm from "./LogTreatmentForm";
+import LogTipForm from "./LogTipForm";
 
 export const metadata: Metadata = { title: "Day Sheet" };
 export const dynamic = "force-dynamic";
@@ -45,6 +47,14 @@ export default async function DaySheetPage({
     (s, r) => s + (r.items?.reduce((n, i) => n + i.qty, 0) ?? 0),
     0
   );
+
+  // ----- Tips for the day -----
+  const dayTips = db.tips.filter((t) => t.date === day).sort((a, b) => a.therapist.localeCompare(b.therapist));
+  const tipsTotal = dayTips.reduce((s, t) => s + t.amount, 0);
+  const tipsByTherapist = [...new Set(dayTips.map((t) => t.therapist))].map((name) => ({
+    name,
+    total: dayTips.filter((t) => t.therapist === name).reduce((s, t) => s + t.amount, 0),
+  }));
 
   return (
     <div className="space-y-8">
@@ -152,6 +162,93 @@ export default async function DaySheetPage({
                   <tr>
                     <td colSpan={4} className="py-10 text-center text-mist-600">
                       Nothing logged for this day yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+
+      {/* Tips */}
+      <div className="grid gap-6 xl:grid-cols-[1fr_1.4fr]">
+        <Card className="h-fit p-6">
+          <div className="flex items-center gap-2">
+            <HandCoins className="h-5 w-5 text-mist-500" aria-hidden="true" />
+            <h2 className="font-serif text-lg font-semibold text-mist-950">Log a tip</h2>
+          </div>
+          <p className="mt-1 text-sm text-mist-700">Tips are tracked per therapist and kept separate from house revenue.</p>
+          <div className="mt-5">
+            {therapists.length === 0 ? (
+              <p className="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800">
+                Add a therapist on the Team page first.
+              </p>
+            ) : (
+              <LogTipForm
+                therapists={therapists}
+                methods={["Cash", "Card", "Mobile Money"]}
+                locations={[...LOCATIONS]}
+                today={day}
+              />
+            )}
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="font-serif text-lg font-semibold text-mist-950">Tips · {formatDate(day)}</h2>
+            <p className="text-sm text-mist-700">
+              Total: <span className="font-semibold text-mist-950">{formatMoney(tipsTotal)}</span>
+            </p>
+          </div>
+
+          {tipsByTherapist.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {tipsByTherapist.map((r) => (
+                <span key={r.name} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs text-emerald-800">
+                  {r.name}: <span className="font-semibold">{formatMoney(r.total)}</span>
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[420px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-mist-200 text-xs font-semibold uppercase tracking-wide text-mist-600">
+                  <th className="pb-3 pr-4">Therapist</th>
+                  <th className="pb-3 pr-4">Via</th>
+                  <th className="pb-3 pr-4">Note</th>
+                  <th className="pb-3 pr-4 text-right">Amount</th>
+                  <th className="pb-3" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-mist-100">
+                {dayTips.map((t) => (
+                  <tr key={t.id}>
+                    <td className="py-3 pr-4 font-medium text-mist-950">{t.therapist}</td>
+                    <td className="py-3 pr-4 text-mist-700">{t.method ?? "—"}</td>
+                    <td className="py-3 pr-4 text-mist-700">{t.note ?? "—"}</td>
+                    <td className="py-3 pr-4 text-right font-semibold text-emerald-700">{formatMoney(t.amount)}</td>
+                    <td className="py-3 text-right">
+                      <form action={deleteTip}>
+                        <input type="hidden" name="id" value={t.id} />
+                        <button
+                          type="submit"
+                          className="text-xs font-medium text-mist-400 transition-colors duration-200 hover:text-red-600"
+                          aria-label={`Delete tip for ${t.therapist}`}
+                        >
+                          Remove
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+                {dayTips.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-10 text-center text-mist-600">
+                      No tips logged for this day yet.
                     </td>
                   </tr>
                 )}

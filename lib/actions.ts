@@ -38,7 +38,10 @@ import {
   type GiftCard,
   type GiftCardStatus,
   type GiftCardDelivery,
+  type Quotation,
+  type QuotationStatus,
 } from "./db";
+import { savePop } from "./pop-store";
 import { suites, bookablePriceMap } from "./content";
 import { allow, LIMITS } from "./rate-limit";
 import {
@@ -613,10 +616,13 @@ export async function addExpense(
   const amount = Number(formData.get("amount") ?? 0);
   const date = /^\d{4}-\d{2}-\d{2}$/.test(String(formData.get("date"))) ? String(formData.get("date")) : todayISO();
   const method = String(formData.get("method") ?? "").trim();
+  const pop = String(formData.get("pop") ?? "");
 
   if (!category || !description || !(amount > 0)) {
     return { ok: false, message: "Please provide a category, description and a positive amount." };
   }
+
+  const popId = await maybeSavePop(pop);
 
   const db = await readDb();
   db.transactions.unshift({
@@ -626,12 +632,214 @@ export async function addExpense(
     category,
     description: method ? `${description} (${method})` : description,
     amount,
+    popId,
   });
   await writeDb(db);
   revalidatePath("/admin/expenses");
   revalidatePath("/admin/finance");
   revalidatePath("/admin");
-  return { ok: true, message: `Expense of ${formatMoney(amount)} recorded under ${category}.` };
+  return {
+    ok: true,
+    message: `Expense of ${formatMoney(amount)} recorded under ${category}${popId ? " with proof of payment" : ""}.`,
+  };
+}
+
+/** Validate and persist a proof-of-payment data URL; returns its id, or undefined. */
+async function maybeSavePop(pop: string): Promise<string | undefined> {
+  if (!pop) return undefined;
+  // Only accept reasonably-sized image/PDF data URLs (~4MB of base64 ≈ 3MB file).
+  if (!/^data:(image\/[a-z.+-]+|application\/pdf);base64,/i.test(pop)) return undefined;
+  if (pop.length > 4_200_000) return undefined;
+  const id = crypto.randomUUID();
+  await savePop(id, pop);
+  return id;
+}
+
+/** Attach (or replace) a proof-of-payment on an existing expense. */
+export async function attachExpensePop(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  const pop = String(formData.get("pop") ?? "");
+  const popId = await maybeSavePop(pop);
+  if (!id || !popId) return;
+
+  const db = await readDb();
+  const tx = db.transactions.find((t) => t.id === id && t.type === "Expense");
+  if (!tx) return;
+  tx.popId = popId;
+  await writeDb(db);
+  revalidatePath("/admin/expenses");
+}
+
+// ---------- Tips (tracked apart from house revenue) ----------
+
+export async function logTip(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireAdmin();
+  const therapist = String(formData.get("therapist") ?? "").trim();
+  const amount = Number(formData.get("amount") ?? 0);
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(String(formData.get("date"))) ? String(formData.get("date")) : todayISO();
+  const method = String(formData.get("method") ?? "").trim();
+  const note = String(formData.get("note") ?? "").trim();
+  const location = String(formData.get("location") ?? "Kabulonga") as Location;
+
+  if (!therapist || !(amount > 0)) {
+    return { ok: false, message: "Choose a therapist and enter a tip amount." };
+  }
+
+  const db = await readDb();
+  if (!db.therapists.some((t) => t.name === therapist)) {
+    return { ok: false, message: "That therapist isn't on the team list." };
+  }
+  db.tips.unshift({
+    id: crypto.randomUUID(),
+    date,
+    therapist,
+    amount,
+    method: method || undefined,
+    note: note || undefined,
+    location,
+    createdAt: todayISO(),
+  });
+  await writeDb(db);
+  revalidatePath("/admin/daysheet");
+  revalidatePath("/admin/reports");
+  return { ok: true, message: `Recorded a ${formatMoney(amount)} tip for ${therapist}.` };
+}
+
+export async function deleteTip(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  const db = await readDb();
+  const before = db.tips.length;
+  db.tips = db.tips.filter((t) => t.id !== id);
+  if (db.tips.length !== before) {
+    await writeDb(db);
+    revalidatePath("/admin/daysheet");
+  }
+}
+
+// ---------- Quotations ----------
+
+function nextQuotationNumber(db: DB): string {
+  const year = new Date().getFullYear();
+  const max = (db.quotations ?? []).reduce((m, q) => {
+    const n = Number(q.number.split("-").pop());
+    return Number.isFinite(n) && n > m ? n : m;
+  }, 0);
+  return `QUO-${year}-${String(max + 1).padStart(4, "0")}`;
+}
+
+/** Pull repeated description/qty/unitPrice fields into invoice line items. */
+function readLineItems(formData: FormData): InvoiceItem[] {
+  const descriptions = formData.getAll("description").map(String);
+  const qtys = formData.getAll("qty").map((v) => Number(v));
+  const prices = formData.getAll("unitPrice").map((v) => Number(v));
+  return descriptions
+    .map((description, i) => ({
+      description: description.trim(),
+      qty: Number.isFinite(qtys[i]) && qtys[i] > 0 ? qtys[i] : 1,
+      unitPrice: Number.isFinite(prices[i]) && prices[i] >= 0 ? prices[i] : 0,
+    }))
+    .filter((item) => item.description && item.qty > 0 && item.unitPrice >= 0);
+}
+
+export async function createQuotation(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireRole("Owner", "Manager");
+  const customer = String(formData.get("customer") ?? "").trim();
+  const customerEmail = String(formData.get("customerEmail") ?? "").trim();
+  const customerPhone = String(formData.get("customerPhone") ?? "").trim();
+  const location = String(formData.get("location") ?? "Kabulonga") as Location;
+  const issueDate = /^\d{4}-\d{2}-\d{2}$/.test(String(formData.get("issueDate"))) ? String(formData.get("issueDate")) : todayISO();
+  const validUntil = /^\d{4}-\d{2}-\d{2}$/.test(String(formData.get("validUntil"))) ? String(formData.get("validUntil")) : addDaysISO(todayISO(), 30);
+  const notes = String(formData.get("notes") ?? "").trim();
+  const items = readLineItems(formData);
+
+  if (!customer) return { ok: false, message: "Enter the client's name." };
+  if (items.length === 0) return { ok: false, message: "Add at least one line item with a description and price." };
+
+  const db = await readDb();
+  const quotation: Quotation = {
+    id: crypto.randomUUID(),
+    number: nextQuotationNumber(db),
+    customer,
+    customerEmail: customerEmail || undefined,
+    customerPhone: customerPhone || undefined,
+    items,
+    issueDate,
+    validUntil,
+    status: "Draft",
+    location,
+    notes: notes || undefined,
+    createdAt: todayISO(),
+  };
+  db.quotations.unshift(quotation);
+  await writeDb(db);
+  revalidatePath("/admin/quotations");
+  return { ok: true, message: `Quotation ${quotation.number} created for ${customer}.` };
+}
+
+export async function updateQuotationStatus(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "") as QuotationStatus;
+  if (!id || !["Draft", "Sent", "Accepted", "Declined", "Expired"].includes(status)) return;
+
+  const db = await readDb();
+  const quotation = db.quotations.find((q) => q.id === id);
+  if (!quotation || quotation.status === "Converted") return;
+  quotation.status = status;
+  await writeDb(db);
+  revalidatePath("/admin/quotations");
+}
+
+/** Turn an accepted quotation into a sent invoice. */
+export async function convertQuotationToInvoice(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+
+  const db = await readDb();
+  const quotation = db.quotations.find((q) => q.id === id);
+  if (!quotation || quotation.status === "Converted") return;
+
+  const number = nextInvoiceNumber(db);
+  db.invoices.unshift({
+    id: crypto.randomUUID(),
+    number,
+    customer: quotation.customer,
+    items: quotation.items,
+    issueDate: todayISO(),
+    dueDate: addDaysISO(todayISO(), 14),
+    status: "Sent",
+    location: quotation.location,
+    customerEmail: quotation.customerEmail,
+    customerPhone: quotation.customerPhone,
+  });
+  quotation.status = "Converted";
+  quotation.convertedInvoice = number;
+  await writeDb(db);
+  revalidatePath("/admin/quotations");
+  revalidatePath("/admin/invoices");
+  redirect("/admin/invoices");
+}
+
+export async function deleteQuotation(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  const db = await readDb();
+  const before = db.quotations.length;
+  db.quotations = db.quotations.filter((q) => q.id !== id);
+  if (db.quotations.length !== before) {
+    await writeDb(db);
+    revalidatePath("/admin/quotations");
+  }
 }
 
 // Intentionally public: this backs the customer-facing stay request form.

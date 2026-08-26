@@ -49,6 +49,14 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Proof-of-payment uploads (expense receipts/screenshots) travel through a
+  // server action, so lift the default 1MB body cap to accommodate a photo or
+  // PDF. Images are downscaled client-side before upload.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "6mb",
+    },
+  },
   // Don't advertise the framework and version to scanners.
   poweredByHeader: false,
   async headers() {

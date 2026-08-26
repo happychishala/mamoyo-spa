@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth";
 import { formatMoney, formatDate, todayISO } from "@/lib/format";
 import { PageHeader, Card, NoAccess } from "@/components/admin/ui";
 import ExpenseForm from "./ExpenseForm";
+import ExpensePopCell from "./ExpensePopCell";
 
 export const metadata: Metadata = { title: "Expenses" };
 export const dynamic = "force-dynamic";
@@ -87,6 +88,7 @@ export default async function ExpensesPage() {
                   <th className="pb-3 pr-4">Date</th>
                   <th className="pb-3 pr-4">Category</th>
                   <th className="pb-3 pr-4">Description</th>
+                  <th className="pb-3 pr-4">Proof</th>
                   <th className="pb-3 text-right">Amount</th>
                 </tr>
               </thead>
@@ -98,12 +100,13 @@ export default async function ExpensesPage() {
                       <span className="rounded-full bg-mist-100 px-2.5 py-0.5 text-xs font-medium text-mist-700">{t.category}</span>
                     </td>
                     <td className="py-3 pr-4 text-mist-800">{t.description}</td>
+                    <td className="py-3 pr-4"><ExpensePopCell id={t.id} popId={t.popId} /></td>
                     <td className="py-3 text-right font-semibold text-red-700">{formatMoney(t.amount)}</td>
                   </tr>
                 ))}
                 {expenses.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-10 text-center text-mist-600">
+                    <td colSpan={5} className="py-10 text-center text-mist-600">
                       No expenses recorded yet.
                     </td>
                   </tr>

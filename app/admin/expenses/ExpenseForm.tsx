@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Plus, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { addExpense, type ActionResult } from "@/lib/actions";
+import PopUploadField from "@/components/admin/PopUploadField";
 
 const inputClasses =
   "w-full rounded-xl border border-mist-200 bg-white px-3.5 py-2.5 text-sm text-mist-950 placeholder:text-mist-400 transition-colors duration-200 focus:border-mist-500 focus:outline-none focus:ring-2 focus:ring-mist-200";
@@ -83,6 +84,8 @@ export default function ExpenseForm({ today }: { today: string }) {
         </label>
         <input id="ex-description" name="description" type="text" required placeholder="What was this for?" className={inputClasses} />
       </div>
+
+      <PopUploadField />
 
       {state && (
         <p
