@@ -5,6 +5,7 @@ import { CalendarCheck, CheckCircle2, AlertCircle, Loader2 } from "lucide-react"
 import { createBooking, type ActionResult } from "@/lib/actions";
 import type { BookableService } from "@/lib/content";
 import ServiceCombobox from "./ServiceCombobox";
+import { useCheckoutSubmit } from "@/components/site/PaymentProcessingOverlay";
 
 const inputClasses =
   "w-full rounded-xl border border-mist-200 bg-white px-4 py-3 text-sm text-mist-950 placeholder:text-mist-400 transition-colors duration-200 focus:border-mist-500 focus:outline-none focus:ring-2 focus:ring-mist-200";
@@ -22,10 +23,14 @@ export default function BookingForm({
     createBooking,
     null
   );
+  const { onSubmit, overlay, active } = useCheckoutSubmit((fd) => formAction(fd), "booking", {
+    autoHideAfter: 600,
+  });
 
   if (state?.ok) {
     return (
       <div className="rounded-2xl border border-mist-200 bg-white p-10 text-center shadow-soft">
+        {overlay}
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-mist-100 text-mist-600">
           <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
         </div>
@@ -36,10 +41,12 @@ export default function BookingForm({
   }
 
   return (
-    <form
-      action={formAction}
-      className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft sm:p-10"
-    >
+    <>
+      {overlay}
+      <form
+        onSubmit={onSubmit}
+        className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft sm:p-10"
+      >
       <div className="grid gap-5 sm:grid-cols-2">
         <fieldset className="sm:col-span-2">
           <legend className="mb-1.5 block text-sm font-medium text-mist-900">Location</legend>
@@ -169,10 +176,10 @@ export default function BookingForm({
 
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || active}
         className="mt-7 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-mist-600 px-8 py-4 text-sm font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-mist-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {pending ? (
+        {pending || active ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
             Sending request…
@@ -187,6 +194,7 @@ export default function BookingForm({
       <p className="mt-4 text-center text-xs text-mist-600">
         No payment taken online. Cancel or reschedule free of charge up to 24 hours before.
       </p>
-    </form>
+      </form>
+    </>
   );
 }

@@ -6,6 +6,7 @@ import { cafeMenu } from "@/lib/content";
 import { formatMoney } from "@/lib/format";
 import type { Location } from "@/lib/db";
 import PaymentSplitFields from "./PaymentSplitFields";
+import { useCheckoutSubmit } from "@/components/site/PaymentProcessingOverlay";
 
 const methods: string[] = ["Cash", "Card", "Mobile Money", "Bank Transfer"];
 const locations: Location[] = ["Kabulonga", "Twangale"];
@@ -25,7 +26,7 @@ export default function CafePOS() {
   const [location, setLocation] = useState<Location>("Kabulonga");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [balanced, setBalanced] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { onSubmit, overlay, active } = useCheckoutSubmit((fd) => createCafeSale(fd), "payment");
 
   const total = useMemo(
     () => cart.reduce((sum, item) => sum + item.qty * item.unitPrice, 0),
@@ -150,9 +151,8 @@ export default function CafePOS() {
           )}
 
           <form
-            action={createCafeSale}
             className="mt-6"
-            onSubmit={() => setIsSubmitting(true)}
+            onSubmit={onSubmit}
           >
             {cart.map((item, index) => (
               <div key={item.description}>
@@ -168,10 +168,10 @@ export default function CafePOS() {
             </div>
             <button
               type="submit"
-              disabled={cart.length === 0 || !balanced || isSubmitting}
+              disabled={cart.length === 0 || !balanced || active}
               className="mt-1 inline-flex w-full items-center justify-center rounded-2xl bg-mist-600 px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-mist-700 disabled:cursor-not-allowed disabled:bg-mist-300"
             >
-              {isSubmitting ? "Processing…" : "Complete sale and print receipt"}
+              Complete sale and print receipt
             </button>
           </form>
         </div>
@@ -213,6 +213,7 @@ export default function CafePOS() {
           ))}
         </div>
       </section>
+      {overlay}
     </div>
   );
 }

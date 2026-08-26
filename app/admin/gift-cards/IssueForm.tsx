@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { Gift, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { issueGiftCard, type ActionResult } from "@/lib/actions";
+import { useCheckoutSubmit } from "@/components/site/PaymentProcessingOverlay";
 
 const input =
   "w-full rounded-xl border border-mist-200 bg-white px-3.5 py-2.5 text-sm text-mist-950 placeholder:text-mist-400 transition-colors duration-200 focus:border-mist-500 focus:outline-none focus:ring-2 focus:ring-mist-200";
@@ -29,9 +30,14 @@ export default function IssueForm({
   const [amount, setAmount] = useState<string>(String(values[1] ?? values[0]));
   const [message, setMessage] = useState("");
   const [occasion, setOccasion] = useState("");
+  const { onSubmit, overlay, active } = useCheckoutSubmit((fd) => action(fd), "payment", {
+    autoHideAfter: 600,
+  });
 
   return (
-    <form action={action} className="space-y-5">
+    <>
+      {overlay}
+      <form onSubmit={onSubmit} className="space-y-5">
       {/* What the card is worth */}
       <fieldset>
         <legend className={label}>What is the gift?</legend>
@@ -196,10 +202,10 @@ export default function IssueForm({
 
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || active}
         className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-mist-600 px-6 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700 disabled:opacity-60"
       >
-        {pending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Gift className="h-4 w-4" aria-hidden="true" />}
+        {pending || active ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Gift className="h-4 w-4" aria-hidden="true" />}
         Issue gift card
       </button>
 
@@ -220,6 +226,7 @@ export default function IssueForm({
           {state.message}
         </p>
       )}
-    </form>
+      </form>
+    </>
   );
 }

@@ -6,6 +6,7 @@ import { createProductSale } from "@/lib/actions";
 import { formatMoney } from "@/lib/format";
 import type { Location } from "@/lib/db";
 import PaymentSplitFields from "./PaymentSplitFields";
+import { useCheckoutSubmit } from "@/components/site/PaymentProcessingOverlay";
 
 const methods = ["Cash", "Card", "Mobile Money", "Bank Transfer"];
 const locations: Location[] = ["Kabulonga", "Twangale"];
@@ -26,7 +27,7 @@ export default function ProductPOS({ items }: { items: RetailItem[] }) {
   const [location, setLocation] = useState<Location>("Kabulonga");
   const [cart, setCart] = useState<Record<string, number>>({});
   const [balanced, setBalanced] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const { onSubmit, overlay, active } = useCheckoutSubmit((fd) => createProductSale(fd), "payment");
 
   const byId = useMemo(() => new Map(items.map((it) => [it.id, it])), [items]);
   const lines = Object.entries(cart)
@@ -179,7 +180,7 @@ export default function ProductPOS({ items }: { items: RetailItem[] }) {
           <span className="font-serif text-xl font-semibold">{formatMoney(total)}</span>
         </div>
 
-        <form action={createProductSale} onSubmit={() => setSubmitting(true)} className="mt-4 space-y-4">
+        <form onSubmit={onSubmit} className="mt-4 space-y-4">
           {lines.map((l) => (
             <span key={l.item.id}>
               <input type="hidden" name="itemId" value={l.item.id} />
@@ -193,13 +194,14 @@ export default function ProductPOS({ items }: { items: RetailItem[] }) {
 
           <button
             type="submit"
-            disabled={lines.length === 0 || !balanced || submitting}
+            disabled={lines.length === 0 || !balanced || active}
             className="inline-flex w-full items-center justify-center rounded-2xl bg-mist-600 px-4 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700 disabled:cursor-not-allowed disabled:bg-mist-300"
           >
-            {submitting ? "Processing…" : "Complete sale & print receipt"}
+            Complete sale &amp; print receipt
           </button>
         </form>
       </div>
+      {overlay}
     </section>
   );
 }
