@@ -43,6 +43,7 @@ import {
   type CafeMenuItem,
   type Recipe,
   type RecipeIngredient,
+  type WorkShift,
 } from "./db";
 import { savePop } from "./pop-store";
 import { suites, bookablePriceMap, cafeMenu } from "./content";
@@ -994,6 +995,56 @@ export async function deleteRecipe(formData: FormData): Promise<void> {
   if (db.recipes.length !== before) {
     await writeDb(db);
     revalidatePath("/admin/chef");
+  }
+}
+
+// ---------- Work sheet (therapist roster) ----------
+
+export async function addWorkShift(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireRole("Owner", "Manager");
+  const date = String(formData.get("date") ?? "");
+  const therapist = String(formData.get("therapist") ?? "").trim();
+  const location = String(formData.get("location") ?? "Kabulonga") as Location;
+  const note = String(formData.get("note") ?? "").trim();
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { ok: false, message: "Pick a valid date." };
+  if (!therapist) return { ok: false, message: "Choose a therapist." };
+  if (!LOCATIONS.includes(location)) return { ok: false, message: "Pick a location." };
+
+  const db = await readDb();
+  if (!db.therapists.some((t) => t.name === therapist)) {
+    return { ok: false, message: "That therapist isn't on the team list." };
+  }
+  // Avoid duplicate therapist+date+location rows.
+  if (db.workShifts.some((s) => s.date === date && s.therapist === therapist && s.location === location)) {
+    return { ok: false, message: `${therapist} is already rostered at ${location} that day.` };
+  }
+  db.workShifts.push({
+    id: crypto.randomUUID(),
+    date,
+    therapist,
+    location,
+    note: note || undefined,
+    createdAt: todayISO(),
+  });
+  await writeDb(db);
+  revalidatePath("/admin/worksheet");
+  return { ok: true, message: `${therapist} rostered at ${location} on ${formatDate(date)}.` };
+}
+
+export async function deleteWorkShift(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  const db = await readDb();
+  const before = db.workShifts.length;
+  db.workShifts = db.workShifts.filter((s) => s.id !== id);
+  if (db.workShifts.length !== before) {
+    await writeDb(db);
+    revalidatePath("/admin/worksheet");
   }
 }
 

@@ -29,6 +29,7 @@ import {
   TrendingDown,
   FileSignature,
   ChefHat,
+  CalendarRange,
 } from "lucide-react";
 import { logout } from "@/lib/auth-actions";
 import type { UserRole } from "@/lib/db";
@@ -55,6 +56,7 @@ const navGroups: { group: string; items: NavItem[] }[] = [
       { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck, minRank: 0, module: "bookings" },
       { href: "/admin/enquiries", label: "Enquiries", icon: Inbox, minRank: 0, module: "enquiries" },
       { href: "/admin/daysheet", label: "Day Sheet", icon: ClipboardList, minRank: 0, module: "daysheet" },
+      { href: "/admin/worksheet", label: "Work Sheet", icon: CalendarRange, minRank: 0, module: "worksheet" },
       { href: "/admin/stays", label: "Stays", icon: BedDouble, minRank: 0, module: "stays" },
       { href: "/admin/inventory", label: "Inventory", icon: Boxes, minRank: 0, module: "inventory" },
     ],

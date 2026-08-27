@@ -5,6 +5,7 @@ export type AdminModule =
   | "stays"
   | "reports"
   | "daysheet"
+  | "worksheet"
   | "expenses"
   | "inventory"
   | "pos"
@@ -37,6 +38,7 @@ export const ADMIN_MODULES: Array<{ id: AdminModule; label: string; description:
   { id: "stays", label: "Stays", description: "Suite stays" },
   { id: "reports", label: "Reports", description: "Reports and therapist view" },
   { id: "daysheet", label: "Day Sheet", description: "Log daily treatments and view product sales" },
+  { id: "worksheet", label: "Work Sheet", description: "Therapist roster — who works each day and where" },
   { id: "expenses", label: "Expenses", description: "Record and review business expenses" },
   { id: "inventory", label: "Inventory", description: "Stock and supplies" },
   { id: "pos", label: "POS", description: "Café and product point of sale" },
@@ -64,7 +66,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
       id: "role-staff",
       name: "Staff",
       description: "Front-line operations access",
-      modules: ["dashboard", "calendar", "bookings", "stays", "reports", "daysheet", "inventory", "pos", "enquiries"],
+      modules: ["dashboard", "calendar", "bookings", "stays", "reports", "daysheet", "worksheet", "inventory", "pos", "enquiries"],
       rank: 0,
       isSystemRole: true,
     },
@@ -79,6 +81,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "stays",
         "reports",
         "daysheet",
+        "worksheet",
         "expenses",
         "inventory",
         "pos",
@@ -109,6 +112,7 @@ export function getDefaultRoleDefinitions(): RoleDefinition[] {
         "stays",
         "reports",
         "daysheet",
+        "worksheet",
         "expenses",
         "inventory",
         "pos",

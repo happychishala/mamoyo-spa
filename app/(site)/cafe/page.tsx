@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPin, Phone, Clock, Users, Navigation } from "lucide-react";
+import { ArrowRight, MapPin, Phone, Clock, Users, Navigation, CalendarClock } from "lucide-react";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 import FaqList from "@/components/site/FaqList";
@@ -54,6 +54,18 @@ export default function CafePage() {
   return (
     <div className="pt-32 pb-8 sm:pt-40">
       <div className="mx-auto max-w-6xl px-6">
+        {/* Opening announcement */}
+        <div className="mx-auto mb-10 max-w-2xl overflow-hidden rounded-2xl border border-mist-200 bg-gradient-to-r from-mist-50 via-white to-mist-50 px-6 py-5 text-center shadow-soft">
+          <p className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-mist-600">
+            <CalendarClock className="h-4 w-4" aria-hidden="true" />
+            Now Opening
+          </p>
+          <p className="mt-1.5 font-serif text-2xl text-cocoa-700 sm:text-3xl">18 September 2026</p>
+          <p className="mt-1 text-sm text-mist-700">
+            We can’t wait to welcome you — reserve a table below and be among the first through the door.
+          </p>
+        </div>
+
         <div className="mb-10 flex justify-center">
           <Image
             src="/cafe-mamoyo-logo.png"
@@ -70,7 +82,7 @@ export default function CafePage() {
           description="Breakfast after the school run. Coffee before a treatment. A work lunch that does not feel like another meeting. Tea with a friend. Something bright and satisfying when the body needs care rather than excess."
         />
         <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-mist-800">
-          MaMoyo Café is open to everyone, whether or not you have a spa booking.
+          MaMoyo Café will be open to everyone, whether or not you have a spa booking.
         </p>
         <div className="mt-8 flex justify-center">
           <Link
