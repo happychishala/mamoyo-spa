@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPin, Phone, Clock, Users, Navigation, CalendarClock } from "lucide-react";
+import { ArrowRight, MapPin, Phone, Clock, Users, Navigation, CalendarClock, PartyPopper } from "lucide-react";
 import { SectionHeading } from "@/components/site/Section";
 import Reveal from "@/components/site/Reveal";
 import FaqList from "@/components/site/FaqList";
@@ -20,6 +20,21 @@ export const metadata: Metadata = {
     url: "/cafe",
   },
 };
+
+// Re-render periodically so the opening banner reflects the current date
+// without giving up caching. Evaluated in Lusaka time at regeneration.
+export const revalidate = 1800;
+
+const CAFE_OPEN_DATE = "2026-09-18"; // launch day
+const CAFE_BANNER_HIDE_DATE = "2026-09-25"; // banner clears one week after opening
+
+/** "opening" before launch, "open" for the launch week, then null. */
+function cafeOpeningPhase(): "opening" | "open" | null {
+  const todayLusaka = new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Lusaka" });
+  if (todayLusaka < CAFE_OPEN_DATE) return "opening";
+  if (todayLusaka < CAFE_BANNER_HIDE_DATE) return "open";
+  return null;
+}
 
 const loc = locationInfo.Kabulonga;
 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.address)}`;
@@ -51,20 +66,37 @@ const faqs = [
 ];
 
 export default function CafePage() {
+  const phase = cafeOpeningPhase();
   return (
     <div className="pt-32 pb-8 sm:pt-40">
       <div className="mx-auto max-w-6xl px-6">
-        {/* Opening announcement */}
-        <div className="mx-auto mb-10 max-w-2xl overflow-hidden rounded-2xl border border-mist-200 bg-gradient-to-r from-mist-50 via-white to-mist-50 px-6 py-5 text-center shadow-soft">
-          <p className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-mist-600">
-            <CalendarClock className="h-4 w-4" aria-hidden="true" />
-            Now Opening
-          </p>
-          <p className="mt-1.5 font-serif text-2xl text-cocoa-700 sm:text-3xl">18 September 2026</p>
-          <p className="mt-1 text-sm text-mist-700">
-            We can’t wait to welcome you — reserve a table below and be among the first through the door.
-          </p>
-        </div>
+        {/* Opening announcement — before launch */}
+        {phase === "opening" && (
+          <div className="mx-auto mb-10 max-w-2xl overflow-hidden rounded-2xl border border-mist-200 bg-gradient-to-r from-mist-50 via-white to-mist-50 px-6 py-5 text-center shadow-soft">
+            <p className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-mist-600">
+              <CalendarClock className="h-4 w-4" aria-hidden="true" />
+              Now Opening
+            </p>
+            <p className="mt-1.5 font-serif text-2xl text-cocoa-700 sm:text-3xl">18 September 2026</p>
+            <p className="mt-1 text-sm text-mist-700">
+              We can’t wait to welcome you — reserve a table below and be among the first through the door.
+            </p>
+          </div>
+        )}
+
+        {/* Now open — launch week */}
+        {phase === "open" && (
+          <div className="mx-auto mb-10 max-w-2xl overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 px-6 py-5 text-center shadow-soft">
+            <p className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+              <PartyPopper className="h-4 w-4" aria-hidden="true" />
+              Now Open
+            </p>
+            <p className="mt-1.5 font-serif text-2xl text-cocoa-700 sm:text-3xl">We’re open in Kabulonga</p>
+            <p className="mt-1 text-sm text-mist-700">
+              Café MaMoyo is now serving — reserve your table below and come say hello.
+            </p>
+          </div>
+        )}
 
         <div className="mb-10 flex justify-center">
           <Image
@@ -82,7 +114,9 @@ export default function CafePage() {
           description="Breakfast after the school run. Coffee before a treatment. A work lunch that does not feel like another meeting. Tea with a friend. Something bright and satisfying when the body needs care rather than excess."
         />
         <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-mist-800">
-          MaMoyo Café will be open to everyone, whether or not you have a spa booking.
+          {phase === "opening"
+            ? "MaMoyo Café will be open to everyone, whether or not you have a spa booking."
+            : "MaMoyo Café is open to everyone, whether or not you have a spa booking."}
         </p>
         <div className="mt-8 flex justify-center">
           <Link
