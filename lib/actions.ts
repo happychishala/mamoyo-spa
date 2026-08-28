@@ -47,11 +47,13 @@ import {
   type WorkShift,
 } from "./db";
 import { savePop } from "./pop-store";
+import { docAttachment } from "./pdf/render";
 import { suites, bookablePriceMap, cafeMenu } from "./content";
 import { allow, LIMITS } from "./rate-limit";
 import {
   alertBooking,
   sendEmail,
+  quotationMessage,
   logNotification,
   invoiceMessage,
   receiptMessage,
@@ -1904,9 +1906,11 @@ export async function emailInvoice(formData: FormData): Promise<void> {
   const to = String(formData.get("to") ?? "").trim() || invoice.customerEmail || "";
   if (to && to !== invoice.customerEmail) invoice.customerEmail = to;
 
+  const attachment = await docAttachment(db, "invoice", invoice.id);
   await sendEmail(db, to, invoiceMessage(invoice), {
     kind: "invoice",
     reference: invoice.number,
+    attachments: attachment ? [attachment] : undefined,
   });
   await writeDb(db);
   revalidatePath("/admin/invoices");
@@ -1923,9 +1927,11 @@ export async function emailReceipt(formData: FormData): Promise<void> {
   const to = String(formData.get("to") ?? "").trim() || receipt.customerEmail || "";
   if (to && to !== receipt.customerEmail) receipt.customerEmail = to;
 
+  const attachment = await docAttachment(db, "receipt", receipt.id);
   await sendEmail(db, to, receiptMessage(receipt), {
     kind: "receipt",
     reference: receipt.number,
+    attachments: attachment ? [attachment] : undefined,
   });
   await writeDb(db);
   revalidatePath("/admin/receipts");
@@ -1935,17 +1941,22 @@ export async function emailReceipt(formData: FormData): Promise<void> {
 /** Record that staff sent something by WhatsApp, so the log stays complete. */
 export async function logWhatsappSend(formData: FormData): Promise<void> {
   await requireAdmin();
-  const kind = String(formData.get("kind") ?? "invoice") as "invoice" | "receipt" | "booking-alert";
+  const kindRaw = String(formData.get("kind") ?? "invoice");
+  const kind = (["invoice", "receipt", "booking-alert", "gift-card", "quotation"].includes(kindRaw)
+    ? kindRaw
+    : "invoice") as "invoice" | "receipt" | "booking-alert" | "gift-card" | "quotation";
   const reference = String(formData.get("reference") ?? "");
   const recipient = String(formData.get("recipient") ?? "");
   if (!reference) return;
 
+  const label =
+    kind === "receipt" ? "Receipt" : kind === "gift-card" ? "Gift card" : kind === "quotation" ? "Quotation" : kind === "booking-alert" ? "Booking" : "Invoice";
   const db = await readDb();
   logNotification(db, {
     kind,
     channel: "whatsapp",
     recipient,
-    subject: `${kind === "receipt" ? "Receipt" : kind === "invoice" ? "Invoice" : "Booking"} ${reference}`,
+    subject: `${label} ${reference}`,
     reference,
     outcome: { status: "manual", detail: "Opened in WhatsApp for a member of staff to send." },
   });
@@ -2049,9 +2060,38 @@ export async function emailGiftCard(formData: FormData): Promise<void> {
   const to = String(formData.get("to") ?? "").trim() || card.recipientEmail || "";
   if (to && to !== card.recipientEmail) card.recipientEmail = to;
 
-  await sendEmail(db, to, giftCardMessage(card), { kind: "gift-card", reference: card.code });
+  const attachment = await docAttachment(db, "gift-card", card.id);
+  await sendEmail(db, to, giftCardMessage(card), {
+    kind: "gift-card",
+    reference: card.code,
+    attachments: attachment ? [attachment] : undefined,
+  });
   await writeDb(db);
   revalidatePath("/admin/gift-cards");
+  revalidatePath("/admin/notifications");
+}
+
+/** Email a quotation to the client, with the PDF attached. */
+export async function emailQuotation(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  const db = await readDb();
+  const quotation = db.quotations.find((q) => q.id === id);
+  if (!quotation) return;
+
+  const to = String(formData.get("to") ?? "").trim() || quotation.customerEmail || "";
+  if (to && to !== quotation.customerEmail) quotation.customerEmail = to;
+  // Sending a draft moves it along to "Sent".
+  if (quotation.status === "Draft") quotation.status = "Sent";
+
+  const attachment = await docAttachment(db, "quotation", quotation.id);
+  await sendEmail(db, to, quotationMessage(quotation), {
+    kind: "quotation",
+    reference: quotation.number,
+    attachments: attachment ? [attachment] : undefined,
+  });
+  await writeDb(db);
+  revalidatePath("/admin/quotations");
   revalidatePath("/admin/notifications");
 }
 

@@ -362,7 +362,7 @@ export interface Review {
 }
 
 export type NotificationChannel = "email" | "whatsapp";
-export type NotificationKind = "booking-alert" | "invoice" | "receipt" | "gift-card";
+export type NotificationKind = "booking-alert" | "invoice" | "receipt" | "gift-card" | "quotation";
 export type NotificationStatus = "sent" | "failed" | "not-configured" | "manual";
 
 /**

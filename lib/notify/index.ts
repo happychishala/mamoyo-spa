@@ -16,11 +16,12 @@ import {
   invoiceMessage,
   receiptMessage,
   giftCardMessage,
+  quotationMessage,
   type Message,
 } from "./messages";
 
 export type { Message };
-export { bookingAlert, invoiceMessage, receiptMessage, giftCardMessage };
+export { bookingAlert, invoiceMessage, receiptMessage, giftCardMessage, quotationMessage };
 
 export interface SendOutcome {
   status: NotificationStatus;
@@ -50,10 +51,13 @@ export function branchPhone(location?: Location): string {
   return locationInfo[location ?? "Kabulonga"].phone;
 }
 
+export type EmailAttachment = { filename: string; content: string }; // content = base64
+
 async function sendViaResend(
   settings: DB["emailSettings"],
   to: string,
-  message: Message
+  message: Message,
+  attachments?: EmailAttachment[]
 ): Promise<SendOutcome> {
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -68,6 +72,7 @@ async function sendViaResend(
         subject: message.subject,
         html: message.html,
         text: message.text,
+        ...(attachments && attachments.length ? { attachments } : {}),
       }),
     });
 
@@ -120,7 +125,7 @@ export async function sendEmail(
   db: DB,
   to: string,
   message: Message,
-  meta: { kind: NotificationKind; reference: string }
+  meta: { kind: NotificationKind; reference: string; attachments?: EmailAttachment[] }
 ): Promise<SendOutcome> {
   const settings = db.emailSettings;
   let outcome: SendOutcome;
@@ -132,7 +137,7 @@ export async function sendEmail(
   } else if (!settings.apiKey || !settings.fromAddress) {
     outcome = { status: "not-configured", detail: "Email provider key or sender address is missing." };
   } else {
-    outcome = await sendViaResend(settings, to.trim(), message);
+    outcome = await sendViaResend(settings, to.trim(), message, meta.attachments);
     settings.lastStatus = outcome.status === "sent" ? "sent" : "failed";
     settings.lastMessage = outcome.detail;
     settings.lastSentAt = new Date().toISOString();

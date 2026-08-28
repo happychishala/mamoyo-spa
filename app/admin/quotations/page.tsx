@@ -9,8 +9,10 @@ import {
   deleteQuotation,
 } from "@/lib/actions";
 import { formatMoney, formatDate, todayISO, addDaysISO } from "@/lib/format";
+import { quotationMessage } from "@/lib/notify";
 import { PageHeader, Card, NoAccess } from "@/components/admin/ui";
 import QuotationForm from "./QuotationForm";
+import QuotationSend from "./QuotationSend";
 
 export const metadata: Metadata = { title: "Quotations" };
 export const dynamic = "force-dynamic";
@@ -137,6 +139,15 @@ export default async function QuotationsPage() {
                           >
                             <Printer className="h-3.5 w-3.5" aria-hidden="true" /> Print
                           </Link>
+                          {(q.customerEmail || q.customerPhone) && (
+                            <QuotationSend
+                              id={q.id}
+                              number={q.number}
+                              email={q.customerEmail}
+                              phone={q.customerPhone}
+                              whatsappBody={quotationMessage(q).text}
+                            />
+                          )}
                           {q.status !== "Converted" ? (
                             <form action={convertQuotationToInvoice}>
                               <input type="hidden" name="id" value={q.id} />

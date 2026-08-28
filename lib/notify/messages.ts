@@ -1,8 +1,19 @@
-import type { Booking, Invoice, Receipt, Location, GiftCard } from "../db";
+import type { Booking, Invoice, Receipt, Location, GiftCard, Quotation } from "../db";
 import { invoiceTotal, invoicePaid, invoiceBalance } from "../db";
 import { locationInfo } from "../content";
 import { formatMoney, formatDate } from "../format";
 import { giftValueLabel } from "../gift-cards";
+import { docUrl, type DocType } from "../doc-link";
+
+/** A plain-text line pointing at the signed PDF (used for WhatsApp + email text). */
+function pdfTextLine(type: DocType, id: string, label: string): string {
+  return `${label} (PDF): ${docUrl(type, id)}`;
+}
+
+/** A branded button linking to the signed PDF, for the HTML email. */
+function pdfButtonHtml(type: DocType, id: string, label: string): string {
+  return `<p style="margin:18px 0 0;"><a href="${docUrl(type, id)}" style="display:inline-block;background:${BRAND_BROWN};color:#ffffff;text-decoration:none;font-size:13px;font-weight:600;padding:11px 20px;border-radius:999px;">${label}</a></p>`;
+}
 
 /** A message rendered for both channels: email gets subject + html, WhatsApp gets text. */
 export interface Message {
@@ -136,6 +147,8 @@ export function invoiceMessage(invoice: Invoice): Message {
     paid > 0 ? `Paid: ${formatMoney(paid)}` : "",
     balance > 0 ? `Balance due: ${formatMoney(balance)}` : `Settled in full — thank you.`,
     ``,
+    pdfTextLine("invoice", invoice.id, "View or download your invoice"),
+    ``,
     `Any questions, reply to this message or call ${b.phone}.`,
     `MaMoyo`,
   ]
@@ -158,6 +171,7 @@ export function invoiceMessage(invoice: Invoice): Message {
          balance > 0 ? formatMoney(balance) : "&mdash;"
        }</td></tr>
      </table>
+     ${pdfButtonHtml("invoice", invoice.id, "Download invoice (PDF)")}
      <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:#166f7a;">Any questions, reply to this email or call ${b.phone}.</p>`,
     invoice.location
   );
@@ -182,6 +196,8 @@ export function receiptMessage(receipt: Receipt): Message {
     `Amount received: ${formatMoney(receipt.amount)}`,
     `Method: ${receipt.method}`,
     ``,
+    pdfTextLine("receipt", receipt.id, "View or download your receipt"),
+    ``,
     `We look forward to seeing you again.`,
     `MaMoyo`,
   ]
@@ -202,6 +218,7 @@ export function receiptMessage(receipt: Receipt): Message {
        <tr><td style="padding:6px 0;font-size:13px;color:#166f7a;">Method</td><td style="padding:6px 0;font-size:13px;text-align:right;color:#166f7a;">${receipt.method}</td></tr>
        <tr><td style="padding:6px 0;font-size:13px;color:#166f7a;">Reference</td><td style="padding:6px 0;font-size:13px;text-align:right;color:#166f7a;">${receipt.invoiceNumber}</td></tr>
      </table>
+     ${pdfButtonHtml("receipt", receipt.id, "Download receipt (PDF)")}
      <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:#166f7a;">We look forward to seeing you again.</p>`,
     receipt.location
   );
@@ -227,6 +244,8 @@ export function giftCardMessage(card: GiftCard): Message {
     ``,
     `To use it, book at ${b.name} and give the code when you book.`,
     `${b.phone} · info@mamoyospa.com`,
+    ``,
+    pdfTextLine("gift-card", card.id, "Download a printable copy of your gift card"),
     ``,
     `Not exchangeable for cash.${card.experience ? " Any upgrade is payable on the day." : " Any remaining value stays on the card until it expires."}`,
     ``,
@@ -255,11 +274,60 @@ export function giftCardMessage(card: GiftCard): Message {
      </table>
 
      <p style="margin:20px 0 0;font-size:14px;line-height:1.6;">To use it, book at <strong>${b.name}</strong> and give the code when you book.</p>
+     ${pdfButtonHtml("gift-card", card.id, "Download printable gift card (PDF)")}
      <p style="margin:12px 0 0;font-size:12px;line-height:1.6;color:#166f7a;">
        Not exchangeable for cash.${card.experience ? " Any upgrade is payable on the day." : " Any remaining value stays on the card until it expires."}
        Standard booking and cancellation terms apply.
      </p>`,
     card.location
+  );
+
+  return { subject, text, html };
+}
+
+/** The quotation, for the prospective client. */
+export function quotationMessage(q: Quotation): Message {
+  const b = branch(q.location);
+  const total = q.items.reduce((s, i) => s + i.qty * i.unitPrice, 0);
+  const first = q.customer.split(" ")[0];
+  const subject = `Your MaMoyo quotation ${q.number}`;
+
+  const text = [
+    `Hello ${first},`,
+    ``,
+    `Thank you for your interest in MaMoyo. Here is your quotation from ${b.name}.`,
+    ``,
+    `Quotation: ${q.number}`,
+    `Issued: ${formatDate(q.issueDate)}`,
+    `Valid until: ${formatDate(q.validUntil)}`,
+    ``,
+    itemsTextLines(q.items),
+    ``,
+    `Total: ${formatMoney(total)}`,
+    q.notes ? `\n${q.notes}\n` : "",
+    ``,
+    pdfTextLine("quotation", q.id, "View or download your quotation"),
+    ``,
+    `To go ahead or ask a question, reply to this message or call ${b.phone}.`,
+    `MaMoyo`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const html = shell(
+    `Quotation ${q.number}`,
+    `<p style="margin:0;font-size:14px;line-height:1.6;">Hello ${first},</p>
+     <p style="margin:8px 0 0;font-size:14px;line-height:1.6;">Thank you for your interest in <strong>${b.name}</strong>. Your quotation is below, valid until ${formatDate(
+       q.validUntil
+     )}.</p>
+     ${itemsTableHtml(q.items)}
+     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+       <tr><td style="padding:10px 0 0;font-size:15px;font-weight:600;color:${BRAND_BROWN};">Total</td><td style="padding:10px 0 0;font-size:15px;text-align:right;font-weight:600;color:${BRAND_BROWN};">${formatMoney(total)}</td></tr>
+     </table>
+     ${q.notes ? `<p style="margin:14px 0 0;font-size:13px;line-height:1.6;color:#166f7a;">${q.notes}</p>` : ""}
+     ${pdfButtonHtml("quotation", q.id, "Download quotation (PDF)")}
+     <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:#166f7a;">To go ahead or ask a question, reply to this email or call ${b.phone}.</p>`,
+    q.location
   );
 
   return { subject, text, html };
