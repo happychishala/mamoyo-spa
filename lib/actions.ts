@@ -1585,6 +1585,64 @@ export async function resetUserTotp(formData: FormData): Promise<void> {
   revalidatePath("/admin/team");
 }
 
+/**
+ * One-time go-live cleanup: wipe all demo/transactional data so the business
+ * starts from zero, while preserving the things that are set up rather than
+ * generated — user accounts, roles, 2FA, email settings, integration settings
+ * and the therapist team. Requires typing the exact phrase to run.
+ */
+export async function resetForGoLive(formData: FormData): Promise<void> {
+  await requireRole("Owner");
+  if (String(formData.get("confirm") ?? "").trim() !== "GO LIVE") return;
+
+  const db = await readDb();
+  db.bookings = [];
+  db.invoices = [];
+  db.receipts = [];
+  db.transactions = [];
+  db.stays = [];
+  db.treatments = [];
+  db.inventory = [];
+  db.reviews = [];
+  db.giftCards = [];
+  db.enquiries = [];
+  db.notifications = [];
+  db.quotations = [];
+  db.tips = [];
+  db.cafeMenuItems = [];
+  db.recipes = [];
+  db.workShifts = [];
+  // Kept on purpose: users, roles, security (2FA), emailSettings,
+  // channelIntegrations and therapists.
+  await writeDb(db);
+
+  for (const p of [
+    "/admin",
+    "/admin/bookings",
+    "/admin/receipts",
+    "/admin/invoices",
+    "/admin/finance",
+    "/admin/expenses",
+    "/admin/inventory",
+    "/admin/reports",
+    "/admin/daysheet",
+    "/admin/worksheet",
+    "/admin/quotations",
+    "/admin/gift-cards",
+    "/admin/enquiries",
+    "/admin/reviews",
+    "/admin/stays",
+    "/admin/notifications",
+    "/admin/chef",
+    "/admin/pos",
+    "/admin/tax",
+    "/admin/team",
+  ]) {
+    revalidatePath(p);
+  }
+  redirect("/admin/team?reset=done");
+}
+
 export async function updateTherapistTarget(formData: FormData): Promise<void> {
   await requireRole("Owner", "Manager");
   const id = String(formData.get("id") ?? "");

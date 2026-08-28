@@ -7,11 +7,17 @@ import { formatMoney } from "@/lib/format";
 import { PageHeader, Card } from "@/components/admin/ui";
 import { AddTherapistForm, AddUserForm } from "./TeamForms";
 import { RoleManager } from "./RoleForms";
+import GoLiveReset from "./GoLiveReset";
 
 export const metadata: Metadata = { title: "Team" };
 export const dynamic = "force-dynamic";
 
-export default async function TeamPage() {
+export default async function TeamPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ reset?: string }>;
+}) {
+  const resetDone = (await searchParams)?.reset === "done";
   const session = await getSession();
   if (!session || session.role === "Staff") {
     return (
@@ -37,6 +43,12 @@ export default async function TeamPage() {
         title="Team"
         description="Therapists appear in booking assignments only while active — mark leavers as ex-employees and their history stays in the reports."
       />
+
+      {resetDone && (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-medium text-emerald-800">
+          Demo data cleared — you&apos;re ready to go live. Users, roles, 2FA, settings and the therapist team were kept.
+        </div>
+      )}
 
       <div className="grid gap-6 xl:grid-cols-3">
         <Card className="p-6 xl:col-span-2">
@@ -230,6 +242,8 @@ export default async function TeamPage() {
               </div>
             </Card>
           </div>
+
+          <GoLiveReset />
         </div>
       )}
     </div>
