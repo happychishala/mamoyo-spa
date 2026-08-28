@@ -12,13 +12,28 @@ export type InvoiceStatus = "Draft" | "Sent" | "Paid" | "Overdue";
 export type PaymentMethod = "Card" | "Cash" | "Mobile Money" | "Bank Transfer";
 export type TransactionType = "Income" | "Expense";
 
+export type BookingItemKind = "service" | "product";
+
+/** One line of a booking — a treatment/service or a retail product. */
+export interface BookingItem {
+  name: string;
+  price: number;
+  kind: BookingItemKind;
+  qty: number;
+  durationMin?: number; // services carry time; products don't
+}
+
 export interface Booking {
   id: string;
   ref: string;
   customer: string;
   email: string;
   phone: string;
+  /** Human summary of what was booked. Derived from `items` when present. */
   service: string;
+  /** Full list of services + products on the booking (multi-select). Older
+   *  single-service bookings have no `items` and rely on `service`/`price`. */
+  items?: BookingItem[];
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
   durationMin: number;

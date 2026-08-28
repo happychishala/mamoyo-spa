@@ -21,6 +21,7 @@ import {
   type ReviewSource,
   REVIEW_SOURCES,
   type Booking,
+  type BookingItem,
   type BookingStatus,
   type InventoryCategory,
   type InvoiceStatus,
@@ -238,6 +239,72 @@ function canEditBooking(booking: Booking): boolean {
 }
 
 // Intentionally public: this backs the customer-facing booking form.
+/**
+ * Read the multi-select booking items from a form. Falls back to the legacy
+ * single `service` field (with the built-in price map) when no items are posted,
+ * so old links and any un-migrated callers still work. Returns the derived
+ * `service` summary, total `price` and total service `durationMin`.
+ */
+function readBookingItems(
+  formData: FormData
+): { items: BookingItem[]; service: string; price: number; durationMin: number } | null {
+  const names = formData.getAll("itemName").map((v) => String(v).trim());
+  const prices = formData.getAll("itemPrice").map((v) => Number(v));
+  const kinds = formData.getAll("itemKind").map((v) => String(v));
+  const qtys = formData.getAll("itemQty").map((v) => Number(v));
+  const durations = formData.getAll("itemDuration").map((v) => Number(v));
+
+  let items: BookingItem[] = names
+    .map((name, i) => ({
+      name,
+      price: Number.isFinite(prices[i]) && prices[i] >= 0 ? prices[i] : 0,
+      kind: (kinds[i] === "product" ? "product" : "service") as BookingItem["kind"],
+      qty: Number.isFinite(qtys[i]) && qtys[i] > 0 ? Math.round(qtys[i]) : 1,
+      durationMin: Number.isFinite(durations[i]) && durations[i] > 0 ? Math.round(durations[i]) : undefined,
+    }))
+    .filter((it) => it.name);
+
+  if (items.length === 0) {
+    const service = String(formData.get("service") ?? "").trim();
+    if (!service) return null;
+    const known = bookablePriceMap[service] ?? { price: 0, durationMin: 60 };
+    items = [{ name: service, price: known.price, kind: "service", qty: 1, durationMin: known.durationMin }];
+  }
+
+  const price = items.reduce((s, it) => s + it.price * it.qty, 0);
+  const durationMin =
+    items.filter((it) => it.kind === "service").reduce((s, it) => s + (it.durationMin ?? 0) * it.qty, 0) || 60;
+  const serviceItems = items.filter((it) => it.kind === "service");
+  const primary = (serviceItems[0] ?? items[0]).name;
+  const service = items.length === 1 ? primary : `${primary} +${items.length - 1} more`;
+
+  return { items, service, price, durationMin };
+}
+
+/** Invoice lines for a completed booking — itemised from its items, with a
+ *  discount line so the invoice total matches the (possibly discounted) price. */
+function buildInvoiceItemsFromBooking(booking: Booking): InvoiceItem[] {
+  const src: BookingItem[] =
+    booking.items && booking.items.length > 0
+      ? booking.items
+      : [{ name: booking.service, price: booking.price, kind: "service", qty: 1, durationMin: booking.durationMin }];
+  const items: InvoiceItem[] = src.map((it) => ({
+    // Menu names already carry their duration (e.g. "— 90 min"); only append it
+    // for services that don't, like salon/barber walk-ins.
+    description:
+      it.kind === "service" && it.durationMin && !/\bmin\b/i.test(it.name)
+        ? `${it.name} (${it.durationMin} min)`
+        : it.name,
+    qty: it.qty,
+    unitPrice: it.price,
+  }));
+  const subtotal = items.reduce((s, i) => s + i.qty * i.unitPrice, 0);
+  if (subtotal > booking.price) {
+    items.push({ description: "Discount", qty: 1, unitPrice: -(subtotal - booking.price) });
+  }
+  return items;
+}
+
 export async function createBooking(
   _prev: ActionResult | null,
   formData: FormData
@@ -249,15 +316,15 @@ export async function createBooking(
   const customer = String(formData.get("customer") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
-  const service = String(formData.get("service") ?? "").trim();
   const date = String(formData.get("date") ?? "").trim();
   const time = String(formData.get("time") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
   const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
   const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
+  const parsed = readBookingItems(formData);
 
-  if (!customer || !email || !service || !date || !time) {
-    return { ok: false, message: "Please fill in your name, email, treatment, date and time." };
+  if (!customer || !email || !parsed || !date || !time) {
+    return { ok: false, message: "Please fill in your name, email, at least one treatment or product, date and time." };
   }
 
   const db = await readDb();
@@ -266,19 +333,18 @@ export async function createBooking(
     return Number.isFinite(n) && n > max ? n : max;
   }, 1000);
 
-  const known = bookablePriceMap[service] ?? { price: 0, durationMin: 60 };
-
   const booking: Booking = {
     id: crypto.randomUUID(),
     ref: `MS-${maxRef + 1}`,
     customer,
     email,
     phone,
-    service,
+    service: parsed.service,
+    items: parsed.items,
     date,
     time,
-    durationMin: known.durationMin,
-    price: known.price,
+    durationMin: parsed.durationMin,
+    price: parsed.price,
     status: "Pending",
     location,
     notes: notes || undefined,
@@ -352,17 +418,7 @@ export async function updateBookingStatus(formData: FormData): Promise<void> {
         // Carried so the invoice and its receipts can be sent to the guest.
         customerEmail: booking.email || undefined,
         customerPhone: booking.phone || undefined,
-        items: [
-          {
-            // Menu names already carry their duration (e.g. "— 90 min"); only
-            // append it for services that don't, like salon/barber walk-ins.
-            description: /\bmin\b/i.test(booking.service)
-              ? booking.service
-              : `${booking.service} (${booking.durationMin} min)`,
-            qty: 1,
-            unitPrice: booking.price,
-          },
-        ],
+        items: buildInvoiceItemsFromBooking(booking),
         issueDate: todayISO(),
         dueDate: addDaysISO(todayISO(), 7),
         status: "Sent",
@@ -1241,22 +1297,17 @@ export async function createAdminBooking(
   const customer = String(formData.get("customer") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
-  const service = String(formData.get("service") ?? "").trim();
   const date = String(formData.get("date") ?? "").trim();
   const time = String(formData.get("time") ?? "").trim();
-  const price = Number(formData.get("price") ?? 0);
   const discount = Number(formData.get("discount") ?? 0);
-  const durationMin = Number(formData.get("durationMin") ?? 60);
   const therapist = String(formData.get("therapist") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
   const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
   const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
+  const parsed = readBookingItems(formData);
 
-  if (!customer || !service || !date || !time) {
-    return { ok: false, message: "Please fill in guest name, service, date and time." };
-  }
-  if (!(price >= 0)) {
-    return { ok: false, message: "Price must be zero or more." };
+  if (!customer || !parsed || !date || !time) {
+    return { ok: false, message: "Please fill in guest name, at least one service or product, date and time." };
   }
   if (!(discount >= 0)) {
     return { ok: false, message: "Discount must be zero or more." };
@@ -1271,6 +1322,7 @@ export async function createAdminBooking(
     return Number.isFinite(n) && n > max ? n : max;
   }, 1000);
 
+  const price = Math.max(0, parsed.price - Math.min(parsed.price, discount));
   const discountNote = discount > 0 ? `Discount K${discount.toLocaleString("en-ZM")}` : "";
   const bookingNotes = ["Walk-in", discountNote, notes].filter(Boolean).join(" — ");
 
@@ -1280,10 +1332,11 @@ export async function createAdminBooking(
     customer,
     email,
     phone,
-    service,
+    service: parsed.service,
+    items: parsed.items,
     date,
     time,
-    durationMin: Number.isFinite(durationMin) && durationMin > 0 ? Math.round(durationMin) : 60,
+    durationMin: parsed.durationMin,
     price,
     status: "Confirmed",
     location,
@@ -1305,18 +1358,16 @@ export async function updateAdminBooking(formData: FormData): Promise<void> {
   const returnTo = String(formData.get("returnTo") ?? "/admin/bookings");
   const customer = String(formData.get("customer") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
-  const service = String(formData.get("service") ?? "").trim();
   const date = String(formData.get("date") ?? "").trim();
   const time = String(formData.get("time") ?? "").trim();
-  const price = Number(formData.get("price") ?? 0);
   const discount = Number(formData.get("discount") ?? 0);
-  const durationMin = Number(formData.get("durationMin") ?? 60);
   const therapist = String(formData.get("therapist") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
   const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
   const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
+  const parsed = readBookingItems(formData);
 
-  if (!id || !customer || !service || !date || !time || !(price >= 0) || !(discount >= 0)) {
+  if (!id || !customer || !parsed || !date || !time || !(discount >= 0)) {
     return;
   }
 
@@ -1326,6 +1377,7 @@ export async function updateAdminBooking(formData: FormData): Promise<void> {
   if (bookingStartsAt({ date, time }).getTime() <= Date.now()) return;
   if (therapist && !db.therapists.some((t) => t.active && t.name === therapist)) return;
 
+  const price = Math.max(0, parsed.price - Math.min(parsed.price, discount));
   const discountNote = discount > 0 ? `Discount K${discount.toLocaleString("en-ZM")}` : "";
   const cleanedNotes = notes
     .replace(/(^| — )Discount K[\d,]+/g, "")
@@ -1335,10 +1387,11 @@ export async function updateAdminBooking(formData: FormData): Promise<void> {
 
   booking.customer = customer;
   booking.phone = phone;
-  booking.service = service;
+  booking.service = parsed.service;
+  booking.items = parsed.items;
   booking.date = date;
   booking.time = time;
-  booking.durationMin = Number.isFinite(durationMin) && durationMin > 0 ? Math.round(durationMin) : 60;
+  booking.durationMin = parsed.durationMin;
   booking.price = price;
   booking.location = location;
   booking.therapist = therapist || undefined;

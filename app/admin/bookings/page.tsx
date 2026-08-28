@@ -189,6 +189,10 @@ export default async function BookingsPage({
     { name: "Salon — braids & styling", price: 550, durationMin: 60, section: "Salon" },
     { name: "Barber — cut & beard trim", price: 250, durationMin: 30, section: "Barber" },
   ];
+  const productOptions = db.inventory
+    .filter((item) => typeof item.retailPrice === "number" && item.retailPrice > 0)
+    .map((item) => ({ name: item.brand ? `${item.name} — ${item.brand}` : item.name, price: item.retailPrice as number }))
+    .sort((a, b) => a.name.localeCompare(b.name));
   const bookings = [...db.bookings].sort((a, b) =>
     `${b.date}${b.time}`.localeCompare(`${a.date}${a.time}`)
   );
@@ -225,6 +229,7 @@ export default async function BookingsPage({
           <div className="mt-5">
             <NewBookingForm
               serviceOptions={serviceOptions}
+              products={productOptions}
               therapists={therapistNames}
               defaultDate={todayISO()}
             />
@@ -310,6 +315,7 @@ export default async function BookingsPage({
                             <EditBookingForm
                               booking={b}
                               serviceOptions={serviceOptions}
+                              products={productOptions}
                               therapists={therapistNames}
                               returnTo={returnTo}
                             />
@@ -383,6 +389,7 @@ export default async function BookingsPage({
                       <EditBookingForm
                         booking={b}
                         serviceOptions={serviceOptions}
+                              products={productOptions}
                         therapists={therapistNames}
                         returnTo={returnTo}
                       />

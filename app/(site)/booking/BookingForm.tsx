@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useActionState } from "react";
 import { CalendarCheck, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { createBooking, type ActionResult } from "@/lib/actions";
 import type { BookableService } from "@/lib/content";
-import ServiceCombobox from "./ServiceCombobox";
+import BookingItemsPicker, { type PickedItem } from "@/components/site/BookingItemsPicker";
 import { useCheckoutSubmit } from "@/components/site/PaymentProcessingOverlay";
 
 const inputClasses =
@@ -12,10 +13,12 @@ const inputClasses =
 
 export default function BookingForm({
   services,
+  products = [],
   preselected,
   preselectedLocation = "Kabulonga",
 }: {
   services: BookableService[];
+  products?: { name: string; price: number }[];
   preselected?: string;
   preselectedLocation?: "Kabulonga" | "Twangale";
 }) {
@@ -26,6 +29,12 @@ export default function BookingForm({
   const { onSubmit, overlay, active } = useCheckoutSubmit((fd) => formAction(fd), "booking", {
     autoHideAfter: 600,
   });
+
+  const initialItems: PickedItem[] = (() => {
+    const s = preselected ? services.find((x) => x.name === preselected) : undefined;
+    return s ? [{ key: "preselected", name: s.name, price: s.price, kind: "service", qty: 1, durationMin: s.durationMin }] : [];
+  })();
+  const [itemCount, setItemCount] = useState(initialItems.length);
 
   if (state?.ok) {
     return (
@@ -81,14 +90,14 @@ export default function BookingForm({
         </fieldset>
 
         <div className="sm:col-span-2">
-          <label htmlFor="service" className="mb-1.5 block text-sm font-medium text-mist-900">
-            Treatment
+          <label className="mb-1.5 block text-sm font-medium text-mist-900">
+            Services &amp; products
           </label>
-          <ServiceCombobox
+          <BookingItemsPicker
             services={services}
-            name="service"
-            preselected={preselected}
-            triggerClassName={inputClasses}
+            products={products}
+            initial={initialItems}
+            onChange={(info) => setItemCount(info.count)}
           />
         </div>
 
@@ -176,7 +185,7 @@ export default function BookingForm({
 
       <button
         type="submit"
-        disabled={pending || active}
+        disabled={pending || active || itemCount === 0}
         className="mt-7 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-mist-600 px-8 py-4 text-sm font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-mist-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending || active ? (
