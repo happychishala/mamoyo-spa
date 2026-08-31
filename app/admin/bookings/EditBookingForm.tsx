@@ -58,6 +58,13 @@ export default function EditBookingForm({
       </div>
 
       <div className="mt-3">
+        <label htmlFor={`edit-email-${booking.id}`} className="mb-1 block text-xs font-medium text-mist-800">
+          Email <span className="font-normal text-mist-500">(for invoice &amp; receipt)</span>
+        </label>
+        <input id={`edit-email-${booking.id}`} name="email" type="email" defaultValue={booking.email} placeholder="guest@example.com" className={inputClasses} />
+      </div>
+
+      <div className="mt-3">
         <label className="mb-1 block text-xs font-medium text-mist-800">Services &amp; products</label>
         <BookingItemsPicker
           services={serviceOptions}

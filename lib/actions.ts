@@ -1360,6 +1360,7 @@ export async function updateAdminBooking(formData: FormData): Promise<void> {
   const returnTo = String(formData.get("returnTo") ?? "/admin/bookings");
   const customer = String(formData.get("customer") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
   const date = String(formData.get("date") ?? "").trim();
   const time = String(formData.get("time") ?? "").trim();
   const discount = Number(formData.get("discount") ?? 0);
@@ -1389,6 +1390,7 @@ export async function updateAdminBooking(formData: FormData): Promise<void> {
 
   booking.customer = customer;
   booking.phone = phone;
+  booking.email = email;
   booking.service = parsed.service;
   booking.items = parsed.items;
   booking.date = date;

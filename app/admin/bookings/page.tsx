@@ -276,7 +276,7 @@ export default async function BookingsPage({
                         <td className="py-4 pr-4 font-medium text-mist-950">{b.ref}</td>
                         <td className="py-4 pr-4">
                           <p className="font-medium text-mist-950">{b.customer}</p>
-                          <p className="text-xs text-mist-600">{b.phone || b.email}</p>
+                          <p className="text-xs text-mist-600">{[b.phone, b.email].filter(Boolean).join(" · ") || "—"}</p>
                         </td>
                         <td className="py-4 pr-4 text-mist-800">
                           {b.service}
@@ -339,7 +339,7 @@ export default async function BookingsPage({
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-mist-950">{b.ref}</p>
                       <p className="truncate text-sm text-mist-900">{b.customer}</p>
-                      <p className="truncate text-xs text-mist-600">{b.phone || b.email}</p>
+                      <p className="truncate text-xs text-mist-600">{[b.phone, b.email].filter(Boolean).join(" · ") || "—"}</p>
                     </div>
                     <StatusBadge status={b.status} />
                   </div>

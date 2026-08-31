@@ -42,6 +42,13 @@ export default function NewBookingForm({
       </div>
 
       <div>
+        <label htmlFor="nb-email" className="mb-1 block text-xs font-medium text-mist-800">
+          Email <span className="font-normal text-mist-500">(optional — to email the invoice &amp; receipt)</span>
+        </label>
+        <input id="nb-email" name="email" type="email" autoComplete="off" placeholder="guest@example.com" className={inputClasses} />
+      </div>
+
+      <div>
         <label className="mb-1 block text-xs font-medium text-mist-800">Services &amp; products</label>
         <BookingItemsPicker
           services={serviceOptions}
