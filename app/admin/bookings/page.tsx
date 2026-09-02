@@ -188,6 +188,9 @@ export default async function BookingsPage({
     })),
     { name: "Salon — braids & styling", price: 550, durationMin: 60, section: "Salon" },
     { name: "Barber — cut & beard trim", price: 250, durationMin: 30, section: "Barber" },
+    { name: "Add-on — Hot stones", price: 120, durationMin: 0, section: "Add-ons" },
+    { name: "Add-on — Bamboo sticks", price: 120, durationMin: 0, section: "Add-ons" },
+    { name: "Add-on — Jelly mask", price: 250, durationMin: 0, section: "Add-ons" },
   ];
   const productOptions = db.inventory
     .filter((item) => typeof item.retailPrice === "number" && item.retailPrice > 0)

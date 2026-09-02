@@ -166,7 +166,7 @@ export const spaMenu: SpaMenuSection[] = [
         { label: "Lip", price: 70 }, { label: "Neck", price: 90 }, { label: "Brow", price: 100 }, { label: "Nose", price: 120 }, { label: "Cheek", price: 150 }, { label: "Chin", price: 150 },
         { label: "Underarm", price: 150 }, { label: "Stomach", price: 170 }, { label: "Half arm", price: 200 }, { label: "Full arm", price: 300 },
         { label: "Bikini", price: 250 }, { label: "Half leg", price: 350 }, { label: "Back", price: 350 }, { label: "¾ leg", price: 450 },
-        { label: "Brazilian", price: 400 }, { label: "Hollywood", price: 450 }, { label: "Full leg", price: 500 }, { label: "Full leg with glutes", price: 650 },
+        { label: "Brazilian", price: 400 }, { label: "Hollywood", price: 500 }, { label: "Full leg", price: 500 }, { label: "Full leg with glutes", price: 650 },
       ] },
       { name: "Threading", options: [{ label: "Brows", price: 100 }, { label: "Chin, cheeks or lip", price: 350 }] },
       { name: "Tinting", options: [{ label: "Eyelash", price: 100 }, { label: "Brow", price: 100 }, { label: "Lash & brow", price: 200 }] },
