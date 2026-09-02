@@ -1376,9 +1376,13 @@ export async function updateAdminBooking(formData: FormData): Promise<void> {
 
   const db = await readDb();
   const booking = db.bookings.find((b) => b.id === id);
-  if (!booking || !canEditBooking(booking)) return;
-  if (bookingStartsAt({ date, time }).getTime() <= Date.now()) return;
-  if (therapist && !db.therapists.some((t) => t.active && t.name === therapist)) return;
+  if (!booking) return;
+  // Completed bookings are editable for corrections regardless of date; open
+  // ones keep the future-only rule.
+  const isCompleted = booking.status === "Completed";
+  if (!isCompleted && !canEditBooking(booking)) return;
+  if (!isCompleted && bookingStartsAt({ date, time }).getTime() <= Date.now()) return;
+  if (!isCompleted && therapist && !db.therapists.some((t) => t.active && t.name === therapist)) return;
 
   const price = Math.max(0, parsed.price - Math.min(parsed.price, discount));
   const discountNote = discount > 0 ? `Discount K${discount.toLocaleString("en-ZM")}` : "";
@@ -1401,10 +1405,54 @@ export async function updateAdminBooking(formData: FormData): Promise<void> {
   booking.therapist = therapist || undefined;
   booking.notes = bookingNotes;
 
+  // Keep the logged treatment (Reports source) in step with a corrected
+  // completed booking. Invoices/receipts are payment records — to correct
+  // billed amounts, delete the booking and re-create it.
+  if (isCompleted) {
+    const tr = db.treatments.find((t) => t.bookingRef === booking.ref);
+    if (tr) {
+      tr.service = booking.service;
+      tr.amount = booking.price;
+      tr.date = booking.date;
+      tr.location = booking.location ?? tr.location;
+      if (booking.therapist) tr.therapist = booking.therapist;
+    }
+  }
+
   await writeDb(db);
   revalidatePath("/admin/bookings");
+  revalidatePath("/admin/reports");
   revalidatePath("/admin");
   redirect(returnTo.startsWith("/admin/bookings") ? returnTo : "/admin/bookings");
+}
+
+/**
+ * Delete a booking and cascade its paperwork — the logged treatment, the
+ * invoice raised on completion, that invoice's receipts and the income
+ * transactions — so Reports and Finance stay correct. Owner/Manager only.
+ */
+export async function deleteBooking(formData: FormData): Promise<void> {
+  await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const db = await readDb();
+  const booking = db.bookings.find((b) => b.id === id);
+  if (!booking) return;
+  const ref = booking.ref;
+  const invoiceNumbers = db.invoices.filter((i) => i.bookingRef === ref).map((i) => i.number);
+
+  db.bookings = db.bookings.filter((b) => b.id !== id);
+  db.treatments = db.treatments.filter((t) => t.bookingRef !== ref);
+  db.invoices = db.invoices.filter((i) => i.bookingRef !== ref);
+  db.receipts = db.receipts.filter((r) => !invoiceNumbers.includes(r.invoiceNumber));
+  // Income entries name their invoice number in the description.
+  db.transactions = db.transactions.filter((t) => !invoiceNumbers.some((n) => t.description.includes(n)));
+
+  await writeDb(db);
+  for (const p of ["/admin/bookings", "/admin/reports", "/admin/invoices", "/admin/receipts", "/admin/finance", "/admin"]) {
+    revalidatePath(p);
+  }
 }
 
 export async function createRole(

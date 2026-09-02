@@ -9,6 +9,7 @@ import { formatMoney, formatDate, todayISO } from "@/lib/format";
 import { PageHeader, Card, StatusBadge } from "@/components/admin/ui";
 import NewBookingForm from "./NewBookingForm";
 import EditBookingForm from "./EditBookingForm";
+import DeleteBookingButton from "./DeleteBookingButton";
 
 export const metadata: Metadata = { title: "Bookings" };
 export const dynamic = "force-dynamic";
@@ -166,6 +167,9 @@ function BookingActions({
           </button>
         </form>
       )}
+      {(b.status === "Completed" || b.status === "Cancelled") && (
+        <DeleteBookingButton id={b.id} refLabel={b.ref} />
+      )}
     </div>
   );
 }
@@ -212,7 +216,8 @@ export default async function BookingsPage({
 
   const rowState = (b: Booking) => {
     const open = b.status === "Pending" || b.status === "Confirmed";
-    const editable = open && bookingStartsAt(b.date, b.time).getTime() > now;
+    // Completed bookings are editable for corrections; open ones only until they start.
+    const editable = b.status === "Completed" || (open && bookingStartsAt(b.date, b.time).getTime() > now);
     return { open, editable, isEditing: editable && editId === b.id };
   };
 
