@@ -1771,6 +1771,34 @@ export async function setRetailPrice(formData: FormData): Promise<void> {
   revalidatePath("/admin/pos");
 }
 
+/** Edit an inventory item's details (name, brand, size, category, unit, stock, reorder level). */
+export async function updateInventoryItem(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const category = String(formData.get("category") ?? "") as InventoryCategory;
+  const unit = String(formData.get("unit") ?? "").trim();
+  const quantity = Number(formData.get("quantity") ?? NaN);
+  const reorderLevel = Number(formData.get("reorderLevel") ?? NaN);
+  if (!id || !name || !["Spa products", "Café"].includes(category) || !unit) return;
+  if (!(quantity >= 0) || !(reorderLevel >= 0)) return;
+
+  const db = await readDb();
+  const item = db.inventory.find((i) => i.id === id);
+  if (!item) return;
+  item.name = name;
+  item.brand = String(formData.get("brand") ?? "").trim() || undefined;
+  item.volume = String(formData.get("volume") ?? "").trim() || undefined;
+  item.category = category;
+  item.unit = unit;
+  item.quantity = Math.round(quantity);
+  item.reorderLevel = Math.round(reorderLevel);
+  item.updatedAt = todayISO();
+  await writeDb(db);
+  revalidatePath("/admin/inventory");
+  revalidatePath("/admin/pos");
+}
+
 export async function adjustInventory(formData: FormData): Promise<void> {
   await requireAdmin();
   const id = String(formData.get("id") ?? "");

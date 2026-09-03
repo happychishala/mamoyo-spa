@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Plus, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { addInventoryItem, type ActionResult } from "@/lib/actions";
+import { INVENTORY_UNITS } from "@/lib/inventory-units";
 
 const inputClasses =
   "w-full rounded-xl border border-mist-200 bg-white px-3.5 py-2.5 text-sm text-mist-950 placeholder:text-mist-400 transition-colors duration-200 focus:border-mist-500 focus:outline-none focus:ring-2 focus:ring-mist-200";
@@ -58,7 +59,11 @@ export default function InventoryItemForm() {
           <label htmlFor="inv-unit" className="mb-1 block text-xs font-medium text-mist-800">
             Unit
           </label>
-          <input id="inv-unit" name="unit" type="text" placeholder="bottle, kg, pcs…" className={inputClasses} />
+          <select id="inv-unit" name="unit" required defaultValue="pcs" className={inputClasses}>
+            {INVENTORY_UNITS.map((u) => (
+              <option key={u} value={u}>{u}</option>
+            ))}
+          </select>
         </div>
       </div>
 

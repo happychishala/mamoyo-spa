@@ -5,6 +5,7 @@ import type { InventoryItem } from "@/lib/db";
 import { adjustInventory, setRetailPrice } from "@/lib/actions";
 import { formatDate } from "@/lib/format";
 import { DataTable, type DataColumn } from "@/components/admin/DataTable";
+import EditInventoryItem from "./EditInventoryItem";
 
 const isLow = (item: InventoryItem) => item.quantity <= item.reorderLevel;
 
@@ -84,6 +85,14 @@ const columns: DataColumn<InventoryItem>[] = [
     header: "Updated",
     value: (i) => i.updatedAt,
     cell: (i) => formatDate(i.updatedAt),
+  },
+  {
+    key: "edit",
+    header: "Edit",
+    sortable: false,
+    searchable: false,
+    exportable: false,
+    cell: (item) => <EditInventoryItem item={item} />,
   },
   {
     key: "adjust",
