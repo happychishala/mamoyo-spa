@@ -49,7 +49,7 @@ export default function NewStayForm({
         <select id="ns-suite" name="suiteId" required defaultValue={suites[0]?.id} className={inputClasses}>
           {suites.map((s) => (
             <option key={s.id} value={s.id}>
-              {s.name} — K{s.ratePerNight.toLocaleString()}/night
+              {s.name} — ${s.ratePerNight.toLocaleString()}/night
             </option>
           ))}
         </select>

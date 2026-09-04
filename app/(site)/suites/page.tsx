@@ -5,7 +5,7 @@ import { BedDouble, Ruler, Users, CalendarX2, ArrowRight, MessageCircle } from "
 import { SectionHeading } from "@/components/site/Section";
 import { suites } from "@/lib/content";
 import { readDb } from "@/lib/db";
-import { formatMoney, formatDate, todayISO } from "@/lib/format";
+import { formatUSD, formatDate, todayISO } from "@/lib/format";
 import Reveal from "@/components/site/Reveal";
 import FaqList from "@/components/site/FaqList";
 import StayBookingForm from "./StayBookingForm";
@@ -145,7 +145,7 @@ export default async function SuitesPage({
                     className="object-cover"
                   />
                   <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3.5 py-1.5 text-xs font-semibold text-mist-800 backdrop-blur">
-                    {formatMoney(s.ratePerNight)} / night
+                    {formatUSD(s.ratePerNight)} / night
                   </div>
                 </div>
                 <div className="p-7">

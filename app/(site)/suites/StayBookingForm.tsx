@@ -72,7 +72,7 @@ export default function StayBookingForm({
           >
             {suites.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.name} — K{s.ratePerNight.toLocaleString()}/night · sleeps {s.sleeps}
+                {s.name} — ${s.ratePerNight.toLocaleString()}/night · sleeps {s.sleeps}
               </option>
             ))}
           </select>
@@ -182,9 +182,9 @@ export default function StayBookingForm({
         <div className="mt-6 flex items-center justify-between rounded-xl bg-mist-50 px-5 py-4">
           <p className="text-sm text-mist-800">
             {suite.name} · {nights} {nights === 1 ? "night" : "nights"} ×{" "}
-            {`K${suite.ratePerNight.toLocaleString()}`}
+            {`$${suite.ratePerNight.toLocaleString()}`}
           </p>
-          <p className="font-serif text-xl text-cocoa-700">{`K${estimate.toLocaleString()}`}</p>
+          <p className="font-serif text-xl text-cocoa-700">{`$${estimate.toLocaleString()}`}</p>
         </div>
       )}
 

@@ -4,7 +4,7 @@ import { Check, X, LogIn, LogOut } from "lucide-react";
 import type { StayBooking } from "@/lib/db";
 import { updateStayStatus } from "@/lib/actions";
 import { suites } from "@/lib/content";
-import { formatMoney, formatDate } from "@/lib/format";
+import { formatUSD, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/admin/ui";
 import { DataTable, type DataColumn } from "@/components/admin/DataTable";
 
@@ -73,7 +73,7 @@ const columns: DataColumn<StayBooking>[] = [
     key: "total",
     header: "Total",
     value: (s) => s.total,
-    cell: (s) => formatMoney(s.total),
+    cell: (s) => formatUSD(s.total),
     cellClassName: "font-semibold text-mist-950",
   },
   {

@@ -1194,7 +1194,7 @@ export async function createStayBooking(
 
   return {
     ok: true,
-    message: `Thank you, ${guest.split(" ")[0]}! ${suite.name} is held for ${formatDate(checkIn)} – ${formatDate(checkOut)} (${nights} ${nights === 1 ? "night" : "nights"}, ${stay.total.toLocaleString()} kwacha). Request ${stay.ref} — we'll confirm by email shortly.${channelSummary ? ` Channel sync: ${channelSummary}.` : ""}`,
+    message: `Thank you, ${guest.split(" ")[0]}! ${suite.name} is held for ${formatDate(checkIn)} – ${formatDate(checkOut)} (${nights} ${nights === 1 ? "night" : "nights"}, $${stay.total.toLocaleString()}). Request ${stay.ref} — we'll confirm by email shortly.${channelSummary ? ` Channel sync: ${channelSummary}.` : ""}`,
   };
 }
 
@@ -1270,7 +1270,7 @@ export async function createAdminStay(
 
   return {
     ok: true,
-    message: `${suite.name} confirmed for ${guest} — ${formatDate(checkIn)} to ${formatDate(checkOut)} (${nights} ${nights === 1 ? "night" : "nights"}, ${(nights * suite.ratePerNight).toLocaleString()} kwacha).`,
+    message: `${suite.name} confirmed for ${guest} — ${formatDate(checkIn)} to ${formatDate(checkOut)} (${nights} ${nights === 1 ? "night" : "nights"}, $${(nights * suite.ratePerNight).toLocaleString()}).`,
   };
 }
 

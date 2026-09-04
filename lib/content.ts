@@ -318,7 +318,7 @@ const studioAmenities = [
 ];
 
 // All four studios are identical; two on the ground floor, two upstairs.
-export const STUDIO_RATE = 1400;
+export const STUDIO_RATE = 80; // US dollars per night
 
 export const suites: Suite[] = [
   {

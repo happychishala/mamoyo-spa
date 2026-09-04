@@ -7,6 +7,11 @@ export function formatMoney(amount: number): string {
   return amount < 0 ? `-K${kwacha.format(-amount)}` : `K${kwacha.format(amount)}`;
 }
 
+// Suite stays are priced and shown in US dollars, unlike spa/café which are Kwacha.
+export function formatUSD(amount: number): string {
+  return amount < 0 ? `-$${kwacha.format(-amount)}` : `$${kwacha.format(amount)}`;
+}
+
 export function formatDate(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString("en-GB", {
     day: "numeric",
