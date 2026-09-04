@@ -8,6 +8,7 @@ import {
   invoiceTotal,
   invoicePaid,
   staysOverlap,
+  settleStayIncome,
   type DB,
   type Invoice,
   type InvoiceItem,
@@ -1283,9 +1284,16 @@ export async function updateStayStatus(formData: FormData): Promise<void> {
   const stay = db.stays.find((s) => s.id === id);
   if (!stay) return;
   stay.status = status;
+  // Checking a guest in (or out) realises the stay revenue: raise the invoice,
+  // receipt and income entry. Idempotent on the stay ref, so re-checkout is safe.
+  settleStayIncome(db, stay);
   await writeDb(db);
   revalidatePath("/admin/stays");
   revalidatePath("/suites");
+  revalidatePath("/admin/invoices");
+  revalidatePath("/admin/receipts");
+  revalidatePath("/admin/finance");
+  revalidatePath("/admin");
 }
 
 // Treatments are only created by completing bookings (walk-ins get an admin

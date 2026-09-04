@@ -637,6 +637,72 @@ const seed: DB = {
 };
 
 /** Backfill arrays added after a stored DB was first written. Mutates in place. */
+// A stay counts as income once the guest is in-house (CheckedIn) or has left
+// (CheckedOut) — that's when the money is real. Raises the paperwork a booking
+// gets on completion: a Paid invoice, a receipt, and an Income transaction.
+// Idempotent: keyed on the stay ref, so re-runs (and the migrate backfill) never
+// double-count. Self-contained here so migrate() can backfill existing stays
+// without reaching into the actions layer. Returns true if it created records.
+export function settleStayIncome(db: DB, stay: StayBooking): boolean {
+  if (stay.status !== "CheckedIn" && stay.status !== "CheckedOut") return false;
+  if (!(stay.total > 0)) return false;
+  if (db.invoices.some((i) => i.bookingRef === stay.ref)) return false;
+
+  // Recognise the income on the check-in date (never a future date).
+  const date = stay.checkIn;
+  const year = new Date().getFullYear();
+  const nextNum = (list: { number: string }[], prefix: string, start: number) => {
+    const max = list.reduce((m, x) => {
+      const n = Number(x.number.split("-").pop());
+      return Number.isFinite(n) && n > m ? n : m;
+    }, start);
+    return `${prefix}-${year}-${String(max + 1).padStart(4, "0")}`;
+  };
+
+  const items: InvoiceItem[] = [
+    {
+      description: `Suite stay — ${stay.nights} ${stay.nights === 1 ? "night" : "nights"} (${stay.checkIn} → ${stay.checkOut})`,
+      qty: 1,
+      unitPrice: stay.total,
+    },
+  ];
+  const invoiceNumber = nextNum(db.invoices, "INV", 100);
+  db.invoices.unshift({
+    id: crypto.randomUUID(),
+    number: invoiceNumber,
+    customer: stay.guest,
+    bookingRef: stay.ref,
+    items,
+    issueDate: date,
+    dueDate: date,
+    status: "Paid",
+    amountPaid: stay.total,
+    customerEmail: stay.email || undefined,
+    customerPhone: stay.phone || undefined,
+  });
+  db.receipts.unshift({
+    id: crypto.randomUUID(),
+    number: nextNum(db.receipts, "RCT", 200),
+    invoiceNumber,
+    customer: stay.guest,
+    amount: stay.total,
+    method: "Bank Transfer",
+    date,
+    items,
+    customerEmail: stay.email || undefined,
+    customerPhone: stay.phone || undefined,
+  });
+  db.transactions.unshift({
+    id: crypto.randomUUID(),
+    date,
+    type: "Income",
+    category: "Accommodation",
+    description: `Suite stay — ${stay.ref} (${stay.guest})`,
+    amount: stay.total,
+  });
+  return true;
+}
+
 function migrate(db: DB): boolean {
   let migrated = false;
   if (!Array.isArray(db.stays)) {
@@ -710,6 +776,13 @@ function migrate(db: DB): boolean {
   if (!Array.isArray(db.workShifts)) {
     db.workShifts = [];
     migrated = true;
+  }
+  // Backfill income for stays that already exist on the live data but never
+  // raised paperwork: any checked-in / checked-out stay without an invoice.
+  if (Array.isArray(db.stays) && Array.isArray(db.invoices)) {
+    for (const stay of db.stays) {
+      if (settleStayIncome(db, stay)) migrated = true;
+    }
   }
   // Seed starter retail prices onto matching inventory items that don't have
   // one yet, so the product POS is usable out of the box. Never overwrites a
