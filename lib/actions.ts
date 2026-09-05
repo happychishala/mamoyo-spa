@@ -9,6 +9,7 @@ import {
   invoicePaid,
   staysOverlap,
   settleStayIncome,
+  recordAudit,
   type DB,
   type Invoice,
   type InvoiceItem,
@@ -375,7 +376,7 @@ export async function createBooking(
 }
 
 export async function updateBookingStatus(formData: FormData): Promise<void> {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "") as BookingStatus;
   if (!id || !["Pending", "Confirmed", "Completed", "Cancelled"].includes(status)) return;
@@ -383,6 +384,7 @@ export async function updateBookingStatus(formData: FormData): Promise<void> {
   const db = await readDb();
   const booking = db.bookings.find((b) => b.id === id);
   if (!booking || booking.status === status) return;
+  recordAudit(db, actor, `booking → ${status}`, booking.ref);
 
   // Completing a booking logs the treatment into Reports and raises the
   // paperwork: an invoice for the service, plus a receipt + income entry for
@@ -1363,7 +1365,7 @@ export async function createAdminBooking(
 }
 
 export async function updateAdminBooking(formData: FormData): Promise<void> {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const returnTo = String(formData.get("returnTo") ?? "/admin/bookings");
   const customer = String(formData.get("customer") ?? "").trim();
@@ -1427,6 +1429,7 @@ export async function updateAdminBooking(formData: FormData): Promise<void> {
     }
   }
 
+  recordAudit(db, actor, isCompleted ? "edited completed booking" : "edited booking", booking.ref);
   await writeDb(db);
   revalidatePath("/admin/bookings");
   revalidatePath("/admin/reports");
@@ -1440,7 +1443,7 @@ export async function updateAdminBooking(formData: FormData): Promise<void> {
  * transactions — so Reports and Finance stay correct. Owner/Manager only.
  */
 export async function deleteBooking(formData: FormData): Promise<void> {
-  await requireRole("Owner", "Manager");
+  const actor = await requireRole("Owner", "Manager");
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
@@ -1448,6 +1451,7 @@ export async function deleteBooking(formData: FormData): Promise<void> {
   const booking = db.bookings.find((b) => b.id === id);
   if (!booking) return;
   const ref = booking.ref;
+  recordAudit(db, actor, "deleted booking", ref);
   const invoiceNumbers = db.invoices.filter((i) => i.bookingRef === ref).map((i) => i.number);
 
   db.bookings = db.bookings.filter((b) => b.id !== id);
@@ -1650,10 +1654,12 @@ export async function resetUserTotp(formData: FormData): Promise<void> {
  * and the therapist team. Requires typing the exact phrase to run.
  */
 export async function resetForGoLive(formData: FormData): Promise<void> {
-  await requireRole("Owner");
+  const actor = await requireRole("Owner");
   if (String(formData.get("confirm") ?? "").trim() !== "GO LIVE") return;
 
   const db = await readDb();
+  // Logged before the wipe; auditLog is deliberately not cleared below.
+  recordAudit(db, actor, "ran GO LIVE reset (cleared transactional data)");
   db.bookings = [];
   db.invoices = [];
   db.receipts = [];
@@ -1781,7 +1787,7 @@ export async function setRetailPrice(formData: FormData): Promise<void> {
 
 /** Edit an inventory item's details (name, brand, size, category, unit, stock, reorder level). */
 export async function updateInventoryItem(formData: FormData): Promise<void> {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   const category = String(formData.get("category") ?? "") as InventoryCategory;
@@ -1802,13 +1808,14 @@ export async function updateInventoryItem(formData: FormData): Promise<void> {
   item.quantity = Math.round(quantity);
   item.reorderLevel = Math.round(reorderLevel);
   item.updatedAt = todayISO();
+  recordAudit(db, actor, "edited stock item", item.name);
   await writeDb(db);
   revalidatePath("/admin/inventory");
   revalidatePath("/admin/pos");
 }
 
 export async function adjustInventory(formData: FormData): Promise<void> {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const amount = Number(formData.get("amount") ?? 0);
   const direction = String(formData.get("direction") ?? "");
@@ -1820,6 +1827,7 @@ export async function adjustInventory(formData: FormData): Promise<void> {
   const delta = direction === "in" ? Math.round(amount) : -Math.round(amount);
   item.quantity = Math.max(0, item.quantity + delta);
   item.updatedAt = todayISO();
+  recordAudit(db, actor, `stock ${direction} ${Math.round(amount)}`, item.name);
   await writeDb(db);
   revalidatePath("/admin/inventory");
 }

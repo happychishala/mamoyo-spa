@@ -21,10 +21,14 @@ export async function GET(
   if (!match) return new Response("Unsupported", { status: 415 });
 
   const body = Buffer.from(match[2], "base64");
+  // Only images and PDFs are shown inline; anything else is forced to download
+  // so a stored text/html data URL can't execute in the admin origin.
+  const mime = match[1];
+  const inline = /^image\//.test(mime) || mime === "application/pdf";
   return new Response(body, {
     headers: {
-      "Content-Type": match[1],
-      "Content-Disposition": "inline",
+      "Content-Type": inline ? mime : "application/octet-stream",
+      "Content-Disposition": inline ? "inline" : `attachment; filename="pop-${id}"`,
       "Cache-Control": "private, no-store",
     },
   });

@@ -19,6 +19,7 @@ import {
   Calculator,
   Users,
   Settings2,
+  ScrollText,
   ExternalLink,
   LogOut,
   Menu,
@@ -97,6 +98,7 @@ const navGroups: { group: string; items: NavItem[] }[] = [
     items: [
       { href: "/admin/team", label: "Team", icon: Users, minRank: 1, module: "team" },
       { href: "/admin/integrations", label: "Integrations", icon: Settings2, minRank: 1, module: "integrations" },
+      { href: "/admin/audit", label: "Audit Log", icon: ScrollText, minRank: 1, module: "audit" },
     ],
   },
 ];

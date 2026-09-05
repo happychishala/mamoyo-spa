@@ -28,9 +28,12 @@ export interface PendingAuth {
   secret?: string;
 }
 
-// Deriving the signing key from ADMIN_PASSWORD means rotating the password
-// also invalidates every existing session.
+// Prefer a dedicated SESSION_SECRET so rotating the admin password doesn't log
+// everyone out (and vice-versa). Falls back to deriving from ADMIN_PASSWORD so
+// existing deployments keep working until SESSION_SECRET is set.
 function signingKey(): Buffer | null {
+  const secret = process.env.SESSION_SECRET;
+  if (secret) return createHash("sha256").update(`mamoyo-session-v3:${secret}`).digest();
   const password = process.env.ADMIN_PASSWORD;
   if (!password) return null;
   return createHash("sha256").update(`mamoyo-session-v2:${password}`).digest();

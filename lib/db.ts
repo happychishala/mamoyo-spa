@@ -435,6 +435,18 @@ export interface GiftCard {
   createdAt: string;
 }
 
+/** An append-only record of a sensitive back-office action: who did what, when.
+ *  Kept PII-free on purpose — `target` references a record (a ref/number/id),
+ *  never guest notes, emails or health information. */
+export interface AuditEntry {
+  id: string;
+  at: string; // ISO timestamp
+  actor: string; // username
+  role: UserRole;
+  action: string; // short verb phrase, e.g. "deleted booking", "edited stock"
+  target?: string; // record reference, e.g. "MS-1041", "INV-2026-0117"
+}
+
 export interface DB {
   bookings: Booking[];
   invoices: Invoice[];
@@ -458,6 +470,28 @@ export interface DB {
   cafeMenuItems: CafeMenuItem[];
   recipes: Recipe[];
   workShifts: WorkShift[];
+  auditLog: AuditEntry[];
+}
+
+/** Append a PII-free audit entry to the in-memory db (caller persists via
+ *  writeDb). Keeps only the most recent 2000 so the JSON blob can't grow
+ *  unbounded. `actor`/`role` come from the caller's authenticated session. */
+export function recordAudit(
+  db: DB,
+  actor: { username: string; role: UserRole },
+  action: string,
+  target?: string
+): void {
+  if (!Array.isArray(db.auditLog)) db.auditLog = [];
+  db.auditLog.unshift({
+    id: crypto.randomUUID(),
+    at: new Date().toISOString(),
+    actor: actor.username,
+    role: actor.role,
+    action,
+    target,
+  });
+  if (db.auditLog.length > 2000) db.auditLog.length = 2000;
 }
 
 export function staysOverlap(
@@ -634,6 +668,7 @@ const seed: DB = {
   cafeMenuItems: [],
   recipes: [],
   workShifts: [],
+  auditLog: [],
 };
 
 /** Backfill arrays added after a stored DB was first written. Mutates in place. */
@@ -777,6 +812,10 @@ function migrate(db: DB): boolean {
     db.workShifts = [];
     migrated = true;
   }
+  if (!Array.isArray(db.auditLog)) {
+    db.auditLog = [];
+    migrated = true;
+  }
   // Backfill income for stays that already exist on the live data but never
   // raised paperwork: any checked-in / checked-out stay without an invoice.
   if (Array.isArray(db.stays) && Array.isArray(db.invoices)) {
@@ -805,7 +844,7 @@ function migrate(db: DB): boolean {
       if (!role.isSystemRole || !Array.isArray(role.modules)) continue;
       // Reviews are published to the public site, so Manager and Owner only.
       // Day Sheet is front-line (all roles); Expenses is Manager and Owner only.
-      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards", "daysheet", "expenses", "quotations", "chef", "worksheet"] as const) : (["enquiries", "daysheet", "worksheet"] as const);
+      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards", "daysheet", "expenses", "quotations", "chef", "worksheet", "audit"] as const) : (["enquiries", "daysheet", "worksheet"] as const);
       for (const mod of mods) {
         if (!role.modules.includes(mod)) {
           role.modules.push(mod);
