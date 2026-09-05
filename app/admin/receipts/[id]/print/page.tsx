@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { readDb } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { formatMoney, formatDate } from "@/lib/format";
+import { formatAmount, formatDate } from "@/lib/format";
 import { inclusiveVatBreakdown, VAT_RATE } from "@/lib/tax";
 import { NoAccess } from "@/components/admin/ui";
 import PrintDocument from "@/components/admin/PrintDocument";
@@ -26,6 +26,7 @@ export default async function ReceiptPrintPage({
   const items = receipt.items ?? [];
   const itemsTotal = items.reduce((sum, i) => sum + i.qty * i.unitPrice, 0);
   const receivedVat = inclusiveVatBreakdown(receipt.amount);
+  const m = (n: number) => formatAmount(n, receipt.currency);
 
   const logoSrc = receipt.invoiceNumber.startsWith("POS-") ? "/cafe-mamoyo-logo.png" : "/logo-mamoyo.png";
   const logoAlt = receipt.invoiceNumber.startsWith("POS-")
@@ -55,7 +56,7 @@ export default async function ReceiptPrintPage({
               <p>Paid by:</p>
               {receipt.payments.map((p, i) => (
                 <p key={i} className="font-medium text-mist-800">
-                  {p.method}: {formatMoney(p.amount)}
+                  {p.method}: {m(p.amount)}
                 </p>
               ))}
             </div>
@@ -80,9 +81,9 @@ export default async function ReceiptPrintPage({
               <tr key={idx}>
                 <td className="py-3 pr-4 text-mist-950">{item.description}</td>
                 <td className="py-3 pr-4 text-right text-mist-800">{item.qty}</td>
-                <td className="py-3 pr-4 text-right text-mist-800">{formatMoney(item.unitPrice)}</td>
+                <td className="py-3 pr-4 text-right text-mist-800">{m(item.unitPrice)}</td>
                 <td className="py-3 text-right font-medium text-mist-950">
-                  {formatMoney(item.qty * item.unitPrice)}
+                  {m(item.qty * item.unitPrice)}
                 </td>
               </tr>
             ))
@@ -90,8 +91,8 @@ export default async function ReceiptPrintPage({
             <tr>
               <td className="py-3 pr-4 text-mist-950">Payment against {receipt.invoiceNumber}</td>
               <td className="py-3 pr-4 text-right text-mist-800">1</td>
-              <td className="py-3 pr-4 text-right text-mist-800">{formatMoney(receipt.amount)}</td>
-              <td className="py-3 text-right font-medium text-mist-950">{formatMoney(receipt.amount)}</td>
+              <td className="py-3 pr-4 text-right text-mist-800">{m(receipt.amount)}</td>
+              <td className="py-3 text-right font-medium text-mist-950">{m(receipt.amount)}</td>
             </tr>
           )}
         </tbody>
@@ -102,7 +103,7 @@ export default async function ReceiptPrintPage({
                 Invoice total incl. VAT
               </td>
               <td className="pt-4 text-right text-sm font-medium text-mist-950">
-                {formatMoney(itemsTotal)}
+                {m(itemsTotal)}
               </td>
             </tr>
           )}
@@ -111,7 +112,7 @@ export default async function ReceiptPrintPage({
               Subtotal excl. VAT
             </td>
             <td className="pt-2 text-right text-sm font-medium text-mist-950">
-              {formatMoney(receivedVat.netAmount)}
+              {m(receivedVat.netAmount)}
             </td>
           </tr>
           <tr>
@@ -119,7 +120,7 @@ export default async function ReceiptPrintPage({
               VAT ({VAT_RATE * 100}% included)
             </td>
             <td className="pt-2 text-right text-sm font-medium text-mist-950">
-              {formatMoney(receivedVat.vatAmount)}
+              {m(receivedVat.vatAmount)}
             </td>
           </tr>
           <tr>
@@ -127,7 +128,7 @@ export default async function ReceiptPrintPage({
               Amount received incl. VAT
             </td>
             <td className="pt-2 text-right font-serif text-2xl text-mist-950">
-              {formatMoney(receipt.amount)}
+              {m(receipt.amount)}
             </td>
           </tr>
           {items.length > 0 && itemsTotal - receipt.amount > 0 && (
@@ -136,7 +137,7 @@ export default async function ReceiptPrintPage({
                 Balance remaining
               </td>
               <td className="pt-1 text-right text-sm font-medium text-mist-950">
-                {formatMoney(itemsTotal - receipt.amount)}
+                {m(itemsTotal - receipt.amount)}
               </td>
             </tr>
           )}

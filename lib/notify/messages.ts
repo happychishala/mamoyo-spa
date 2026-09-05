@@ -1,7 +1,7 @@
 import type { Booking, Invoice, Receipt, Location, GiftCard, Quotation } from "../db";
 import { invoiceTotal, invoicePaid, invoiceBalance } from "../db";
 import { locationInfo } from "../content";
-import { formatMoney, formatDate } from "../format";
+import { formatMoney, formatAmount, formatDate } from "../format";
 import { giftValueLabel } from "../gift-cards";
 import { docUrl, type DocType } from "../doc-link";
 
@@ -54,15 +54,15 @@ function shell(heading: string, bodyHtml: string, location?: Location): string {
 </body></html>`;
 }
 
-function itemsTableHtml(items: { description: string; qty: number; unitPrice: number }[]): string {
+function itemsTableHtml(items: { description: string; qty: number; unitPrice: number }[], currency?: "USD"): string {
   const rows = items
     .map(
       (i) => `<tr>
         <td style="padding:8px 0;border-bottom:1px solid #dcf2f5;font-size:14px;">${i.description}${
           i.qty > 1 ? ` <span style="color:#54b8c5;">&times;${i.qty}</span>` : ""
         }</td>
-        <td style="padding:8px 0;border-bottom:1px solid #dcf2f5;font-size:14px;text-align:right;white-space:nowrap;">${formatMoney(
-          i.qty * i.unitPrice
+        <td style="padding:8px 0;border-bottom:1px solid #dcf2f5;font-size:14px;text-align:right;white-space:nowrap;">${formatAmount(
+          i.qty * i.unitPrice, currency
         )}</td>
       </tr>`
     )
@@ -70,9 +70,9 @@ function itemsTableHtml(items: { description: string; qty: number; unitPrice: nu
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0;">${rows}</table>`;
 }
 
-function itemsTextLines(items: { description: string; qty: number; unitPrice: number }[]): string {
+function itemsTextLines(items: { description: string; qty: number; unitPrice: number }[], currency?: "USD"): string {
   return items
-    .map((i) => `• ${i.description}${i.qty > 1 ? ` x${i.qty}` : ""} — ${formatMoney(i.qty * i.unitPrice)}`)
+    .map((i) => `• ${i.description}${i.qty > 1 ? ` x${i.qty}` : ""} — ${formatAmount(i.qty * i.unitPrice, currency)}`)
     .join("\n");
 }
 
@@ -129,6 +129,8 @@ export function invoiceMessage(invoice: Invoice): Message {
   const total = invoiceTotal(invoice);
   const paid = invoicePaid(invoice);
   const balance = invoiceBalance(invoice);
+  const cur = invoice.currency;
+  const m = (n: number) => formatAmount(n, cur);
   const b = branch(invoice.location);
   const subject = `Your MaMoyo invoice ${invoice.number}`;
 
@@ -141,11 +143,11 @@ export function invoiceMessage(invoice: Invoice): Message {
     `Issued: ${formatDate(invoice.issueDate)}`,
     `Due: ${formatDate(invoice.dueDate)}`,
     ``,
-    itemsTextLines(invoice.items),
+    itemsTextLines(invoice.items, cur),
     ``,
-    `Total: ${formatMoney(total)}`,
-    paid > 0 ? `Paid: ${formatMoney(paid)}` : "",
-    balance > 0 ? `Balance due: ${formatMoney(balance)}` : `Settled in full — thank you.`,
+    `Total: ${m(total)}`,
+    paid > 0 ? `Paid: ${m(paid)}` : "",
+    balance > 0 ? `Balance due: ${m(balance)}` : `Settled in full — thank you.`,
     ``,
     pdfTextLine("invoice", invoice.id, "View or download your invoice"),
     ``,
@@ -161,14 +163,14 @@ export function invoiceMessage(invoice: Invoice): Message {
      <p style="margin:8px 0 0;font-size:14px;line-height:1.6;">Here is your invoice from <strong>${b.name}</strong>, issued ${formatDate(
        invoice.issueDate
      )} and due ${formatDate(invoice.dueDate)}.</p>
-     ${itemsTableHtml(invoice.items)}
+     ${itemsTableHtml(invoice.items, cur)}
      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-       <tr><td style="padding:6px 0;font-size:14px;">Total</td><td style="padding:6px 0;font-size:14px;text-align:right;font-weight:600;">${formatMoney(total)}</td></tr>
-       ${paid > 0 ? `<tr><td style="padding:6px 0;font-size:14px;">Paid</td><td style="padding:6px 0;font-size:14px;text-align:right;">${formatMoney(paid)}</td></tr>` : ""}
+       <tr><td style="padding:6px 0;font-size:14px;">Total</td><td style="padding:6px 0;font-size:14px;text-align:right;font-weight:600;">${m(total)}</td></tr>
+       ${paid > 0 ? `<tr><td style="padding:6px 0;font-size:14px;">Paid</td><td style="padding:6px 0;font-size:14px;text-align:right;">${m(paid)}</td></tr>` : ""}
        <tr><td style="padding:10px 0 0;font-size:15px;font-weight:600;color:${BRAND_BROWN};">${
          balance > 0 ? "Balance due" : "Settled in full"
        }</td><td style="padding:10px 0 0;font-size:15px;text-align:right;font-weight:600;color:${BRAND_BROWN};">${
-         balance > 0 ? formatMoney(balance) : "&mdash;"
+         balance > 0 ? m(balance) : "&mdash;"
        }</td></tr>
      </table>
      ${pdfButtonHtml("invoice", invoice.id, "Download invoice (PDF)")}
@@ -181,6 +183,8 @@ export function invoiceMessage(invoice: Invoice): Message {
 
 /** The receipt, for the guest. */
 export function receiptMessage(receipt: Receipt): Message {
+  const cur = receipt.currency;
+  const m = (n: number) => formatAmount(n, cur);
   const b = branch(receipt.location);
   const subject = `Your MaMoyo receipt ${receipt.number}`;
 
@@ -192,8 +196,8 @@ export function receiptMessage(receipt: Receipt): Message {
     `Receipt: ${receipt.number}`,
     `Date: ${formatDate(receipt.date)}`,
     `Reference: ${receipt.invoiceNumber}`,
-    receipt.items?.length ? `\n${itemsTextLines(receipt.items)}\n` : "",
-    `Amount received: ${formatMoney(receipt.amount)}`,
+    receipt.items?.length ? `\n${itemsTextLines(receipt.items, cur)}\n` : "",
+    `Amount received: ${m(receipt.amount)}`,
     `Method: ${receipt.method}`,
     ``,
     pdfTextLine("receipt", receipt.id, "View or download your receipt"),
@@ -210,9 +214,9 @@ export function receiptMessage(receipt: Receipt): Message {
      <p style="margin:8px 0 0;font-size:14px;line-height:1.6;">Thank you — here is your receipt from <strong>${b.name}</strong>, dated ${formatDate(
        receipt.date
      )}.</p>
-     ${receipt.items?.length ? itemsTableHtml(receipt.items) : ""}
+     ${receipt.items?.length ? itemsTableHtml(receipt.items, cur) : ""}
      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">
-       <tr><td style="padding:6px 0;font-size:15px;font-weight:600;color:${BRAND_BROWN};">Amount received</td><td style="padding:6px 0;font-size:15px;text-align:right;font-weight:600;color:${BRAND_BROWN};">${formatMoney(
+       <tr><td style="padding:6px 0;font-size:15px;font-weight:600;color:${BRAND_BROWN};">Amount received</td><td style="padding:6px 0;font-size:15px;text-align:right;font-weight:600;color:${BRAND_BROWN};">${m(
          receipt.amount
        )}</td></tr>
        <tr><td style="padding:6px 0;font-size:13px;color:#166f7a;">Method</td><td style="padding:6px 0;font-size:13px;text-align:right;color:#166f7a;">${receipt.method}</td></tr>

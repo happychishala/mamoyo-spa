@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { readDb, invoiceTotal, invoicePaid, invoiceBalance } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { formatMoney, formatDate } from "@/lib/format";
+import { formatAmount, formatDate } from "@/lib/format";
 import { inclusiveVatBreakdown, VAT_RATE } from "@/lib/tax";
 import { NoAccess } from "@/components/admin/ui";
 import PrintDocument from "@/components/admin/PrintDocument";
@@ -27,6 +27,7 @@ export default async function InvoicePrintPage({
   const paid = invoicePaid(invoice);
   const balance = invoiceBalance(invoice);
   const totalVat = inclusiveVatBreakdown(total);
+  const m = (n: number) => formatAmount(n, invoice.currency);
 
   return (
     <PrintDocument backHref="/admin/invoices" backLabel="Back to invoices" location={invoice.location}>
@@ -62,9 +63,9 @@ export default async function InvoicePrintPage({
             <tr key={idx}>
               <td className="py-3 pr-4 text-mist-950">{item.description}</td>
               <td className="py-3 pr-4 text-right text-mist-800">{item.qty}</td>
-              <td className="py-3 pr-4 text-right text-mist-800">{formatMoney(item.unitPrice)}</td>
+              <td className="py-3 pr-4 text-right text-mist-800">{m(item.unitPrice)}</td>
               <td className="py-3 text-right font-medium text-mist-950">
-                {formatMoney(item.qty * item.unitPrice)}
+                {m(item.qty * item.unitPrice)}
               </td>
             </tr>
           ))}
@@ -75,7 +76,7 @@ export default async function InvoicePrintPage({
               Subtotal excl. VAT
             </td>
             <td className="pt-4 text-right font-medium text-mist-950">
-              {formatMoney(totalVat.netAmount)}
+              {m(totalVat.netAmount)}
             </td>
           </tr>
           <tr>
@@ -83,14 +84,14 @@ export default async function InvoicePrintPage({
               VAT ({VAT_RATE * 100}% included)
             </td>
             <td className="pt-2 text-right text-sm font-medium text-mist-950">
-              {formatMoney(totalVat.vatAmount)}
+              {m(totalVat.vatAmount)}
             </td>
           </tr>
           <tr>
             <td colSpan={3} className="pt-2 pr-4 text-right font-semibold text-mist-950">
               Total incl. VAT
             </td>
-            <td className="pt-2 text-right font-serif text-2xl text-mist-950">{formatMoney(total)}</td>
+            <td className="pt-2 text-right font-serif text-2xl text-mist-950">{m(total)}</td>
           </tr>
           {paid > 0 && (
             <>
@@ -99,7 +100,7 @@ export default async function InvoicePrintPage({
                   Paid to date
                 </td>
                 <td className="pt-2 text-right text-sm font-medium text-mist-950">
-                  {formatMoney(paid)}
+                  {m(paid)}
                 </td>
               </tr>
               <tr>
@@ -107,7 +108,7 @@ export default async function InvoicePrintPage({
                   Balance due
                 </td>
                 <td className="pt-1 text-right font-serif text-xl text-mist-950">
-                  {formatMoney(balance)}
+                  {m(balance)}
                 </td>
               </tr>
             </>

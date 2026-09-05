@@ -8,7 +8,7 @@ import type { Receipt } from "@/lib/db";
 /** Receipt plus the WhatsApp text, rendered on the server so this client
  *  component never imports lib/notify (which reaches into the database). */
 export type ReceiptRow = Receipt & { whatsappBody: string };
-import { formatMoney, formatDate } from "@/lib/format";
+import { formatAmount, formatDate } from "@/lib/format";
 import { DataTable, type DataColumn } from "@/components/admin/DataTable";
 
 const columns: DataColumn<ReceiptRow>[] = [
@@ -33,7 +33,7 @@ const columns: DataColumn<ReceiptRow>[] = [
     header: "Amount",
     align: "right",
     value: (r) => r.amount,
-    cell: (r) => formatMoney(r.amount),
+    cell: (r) => formatAmount(r.amount, r.currency),
     cellClassName: "font-semibold text-mist-950",
   },
   {

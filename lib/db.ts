@@ -64,6 +64,7 @@ export interface Invoice {
   amountPaid?: number; // running total of payments; missing on pre-partial-payment records
   customerEmail?: string; // copied from the booking so the invoice can be emailed
   customerPhone?: string; // copied from the booking so the invoice can be sent on WhatsApp
+  currency?: "USD"; // suite stays are billed in USD; absent means Kwacha
 }
 
 export interface Receipt {
@@ -81,6 +82,7 @@ export interface Receipt {
   /** Set when the guest settled with more than one method; `method` then holds
    *  a short summary ("Split payment"). Single-method sales leave this empty. */
   payments?: PaymentSplit[];
+  currency?: "USD"; // suite stays are billed in USD; absent means Kwacha
 }
 
 export interface Transaction {
@@ -714,6 +716,7 @@ export function settleStayIncome(db: DB, stay: StayBooking): boolean {
     amountPaid: stay.total,
     customerEmail: stay.email || undefined,
     customerPhone: stay.phone || undefined,
+    currency: "USD",
   });
   db.receipts.unshift({
     id: crypto.randomUUID(),
@@ -726,6 +729,7 @@ export function settleStayIncome(db: DB, stay: StayBooking): boolean {
     items,
     customerEmail: stay.email || undefined,
     customerPhone: stay.phone || undefined,
+    currency: "USD",
   });
   db.transactions.unshift({
     id: crypto.randomUUID(),

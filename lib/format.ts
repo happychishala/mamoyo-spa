@@ -12,6 +12,11 @@ export function formatUSD(amount: number): string {
   return amount < 0 ? `-$${kwacha.format(-amount)}` : `$${kwacha.format(amount)}`;
 }
 
+/** Format an amount in a record's own currency: USD for suite stays, Kwacha otherwise. */
+export function formatAmount(amount: number, currency?: "USD"): string {
+  return currency === "USD" ? formatUSD(amount) : formatMoney(amount);
+}
+
 export function formatDate(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString("en-GB", {
     day: "numeric",

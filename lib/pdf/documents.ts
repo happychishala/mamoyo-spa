@@ -2,7 +2,7 @@ import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf
 import type { Invoice, Receipt, Quotation, GiftCard, Location } from "../db";
 import { invoiceTotal, invoicePaid, invoiceBalance } from "../db";
 import { inclusiveVatBreakdown, VAT_RATE } from "../tax";
-import { formatMoney, formatDate } from "../format";
+import { formatMoney, formatAmount, formatDate } from "../format";
 import { locationInfo } from "../content";
 import { giftValueLabel } from "../gift-cards";
 
@@ -71,6 +71,7 @@ async function financeDoc(opts: {
   totals: { label: string; value: string; strong?: boolean; big?: boolean }[];
   note: string;
   location?: Location;
+  currency?: "USD"; // line-item currency; totals are pre-formatted by the caller
 }): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   const page = doc.addPage([A4.w, A4.h]);
@@ -108,8 +109,8 @@ async function financeDoc(opts: {
     const lineTotal = it.qty * it.unitPrice;
     page.drawText(san(it.description), { x: M, y, size: 10, font: reg, color: INK, maxWidth: colQty - M - 60 });
     right(page, reg, String(it.qty), colQty, y, 10, INK);
-    right(page, reg, formatMoney(it.unitPrice), colUnit, y, 10, INK);
-    right(page, bold, formatMoney(lineTotal), colAmt, y, 10, INK);
+    right(page, reg, formatAmount(it.unitPrice, opts.currency), colUnit, y, 10, INK);
+    right(page, bold, formatAmount(lineTotal, opts.currency), colAmt, y, 10, INK);
     y -= 18;
     page.drawLine({ start: { x: M, y: y + 6 }, end: { x: A4.w - M, y: y + 6 }, thickness: 0.4, color: LINE });
   }
@@ -132,6 +133,8 @@ export function invoicePdf(invoice: Invoice): Promise<Uint8Array> {
   const paid = invoicePaid(invoice);
   const balance = invoiceBalance(invoice);
   const vat = inclusiveVatBreakdown(total);
+  const cur = invoice.currency;
+  const m = (n: number) => formatAmount(n, cur);
   return financeDoc({
     title: "Invoice",
     number: invoice.number,
@@ -143,14 +146,15 @@ export function invoicePdf(invoice: Invoice): Promise<Uint8Array> {
       { label: "Status", value: invoice.status },
     ],
     items: invoice.items,
+    currency: cur,
     totals: [
-      { label: "Subtotal excl. VAT", value: formatMoney(vat.netAmount) },
-      { label: `VAT (${VAT_RATE * 100}% incl.)`, value: formatMoney(vat.vatAmount) },
-      { label: "Total", value: formatMoney(total), strong: true, big: true },
+      { label: "Subtotal excl. VAT", value: m(vat.netAmount) },
+      { label: `VAT (${VAT_RATE * 100}% incl.)`, value: m(vat.vatAmount) },
+      { label: "Total", value: m(total), strong: true, big: true },
       ...(paid > 0
         ? [
-            { label: "Paid to date", value: formatMoney(paid) },
-            { label: "Balance due", value: formatMoney(balance), strong: true },
+            { label: "Paid to date", value: m(paid) },
+            { label: "Balance due", value: m(balance), strong: true },
           ]
         : []),
     ],
@@ -162,8 +166,10 @@ export function invoicePdf(invoice: Invoice): Promise<Uint8Array> {
 export function receiptPdf(receipt: Receipt): Promise<Uint8Array> {
   const items = receipt.items && receipt.items.length > 0 ? receipt.items : [{ description: `Payment — ${receipt.invoiceNumber}`, qty: 1, unitPrice: receipt.amount }];
   const vat = inclusiveVatBreakdown(receipt.amount);
+  const cur = receipt.currency;
+  const m = (n: number) => formatAmount(n, cur);
   const paymentLine = receipt.payments && receipt.payments.length > 1
-    ? receipt.payments.map((p) => `${p.method} ${formatMoney(p.amount)}`).join(", ")
+    ? receipt.payments.map((p) => `${p.method} ${m(p.amount)}`).join(", ")
     : receipt.method;
   return financeDoc({
     title: "Receipt",
@@ -176,9 +182,10 @@ export function receiptPdf(receipt: Receipt): Promise<Uint8Array> {
       { label: "Paid by", value: paymentLine },
     ],
     items,
+    currency: cur,
     totals: [
-      { label: "VAT included", value: formatMoney(vat.vatAmount) },
-      { label: "Amount received", value: formatMoney(receipt.amount), strong: true, big: true },
+      { label: "VAT included", value: m(vat.vatAmount) },
+      { label: "Amount received", value: m(receipt.amount), strong: true, big: true },
     ],
     note: "This receipt confirms payment received for the amount shown above. Thank you.",
     location: receipt.location,

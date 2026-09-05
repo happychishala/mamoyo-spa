@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Send, BadgeCheck, Printer } from "lucide-react";
 import { readDb, invoiceTotal, invoicePaid, invoiceBalance } from "@/lib/db";
 import { updateInvoiceStatus, recordInvoicePayment } from "@/lib/actions";
-import { formatMoney, formatDate } from "@/lib/format";
+import { formatAmount, formatDate } from "@/lib/format";
 import { PageHeader, Card, StatusBadge, NoAccess } from "@/components/admin/ui";
 import SendButtons from "@/components/admin/SendButtons";
 import { invoiceMessage } from "@/lib/notify";
@@ -51,7 +51,7 @@ export default async function InvoicesPage() {
                       {item.description}
                       {item.qty > 1 && <span className="text-mist-500"> × {item.qty}</span>}
                     </span>
-                    <span className="shrink-0">{formatMoney(item.qty * item.unitPrice)}</span>
+                    <span className="shrink-0">{formatAmount(item.qty * item.unitPrice, inv.currency)}</span>
                   </li>
                 ))}
               </ul>
@@ -70,7 +70,7 @@ export default async function InvoicesPage() {
                     <Printer className="h-3.5 w-3.5" aria-hidden="true" />
                     Print
                   </Link>
-                  <p className="font-serif text-2xl font-semibold text-mist-950">{formatMoney(total)}</p>
+                  <p className="font-serif text-2xl font-semibold text-mist-950">{formatAmount(total, inv.currency)}</p>
                 </div>
               </div>
 
@@ -87,7 +87,7 @@ export default async function InvoicesPage() {
 
               {paid > 0 && balance > 0 && (
                 <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
-                  {formatMoney(paid)} paid · balance {formatMoney(balance)}
+                  {formatAmount(paid, inv.currency)} paid · balance {formatAmount(balance, inv.currency)}
                 </p>
               )}
 
