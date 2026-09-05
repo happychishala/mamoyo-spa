@@ -24,6 +24,7 @@ const kindLabels: Record<string, string> = {
   receipt: "Receipt",
   "gift-card": "Gift card",
   quotation: "Quotation",
+  confirmation: "Confirmation",
 };
 
 const columns: DataColumn<NotificationLog>[] = [

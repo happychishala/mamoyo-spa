@@ -1,4 +1,4 @@
-import type { Booking, Invoice, Receipt, Location, GiftCard, Quotation } from "../db";
+import type { Booking, Invoice, Receipt, Location, GiftCard, Quotation, StayBooking } from "../db";
 import { invoiceTotal, invoicePaid, invoiceBalance } from "../db";
 import { locationInfo } from "../content";
 import { formatMoney, formatAmount, formatDate } from "../format";
@@ -119,6 +119,87 @@ export function bookingAlert(booking: Booking, forName?: string): Message {
      ${booking.notes ? `<p style="margin:12px 0;padding:12px;background:#f1fafb;border-radius:10px;font-size:13px;line-height:1.6;"><strong>Notes:</strong> ${booking.notes}</p>` : ""}
      <p style="margin:16px 0 0;font-size:13px;color:#166f7a;">Status: ${booking.status}. Open the back office to confirm.</p>`,
     booking.location
+  );
+
+  return { subject, text, html };
+}
+
+/** Confirmation to the guest that their booking request has been received. */
+export function bookingConfirmation(booking: Booking): Message {
+  const b = branch(booking.location);
+  const subject = `We've got your MaMoyo booking — ${booking.ref}`;
+  const row = (k: string, v: string) =>
+    `<tr><td style="padding:6px 0;font-size:14px;color:#166f7a;width:110px;">${k}</td><td style="padding:6px 0;font-size:14px;font-weight:600;">${v}</td></tr>`;
+
+  const text = [
+    `Hello ${booking.customer.split(" ")[0]},`,
+    ``,
+    `Thank you — we've received your booking request at ${b.name}.`,
+    ``,
+    `Reference: ${booking.ref}`,
+    `Treatment: ${booking.service}`,
+    `When: ${formatDate(booking.date)} at ${booking.time}`,
+    `Value: ${formatMoney(booking.price)}`,
+    ``,
+    `Our team will confirm your appointment shortly. If you need to change anything, reply to this message or call ${b.phone}.`,
+    `MaMoyo`,
+  ].join("\n");
+
+  const html = shell(
+    `Booking received — ${booking.ref}`,
+    `<p style="margin:0;font-size:14px;line-height:1.6;">Hello ${booking.customer.split(" ")[0]},</p>
+     <p style="margin:8px 0 0;font-size:14px;line-height:1.6;">Thank you — we've received your booking request at <strong>${b.name}</strong>. Our team will confirm it shortly.</p>
+     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0;">
+       ${row("Reference", booking.ref)}
+       ${row("Treatment", booking.service)}
+       ${row("When", `${formatDate(booking.date)} at ${booking.time}`)}
+       ${row("Value", formatMoney(booking.price))}
+     </table>
+     <p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:#166f7a;">Need to change something? Reply to this email or call ${b.phone}.</p>`,
+    booking.location
+  );
+
+  return { subject, text, html };
+}
+
+/** Confirmation to the guest that their suite stay request has been received. */
+export function stayConfirmation(stay: StayBooking, suiteName: string): Message {
+  const b = branch();
+  const subject = `We've got your MaMoyo stay — ${stay.ref}`;
+  const money = (n: number) => formatAmount(n, "USD");
+  const row = (k: string, v: string) =>
+    `<tr><td style="padding:6px 0;font-size:14px;color:#166f7a;width:110px;">${k}</td><td style="padding:6px 0;font-size:14px;font-weight:600;">${v}</td></tr>`;
+  const nightsLabel = `${stay.nights} ${stay.nights === 1 ? "night" : "nights"}`;
+
+  const text = [
+    `Hello ${stay.guest.split(" ")[0]},`,
+    ``,
+    `Thank you — we've received your stay request for ${suiteName}.`,
+    ``,
+    `Reference: ${stay.ref}`,
+    `Studio: ${suiteName}`,
+    `Check-in: ${formatDate(stay.checkIn)}`,
+    `Check-out: ${formatDate(stay.checkOut)}`,
+    `Nights: ${nightsLabel}`,
+    `Total: ${money(stay.total)}`,
+    ``,
+    `We'll confirm availability and next steps shortly. Reply to this message or call ${b.phone} with any questions.`,
+    `MaMoyo Suites`,
+  ].join("\n");
+
+  const html = shell(
+    `Stay received — ${stay.ref}`,
+    `<p style="margin:0;font-size:14px;line-height:1.6;">Hello ${stay.guest.split(" ")[0]},</p>
+     <p style="margin:8px 0 0;font-size:14px;line-height:1.6;">Thank you — we've received your stay request for <strong>${suiteName}</strong>. We'll confirm availability shortly.</p>
+     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0;">
+       ${row("Reference", stay.ref)}
+       ${row("Studio", suiteName)}
+       ${row("Check-in", formatDate(stay.checkIn))}
+       ${row("Check-out", formatDate(stay.checkOut))}
+       ${row("Nights", nightsLabel)}
+       ${row("Total", money(stay.total))}
+     </table>
+     <p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:#166f7a;">Questions? Reply to this email or call ${b.phone}.</p>`
   );
 
   return { subject, text, html };

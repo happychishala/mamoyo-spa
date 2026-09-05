@@ -13,6 +13,8 @@ import {
 import { locationInfo } from "../content";
 import {
   bookingAlert,
+  bookingConfirmation,
+  stayConfirmation,
   invoiceMessage,
   receiptMessage,
   giftCardMessage,
@@ -21,7 +23,7 @@ import {
 } from "./messages";
 
 export type { Message };
-export { bookingAlert, invoiceMessage, receiptMessage, giftCardMessage, quotationMessage };
+export { bookingAlert, bookingConfirmation, stayConfirmation, invoiceMessage, receiptMessage, giftCardMessage, quotationMessage };
 
 export interface SendOutcome {
   status: NotificationStatus;

@@ -60,6 +60,8 @@ import {
   invoiceMessage,
   receiptMessage,
   giftCardMessage,
+  bookingConfirmation,
+  stayConfirmation,
 } from "./notify";
 import { generateCode, expiryFrom, GIFT_EXPERIENCES, GIFT_MIN_CUSTOM } from "./gift-cards";
 import { formatDate, formatMoney, todayISO, addDaysISO } from "./format";
@@ -356,6 +358,13 @@ export async function createBooking(
   };
 
   db.bookings.unshift(booking);
+  // Email the guest a confirmation of their request (no-op if email is off or
+  // the guest gave no address). Logged in the same write as the booking.
+  try {
+    await sendEmail(db, email, bookingConfirmation(booking), { kind: "confirmation", reference: booking.ref });
+  } catch {
+    // sendEmail never throws, but guard anyway — the booking must still save.
+  }
   await writeDb(db);
 
   // Tell the team a booking has landed. Never let a notification failure lose
@@ -1184,6 +1193,12 @@ export async function createStayBooking(
   };
 
   db.stays.unshift(stay);
+  // Confirm the request to the guest by email (no-op if email is off).
+  try {
+    await sendEmail(db, email, stayConfirmation(stay, suite.name), { kind: "confirmation", reference: stay.ref });
+  } catch {
+    // sendEmail never throws; the stay must still save regardless.
+  }
   await writeDb(db);
   revalidatePath("/suites");
   revalidatePath("/admin/stays");
