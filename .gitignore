@@ -42,6 +42,7 @@ next-env.d.ts
 
 # local dev database (regenerated from lib/db.ts seed; Vercel uses Redis)
 /data/db.json
+/data/backups/
 
 # local editor/harness config
 /.claude

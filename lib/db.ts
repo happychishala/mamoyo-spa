@@ -894,3 +894,34 @@ export async function writeDb(db: DB): Promise<void> {
   await fs.mkdir(path.dirname(DB_PATH), { recursive: true });
   await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2), "utf-8");
 }
+
+/** The whole database as a pretty-printed JSON string, for a manual download. */
+export async function serializeDb(): Promise<string> {
+  return JSON.stringify(await readDb(), null, 2);
+}
+
+const BACKUP_TTL_SECONDS = 60 * 60 * 24 * 30; // keep 30 days of daily snapshots
+const BACKUPS_DIR = path.join(process.cwd(), "data", "backups");
+
+/**
+ * Take a point-in-time snapshot of the DB. On Redis, each snapshot is a keyed
+ * copy with a 30-day TTL, so old ones prune themselves. On the local file
+ * backend, it writes a dated file and keeps the newest 14.
+ */
+export async function snapshotDb(): Promise<{ id: string; bytes: number }> {
+  const db = await readDb();
+  const payload = JSON.stringify(db);
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const redis = getRedis();
+  if (redis) {
+    await redis.set(`${DB_KEY}:backup:${stamp}`, db, { ex: BACKUP_TTL_SECONDS });
+    return { id: stamp, bytes: payload.length };
+  }
+  await fs.mkdir(BACKUPS_DIR, { recursive: true });
+  await fs.writeFile(path.join(BACKUPS_DIR, `db-${stamp}.json`), payload, "utf-8");
+  const files = (await fs.readdir(BACKUPS_DIR)).filter((f) => f.startsWith("db-")).sort();
+  for (const stale of files.slice(0, Math.max(0, files.length - 14))) {
+    await fs.rm(path.join(BACKUPS_DIR, stale)).catch(() => {});
+  }
+  return { id: stamp, bytes: payload.length };
+}

@@ -20,6 +20,22 @@ export default async function AuditPage() {
         title="Audit Log"
         description="A record of sensitive back-office actions — who did what, and when. Guest details are never stored here; entries reference records by their number."
       />
+      {session?.role === "Owner" && (
+        <Card className="flex flex-wrap items-center justify-between gap-3 p-6">
+          <div>
+            <h2 className="font-serif text-lg font-semibold text-mist-950">Database backup</h2>
+            <p className="text-sm text-mist-700">
+              A full snapshot is taken automatically every night. Download one now before any big change.
+            </p>
+          </div>
+          <a
+            href="/admin/backup"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-mist-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+          >
+            Download backup
+          </a>
+        </Card>
+      )}
       <Card className="p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="font-serif text-xl font-semibold text-mist-950">
