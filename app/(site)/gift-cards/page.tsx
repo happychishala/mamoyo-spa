@@ -7,6 +7,7 @@ import Reveal from "@/components/site/Reveal";
 import PhotoStrip from "@/components/site/PhotoStrip";
 import FaqList from "@/components/site/FaqList";
 import EnquiryForm from "@/components/site/EnquiryForm";
+import GiftCardBalanceCheck from "@/components/site/GiftCardBalanceCheck";
 
 export const metadata: Metadata = {
   title: { absolute: "MaMoyo Gift Cards | Spa and Wellness Gifts in Lusaka" },
@@ -153,6 +154,11 @@ export default function GiftCardsPage() {
             ]}
           />
         </div>
+      </section>
+
+      {/* Check your balance */}
+      <section className="mx-auto max-w-3xl px-6 pt-4">
+        <GiftCardBalanceCheck />
       </section>
 
       {/* Terms + FAQ */}

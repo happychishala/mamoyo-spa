@@ -63,7 +63,7 @@ import {
   bookingConfirmation,
   stayConfirmation,
 } from "./notify";
-import { generateCode, expiryFrom, GIFT_EXPERIENCES, GIFT_MIN_CUSTOM } from "./gift-cards";
+import { generateCode, expiryFrom, GIFT_EXPERIENCES, GIFT_MIN_CUSTOM, giftValueLabel, isRedeemable } from "./gift-cards";
 import { formatDate, formatMoney, todayISO, addDaysISO } from "./format";
 import { requireAdmin, requireRole, requireModule } from "./auth";
 import { hashPassword } from "./auth-token";
@@ -2300,4 +2300,41 @@ export async function setGiftCardStatus(formData: FormData): Promise<void> {
   card.status = status;
   await writeDb(db);
   revalidatePath("/admin/gift-cards");
+}
+
+export interface GiftCardLookupResult {
+  ok: boolean;
+  message: string;
+  card?: { label: string; balance: string; status: GiftCardStatus; expiresOn: string; redeemable: boolean };
+}
+
+// Intentionally public: lets a guest check their own gift card's balance. The
+// code is the card's bearer token, so revealing balance to whoever holds it is
+// expected; rate-limited to blunt code-guessing, and returns no personal data.
+export async function checkGiftCardBalance(
+  _prev: GiftCardLookupResult | null,
+  formData: FormData
+): Promise<GiftCardLookupResult> {
+  if (!(await allow("giftcheck", LIMITS.publicForm.limit, LIMITS.publicForm.windowSeconds))) {
+    return { ok: false, message: "You've checked a few times already — please wait a minute and try again." };
+  }
+  const code = String(formData.get("code") ?? "").trim().toUpperCase();
+  if (!code) return { ok: false, message: "Enter the code printed on your gift card." };
+
+  const db = await readDb();
+  const card = db.giftCards.find((c) => c.code.toUpperCase() === code);
+  if (!card) {
+    return { ok: false, message: "We couldn't find a gift card with that code. Check it and try again." };
+  }
+  return {
+    ok: true,
+    message: "",
+    card: {
+      label: giftValueLabel(card),
+      balance: card.experience ? giftValueLabel(card) : formatMoney(card.balance),
+      status: card.status,
+      expiresOn: card.expiresOn,
+      redeemable: isRedeemable(card, todayISO()),
+    },
+  };
 }
