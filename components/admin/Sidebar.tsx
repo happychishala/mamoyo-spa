@@ -36,7 +36,6 @@ import { logout } from "@/lib/auth-actions";
 import type { UserRole } from "@/lib/db";
 import { useMemo, useState } from "react";
 
-const roleRank: Record<string, number> = { Staff: 0, Manager: 1, Owner: 2 };
 
 type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; minRank: number; module: string };
 
@@ -120,7 +119,10 @@ export default function Sidebar({
       navGroups
         .map((g) => ({
           group: g.group,
-          items: g.items.filter((item) => roleRank[role] >= item.minRank && allowedModules.includes(item.module)),
+          // allowedModules is the authoritative per-role grant (system + custom
+          // roles alike), so it alone decides visibility. The old rank gate broke
+          // custom roles, whose name isn't in the fixed rank map.
+          items: g.items.filter((item) => allowedModules.includes(item.module)),
         }))
         .filter((g) => g.items.length > 0),
     [allowedModules, role]

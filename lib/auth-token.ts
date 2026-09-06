@@ -64,7 +64,11 @@ export function verifySessionToken(token: string | undefined): Session | null {
 
   const expiresAt = Number(expires);
   if (!Number.isFinite(expiresAt) || expiresAt < Date.now()) return null;
-  if (!["Owner", "Manager", "Staff"].includes(role)) return null;
+  // Any non-empty role is accepted — custom roles (e.g. "Cafe Supervisor") are
+  // valid. The role's integrity is guaranteed by the HMAC check below, so it
+  // can't be forged; a hardcoded allow-list here would wrongly reject custom
+  // roles and bounce those users back to the login page.
+  if (!role) return null;
 
   const expected = Buffer.from(sign(payload, key), "hex");
   const actual = Buffer.from(signature, "hex");
