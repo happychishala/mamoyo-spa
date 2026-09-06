@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { TrendingUp, TrendingDown, Scale } from "lucide-react";
 import { readDb } from "@/lib/db";
-import { formatMoney } from "@/lib/format";
+import { formatMoney, formatUSD } from "@/lib/format";
 import { PageHeader, Card, NoAccess } from "@/components/admin/ui";
 import { getSession } from "@/lib/auth";
 import { IncomeExpenseChart } from "@/components/admin/charts";
@@ -19,24 +19,29 @@ export default async function FinancePage() {
   const db = await readDb();
   const transactions = [...db.transactions].sort((a, b) => b.date.localeCompare(a.date));
 
-  const income = transactions.filter((t) => t.type === "Income").reduce((s, t) => s + t.amount, 0);
+  // Income is tracked in two currencies: Kwacha (spa, café, products) and USD
+  // (suite stays). They're kept apart rather than summed so each is honest.
+  const incomeTx = transactions.filter((t) => t.type === "Income");
+  const incomeKwacha = incomeTx.filter((t) => t.currency !== "USD").reduce((s, t) => s + t.amount, 0);
+  const incomeUsd = incomeTx.filter((t) => t.currency === "USD").reduce((s, t) => s + t.amount, 0);
   const expenses = transactions.filter((t) => t.type === "Expense").reduce((s, t) => s + t.amount, 0);
-  const net = income - expenses;
+  const net = incomeKwacha - expenses;
 
   const totals = [
-    { label: "Total income", value: formatMoney(income), icon: TrendingUp, tone: "text-emerald-700" },
-    { label: "Total expenses", value: formatMoney(expenses), icon: TrendingDown, tone: "text-red-700" },
-    { label: "Net position", value: formatMoney(net), icon: Scale, tone: net >= 0 ? "text-emerald-700" : "text-red-700" },
+    { label: "Income (Kwacha)", value: formatMoney(incomeKwacha), icon: TrendingUp, tone: "text-emerald-700" },
+    { label: "Studio income (USD)", value: formatUSD(incomeUsd), icon: TrendingUp, tone: "text-emerald-700" },
+    { label: "Expenses (Kwacha)", value: formatMoney(expenses), icon: TrendingDown, tone: "text-red-700" },
+    { label: "Net (Kwacha)", value: formatMoney(net), icon: Scale, tone: net >= 0 ? "text-emerald-700" : "text-red-700" },
   ];
 
   return (
     <div className="space-y-8">
       <PageHeader
         title="Finance"
-        description="Every kwacha in and out of the retreat — spa, café and operations combined."
+        description="Every kwacha and dollar in and out of the retreat — spa, café, suites and operations. Kwacha and USD income are tracked separately."
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {totals.map((t) => (
           <Card key={t.label} className="p-6">
             <div className="flex items-center justify-between">

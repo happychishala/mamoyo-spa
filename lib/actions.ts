@@ -1190,6 +1190,7 @@ export async function createStayBooking(
     status: "Pending",
     notes: notes || undefined,
     createdAt: todayISO(),
+    currency: "USD",
   };
 
   db.stays.unshift(stay);
@@ -1280,6 +1281,7 @@ export async function createAdminStay(
     status: "Confirmed",
     notes: notes ? `Walk-in — ${notes}` : "Walk-in",
     createdAt: todayISO(),
+    currency: "USD",
   });
   await writeDb(db);
   revalidatePath("/admin/stays");

@@ -92,6 +92,7 @@ export interface Transaction {
   category: string;
   description: string;
   amount: number;
+  currency?: "USD"; // USD for suite-stay income; absent means Kwacha
   /** Id of an attached proof-of-payment (receipt photo / screenshot), stored
    *  separately from the main DB blob and served via /admin/expenses/pop/{id}. */
   popId?: string;
@@ -191,6 +192,7 @@ export interface StayBooking {
   status: StayStatus;
   notes?: string;
   createdAt: string;
+  currency?: "USD"; // stays booked at the USD studio rate; absent = Kwacha (legacy rate)
 }
 
 export type TreatmentPayment = "Cash" | "Card" | "Credit" | "Voucher" | "Comp" | "Mobile Money";
@@ -687,6 +689,7 @@ export function settleStayIncome(db: DB, stay: StayBooking): boolean {
 
   // Recognise the income on the check-in date (never a future date).
   const date = stay.checkIn;
+  const cur = stay.currency; // "USD" for USD-rate stays, undefined = Kwacha
   const year = new Date().getFullYear();
   const nextNum = (list: { number: string }[], prefix: string, start: number) => {
     const max = list.reduce((m, x) => {
@@ -716,7 +719,7 @@ export function settleStayIncome(db: DB, stay: StayBooking): boolean {
     amountPaid: stay.total,
     customerEmail: stay.email || undefined,
     customerPhone: stay.phone || undefined,
-    currency: "USD",
+    currency: cur,
   });
   db.receipts.unshift({
     id: crypto.randomUUID(),
@@ -729,7 +732,7 @@ export function settleStayIncome(db: DB, stay: StayBooking): boolean {
     items,
     customerEmail: stay.email || undefined,
     customerPhone: stay.phone || undefined,
-    currency: "USD",
+    currency: cur,
   });
   db.transactions.unshift({
     id: crypto.randomUUID(),
@@ -738,8 +741,35 @@ export function settleStayIncome(db: DB, stay: StayBooking): boolean {
     category: "Accommodation",
     description: `Suite stay — ${stay.ref} (${stay.guest})`,
     amount: stay.total,
+    currency: cur,
   });
   return true;
+}
+
+/** Keep each settled stay's invoice, receipt and income entry in the stay's own
+ *  currency. Legacy stays (booked at the Kwacha rate) have no `currency`, so
+ *  their paperwork reads Kwacha; USD-rate stays read USD. Idempotent — no write
+ *  once everything already matches. Returns true if anything changed. */
+function syncStayCurrency(db: DB): boolean {
+  let changed = false;
+  const apply = (obj: { currency?: "USD" }, want?: "USD") => {
+    if (obj.currency === want) return;
+    if (want) obj.currency = want;
+    else delete obj.currency;
+    changed = true;
+  };
+  for (const stay of db.stays) {
+    const inv = db.invoices.find((i) => i.bookingRef === stay.ref);
+    if (!inv) continue;
+    const want = stay.currency;
+    apply(inv, want);
+    for (const r of db.receipts.filter((r) => r.invoiceNumber === inv.number)) apply(r, want);
+    const tx = db.transactions.find(
+      (t) => t.category === "Accommodation" && t.description.includes(stay.ref)
+    );
+    if (tx) apply(tx, want);
+  }
+  return changed;
 }
 
 function migrate(db: DB): boolean {
@@ -826,6 +856,9 @@ function migrate(db: DB): boolean {
     for (const stay of db.stays) {
       if (settleStayIncome(db, stay)) migrated = true;
     }
+    // Correct paperwork currency: legacy Kwacha stays were tagged USD by the
+    // first backfill; re-sync every stay's records to the stay's own currency.
+    if (syncStayCurrency(db)) migrated = true;
   }
   // Seed starter retail prices onto matching inventory items that don't have
   // one yet, so the product POS is usable out of the box. Never overwrites a

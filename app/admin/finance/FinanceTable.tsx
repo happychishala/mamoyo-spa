@@ -1,7 +1,7 @@
 "use client";
 
 import type { Transaction } from "@/lib/db";
-import { formatMoney, formatDate } from "@/lib/format";
+import { formatAmount, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/admin/ui";
 import { DataTable, type DataColumn } from "@/components/admin/DataTable";
 
@@ -28,7 +28,7 @@ const columns: DataColumn<Transaction>[] = [
     cell: (t) => (
       <span className={`font-semibold ${t.type === "Income" ? "text-emerald-700" : "text-red-700"}`}>
         {t.type === "Income" ? "+" : "−"}
-        {formatMoney(t.amount)}
+        {formatAmount(t.amount, t.currency)}
       </span>
     ),
   },
