@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { Redis } from "@upstash/redis";
 import { getDefaultRoleDefinitions } from "./permissions";
+import { RECIPE_SEED } from "./recipe-seed";
 
 export type BookingStatus = "Pending" | "Confirmed" | "Completed" | "Cancelled";
 
@@ -475,6 +476,9 @@ export interface DB {
   recipes: Recipe[];
   workShifts: WorkShift[];
   auditLog: AuditEntry[];
+  /** True once the AZURE chef recipe pack has been seeded (one-time, so a recipe
+   *  the chef later deletes is not re-created). */
+  seededRecipesV1?: boolean;
 }
 
 /** Append a PII-free audit entry to the in-memory db (caller persists via
@@ -848,6 +852,17 @@ function migrate(db: DB): boolean {
   }
   if (!Array.isArray(db.auditLog)) {
     db.auditLog = [];
+    migrated = true;
+  }
+  // One-time: seed the chef's AZURE recipe pack. Keyed by a flag so recipes the
+  // chef later deletes are not resurrected; skips any name already present.
+  if (!db.seededRecipesV1 && Array.isArray(db.recipes)) {
+    const have = new Set(db.recipes.map((r) => r.name.toLowerCase()));
+    for (const r of RECIPE_SEED) {
+      if (have.has(r.name.toLowerCase())) continue;
+      db.recipes.push({ ...r, id: crypto.randomUUID(), createdAt: new Date().toISOString().slice(0, 10) });
+    }
+    db.seededRecipesV1 = true;
     migrated = true;
   }
   // Backfill income for stays that already exist on the live data but never
