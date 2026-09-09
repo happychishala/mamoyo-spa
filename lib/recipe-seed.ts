@@ -343,3 +343,80 @@ export const RECIPE_SEED: SeedRecipe[] = [
       "Raw chicken 0–4°C; cook to 74°C control point; shave only cooked exterior. Allergens: milk (yoghurt), sesame (tahini), wheat/gluten (pita). Working cost ≈ K46.50/wrap; recommended price K195 (~24% FC).",
   },
 ];
+
+// Second batch: the AZURE spa-restaurant breakfast technical sheets. Seeded
+// under seededRecipesV2 so they land even though the first pack already ran.
+export const BREAKFAST_SEED: SeedRecipe[] = [
+  {
+    name: "Swiss-Style Muesli (Bircher)",
+    category: "Breakfast",
+    yield: "10 portions (≈300 g each)",
+    ingredients: [
+      { name: "Rolled oats", qty: "500", unit: "g" },
+      { name: "Plain Greek yogurt", qty: "1.5", unit: "kg" },
+      { name: "Whole milk", qty: "0.5", unit: "L" },
+      { name: "Orange juice", qty: "0.25", unit: "L" },
+      { name: "Green apples", qty: "0.6", unit: "kg" },
+      { name: "Bananas", qty: "0.4", unit: "kg" },
+      { name: "Blueberries", qty: "0.25", unit: "kg" },
+      { name: "Raisins", qty: "0.15", unit: "kg" },
+      { name: "Mixed nuts", qty: "0.15", unit: "kg" },
+      { name: "Honey", qty: "0.12", unit: "kg" },
+      { name: "Cinnamon", qty: "0.02", unit: "kg" },
+    ],
+    method:
+      "1. Mix rolled oats, yogurt, milk and orange juice. Refrigerate at least 2 hours; overnight is preferred for a softer Swiss-style texture.\n" +
+      "2. Dice apples and bananas. Fold fruit into the chilled muesli shortly before service to preserve freshness.\n" +
+      "3. Portion into chilled bowls. Finish with blueberries, raisins, nuts, a light honey drizzle and cinnamon.",
+    notes:
+      "Serve chilled 5–8°C; garnish just before service. Allergens: milk/dairy, tree nuts; oats may contain gluten. Est. cost ≈ ZMW 18/portion; recommended price ZMW 60. ~390 kcal. Spa note: keep added sugar moderate, emphasise fresh fruit, yogurt and whole grains.",
+  },
+  {
+    name: "Monte Cristo Toast",
+    category: "Breakfast",
+    yield: "10 portions (2 toasted triangles each)",
+    ingredients: [
+      { name: "Sandwich bread", qty: "20", unit: "slices" },
+      { name: "Cooked ham", qty: "0.8", unit: "kg" },
+      { name: "Emmental / Gruyère", qty: "0.6", unit: "kg" },
+      { name: "Eggs", qty: "10", unit: "pcs" },
+      { name: "Whole milk", qty: "0.3", unit: "L" },
+      { name: "Butter", qty: "0.2", unit: "kg" },
+      { name: "Flour", qty: "0.1", unit: "kg" },
+      { name: "Icing sugar", qty: "0.08", unit: "kg" },
+      { name: "Strawberry jam", qty: "0.25", unit: "kg" },
+      { name: "Salt & black pepper", qty: "QS", unit: "" },
+    ],
+    method:
+      "1. Build sandwiches with ham and cheese. Press lightly and trim the edges for a refined presentation.\n" +
+      "2. Prepare an egg-and-milk batter with a little flour, salt and pepper. Dip sandwiches briefly without over-soaking.\n" +
+      "3. Pan-fry in butter over medium heat until evenly golden and the cheese has melted (or finish in a hot oven for consistency).\n" +
+      "4. Cut into triangles, dust lightly with icing sugar and serve with strawberry jam on the side.",
+    notes:
+      "Serve hot ~60–65°C; jam and icing sugar added at pass. Allergens: wheat/gluten, milk/dairy, eggs. Est. cost ≈ ZMW 26.29/portion; recommended price ZMW 90. ~620 kcal. Lighter spa version: less ham/cheese, whole-grain bread, minimal butter.",
+  },
+  {
+    name: "Eggs Benedict Toast",
+    category: "Breakfast",
+    yield: "10 portions (2 muffin halves + 2 poached eggs + hollandaise)",
+    ingredients: [
+      { name: "English muffins", qty: "10", unit: "pcs" },
+      { name: "Eggs — for poaching", qty: "20", unit: "pcs" },
+      { name: "Egg yolks — hollandaise", qty: "6", unit: "pcs" },
+      { name: "Cooked ham", qty: "0.5", unit: "kg" },
+      { name: "Butter", qty: "0.45", unit: "kg" },
+      { name: "Lemon juice", qty: "0.15", unit: "L" },
+      { name: "White vinegar", qty: "0.1", unit: "L" },
+      { name: "Chives", qty: "1", unit: "bunch" },
+      { name: "Cayenne pepper", qty: "0.01", unit: "kg" },
+      { name: "Salt", qty: "QS", unit: "" },
+    ],
+    method:
+      "1. Toast the split English muffins and keep warm. Warm the ham briefly in a pan.\n" +
+      "2. Hollandaise: whisk egg yolks with lemon juice over gentle heat; slowly emulsify with warm melted butter; season with salt and cayenne. Keep warm without boiling.\n" +
+      "3. Bring poaching water to a gentle simmer with vinegar. Poach fresh eggs until whites are set and yolks runny, ~3–5 min.\n" +
+      "4. Place ham on each muffin half, top with a poached egg, spoon over hollandaise and garnish with chives. Serve immediately.",
+    notes:
+      "Serve immediately; hollandaise warm and smooth — do not boil or hold hot. Allergens: eggs, milk/dairy, wheat/gluten. Est. cost ≈ ZMW 29.36/portion; recommended price ZMW 100. ~610 kcal.",
+  },
+];

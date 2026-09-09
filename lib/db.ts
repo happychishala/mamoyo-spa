@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { Redis } from "@upstash/redis";
 import { getDefaultRoleDefinitions } from "./permissions";
-import { RECIPE_SEED } from "./recipe-seed";
+import { RECIPE_SEED, BREAKFAST_SEED } from "./recipe-seed";
 
 export type BookingStatus = "Pending" | "Confirmed" | "Completed" | "Cancelled";
 
@@ -479,6 +479,8 @@ export interface DB {
   /** True once the AZURE chef recipe pack has been seeded (one-time, so a recipe
    *  the chef later deletes is not re-created). */
   seededRecipesV1?: boolean;
+  /** True once the AZURE breakfast recipe pack (second batch) has been seeded. */
+  seededRecipesV2?: boolean;
 }
 
 /** Append a PII-free audit entry to the in-memory db (caller persists via
@@ -863,6 +865,16 @@ function migrate(db: DB): boolean {
       db.recipes.push({ ...r, id: crypto.randomUUID(), createdAt: new Date().toISOString().slice(0, 10) });
     }
     db.seededRecipesV1 = true;
+    migrated = true;
+  }
+  // Second one-time batch: the breakfast recipe pack.
+  if (!db.seededRecipesV2 && Array.isArray(db.recipes)) {
+    const have = new Set(db.recipes.map((r) => r.name.toLowerCase()));
+    for (const r of BREAKFAST_SEED) {
+      if (have.has(r.name.toLowerCase())) continue;
+      db.recipes.push({ ...r, id: crypto.randomUUID(), createdAt: new Date().toISOString().slice(0, 10) });
+    }
+    db.seededRecipesV2 = true;
     migrated = true;
   }
   // Backfill income for stays that already exist on the live data but never
