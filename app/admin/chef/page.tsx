@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { UtensilsCrossed, NotebookPen, Download, Trash2, Eye, EyeOff } from "lucide-react";
+import { UtensilsCrossed, NotebookPen, Download, Trash2, Eye, EyeOff, Plus, Check } from "lucide-react";
 import { readDb } from "@/lib/db";
 import { getSession, canAccessModule } from "@/lib/auth";
 import {
@@ -7,6 +7,7 @@ import {
   updateCafeMenuItem,
   deleteCafeMenuItem,
   deleteRecipe,
+  addRecipeToMenu,
 } from "@/lib/actions";
 import { formatMoney } from "@/lib/format";
 import { PageHeader, Card, NoAccess } from "@/components/admin/ui";
@@ -29,6 +30,7 @@ export default async function ChefPage() {
   );
   const sections = [...new Set(items.map((i) => i.section))];
   const recipes = db.recipes;
+  const onMenu = new Set(items.map((i) => i.name.toLowerCase()));
 
   return (
     <div className="space-y-8">
@@ -197,12 +199,41 @@ export default async function ChefPage() {
                         {r.notes && <p className="mt-3 text-xs italic text-mist-600">{r.notes}</p>}
                       </div>
                     </div>
-                    <form action={deleteRecipe} className="mt-4 border-t border-mist-100 pt-3 text-right">
-                      <input type="hidden" name="id" value={r.id} />
-                      <button type="submit" className="inline-flex items-center gap-1 text-xs font-medium text-mist-400 transition-colors duration-200 hover:text-red-600">
-                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Delete recipe
-                      </button>
-                    </form>
+                    <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t border-mist-100 pt-3">
+                      {onMenu.has(r.name.toLowerCase()) ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                          <Check className="h-3.5 w-3.5" aria-hidden="true" /> On the café menu
+                        </span>
+                      ) : (
+                        <form action={addRecipeToMenu} className="flex items-end gap-2">
+                          <input type="hidden" name="id" value={r.id} />
+                          <label className="text-xs text-mist-600">
+                            Sale price (K)
+                            <input
+                              name="price"
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              required
+                              placeholder="0.00"
+                              className="mt-1 block w-24 rounded-lg border border-mist-200 bg-white px-2.5 py-1.5 text-sm text-mist-950 focus:border-mist-500 focus:outline-none"
+                            />
+                          </label>
+                          <button
+                            type="submit"
+                            className="inline-flex items-center gap-1.5 rounded-full bg-mist-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors duration-200 hover:bg-mist-700"
+                          >
+                            <Plus className="h-3.5 w-3.5" aria-hidden="true" /> Add to café menu
+                          </button>
+                        </form>
+                      )}
+                      <form action={deleteRecipe} className="text-right">
+                        <input type="hidden" name="id" value={r.id} />
+                        <button type="submit" className="inline-flex items-center gap-1 text-xs font-medium text-mist-400 transition-colors duration-200 hover:text-red-600">
+                          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Delete recipe
+                        </button>
+                      </form>
+                    </div>
                   </details>
                 ))}
               </div>

@@ -976,6 +976,34 @@ export async function addCafeMenuItem(
   return { ok: true, message: `Added “${name}” to ${section}.` };
 }
 
+/** Promote a recipe to the café menu as a sellable item at an owner-set price.
+ *  The recipe stays in the recipe book; this creates a linked till item. */
+export async function addRecipeToMenu(formData: FormData): Promise<void> {
+  await requireModule("chef");
+  const id = String(formData.get("id") ?? "");
+  const price = Number(formData.get("price") ?? NaN);
+  const section = String(formData.get("section") ?? "").trim();
+  if (!id || !(price > 0)) return;
+
+  const db = await readDb();
+  const recipe = db.recipes.find((r) => r.id === id);
+  if (!recipe) return;
+  // Don't create a duplicate till item for the same dish.
+  if (db.cafeMenuItems.some((m) => m.name.toLowerCase() === recipe.name.toLowerCase())) return;
+
+  db.cafeMenuItems.push({
+    id: crypto.randomUUID(),
+    section: section || recipe.category || "Kitchen",
+    name: recipe.name,
+    description: recipe.category || undefined,
+    price: Math.round(price * 100) / 100,
+    available: true,
+    createdAt: todayISO(),
+  });
+  await writeDb(db);
+  revalidateChef();
+}
+
 export async function updateCafeMenuItem(formData: FormData): Promise<void> {
   await requireModule("chef");
   const id = String(formData.get("id") ?? "");
