@@ -5,6 +5,7 @@ import { Check, X, CheckCheck, Pencil, UserCheck } from "lucide-react";
 import { readDb, TREATMENT_PAYMENTS, type Booking } from "@/lib/db";
 import { updateBookingStatus, assignBookingTherapist } from "@/lib/actions";
 import { bookableServices } from "@/lib/content";
+import { bookingNeedsTherapist } from "@/lib/facility-services";
 import { formatMoney, formatDate, todayISO } from "@/lib/format";
 import { PageHeader, Card, StatusBadge } from "@/components/admin/ui";
 import NewBookingForm from "./NewBookingForm";
@@ -110,7 +111,7 @@ function BookingActions({
         </form>
       )}
       {b.status === "Confirmed" &&
-        (b.therapist ? (
+        (b.therapist || !bookingNeedsTherapist(b.items, b.service) ? (
           <form action={updateBookingStatus} className="flex flex-wrap items-center gap-2">
             <input type="hidden" name="id" value={b.id} />
             <input type="hidden" name="status" value="Completed" />

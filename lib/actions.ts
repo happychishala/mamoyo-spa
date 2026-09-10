@@ -51,6 +51,7 @@ import {
 import { savePop } from "./pop-store";
 import { docAttachment } from "./pdf/render";
 import { suites, bookablePriceMap, cafeMenu } from "./content";
+import { bookingNeedsTherapist } from "./facility-services";
 import { allow, LIMITS } from "./rate-limit";
 import {
   alertBooking,
@@ -399,7 +400,10 @@ export async function updateBookingStatus(formData: FormData): Promise<void> {
   // paperwork: an invoice for the service, plus a receipt + income entry for
   // whatever was paid on the spot (full or partial).
   if (status === "Completed") {
-    if (!booking.therapist) return;
+    // Facility-only bookings (jacuzzi, steam room, pool) need no therapist;
+    // everything with a hands-on service still does.
+    const needsTherapist = bookingNeedsTherapist(booking.items, booking.service);
+    if (needsTherapist && !booking.therapist) return;
     const payment = String(formData.get("payment") ?? "Cash") as TreatmentPayment;
     if (!TREATMENT_PAYMENTS.includes(payment)) return;
     const rawPaid = Number(formData.get("amountPaid"));
@@ -412,7 +416,7 @@ export async function updateBookingStatus(formData: FormData): Promise<void> {
       db.treatments.unshift({
         id: crypto.randomUUID(),
         date: booking.date,
-        therapist: booking.therapist,
+        therapist: booking.therapist ?? "Facility",
         service: booking.service,
         amount: booking.price,
         payment,
