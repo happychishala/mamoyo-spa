@@ -18,6 +18,7 @@ export const SITE_ROUTES = [
   "/spa/menu",
   "/spa/etiquette",
   "/cafe",
+  "/cafe/menu",
   "/suites",
   "/wellness",
   "/experiences",

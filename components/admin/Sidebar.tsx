@@ -20,6 +20,7 @@ import {
   Users,
   Settings2,
   ScrollText,
+  QrCode,
   ExternalLink,
   LogOut,
   Menu,
@@ -66,6 +67,7 @@ const navGroups: { group: string; items: NavItem[] }[] = [
     items: [
       { href: "/admin/pos", label: "POS", icon: ShoppingCart, minRank: 0, module: "pos" },
       { href: "/admin/chef", label: "Chef", icon: ChefHat, minRank: 0, module: "chef" },
+      { href: "/admin/menu", label: "Café Menu (QR)", icon: QrCode, minRank: 1, module: "menu" },
     ],
   },
   {

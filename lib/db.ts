@@ -917,7 +917,7 @@ function migrate(db: DB): boolean {
       if (!role.isSystemRole || !Array.isArray(role.modules)) continue;
       // Reviews are published to the public site, so Manager and Owner only.
       // Day Sheet is front-line (all roles); Expenses is Manager and Owner only.
-      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards", "daysheet", "expenses", "quotations", "chef", "worksheet", "audit"] as const) : (["enquiries", "daysheet", "worksheet"] as const);
+      const mods = role.rank >= 1 ? (["enquiries", "reviews", "notifications", "gift-cards", "daysheet", "expenses", "quotations", "chef", "worksheet", "audit", "menu"] as const) : (["enquiries", "daysheet", "worksheet"] as const);
       for (const mod of mods) {
         if (!role.modules.includes(mod)) {
           role.modules.push(mod);
