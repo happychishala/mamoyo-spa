@@ -1784,6 +1784,8 @@ export async function addInventoryItem(
   const reorderLevel = Number(formData.get("reorderLevel") ?? 0);
   const retailRaw = String(formData.get("retailPrice") ?? "").trim();
   const retailPrice = retailRaw ? Number(retailRaw) : undefined;
+  const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
+  const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
 
   if (!name || !["Spa products", "Café"].includes(category)) {
     return { ok: false, message: "Please provide a name and pick a category." };
@@ -1796,8 +1798,15 @@ export async function addInventoryItem(
   }
 
   const db = await readDb();
-  if (db.inventory.some((i) => i.name.toLowerCase() === name.toLowerCase() && i.category === category)) {
-    return { ok: false, message: `"${name}" already exists in ${category} — adjust its stock instead.` };
+  if (
+    db.inventory.some(
+      (i) =>
+        i.name.toLowerCase() === name.toLowerCase() &&
+        i.category === category &&
+        (i.location ?? "Kabulonga") === location
+    )
+  ) {
+    return { ok: false, message: `"${name}" already exists in ${category} at ${location} — adjust its stock instead.` };
   }
   db.inventory.push({
     id: crypto.randomUUID(),
@@ -1809,6 +1818,7 @@ export async function addInventoryItem(
     quantity: Math.round(quantity),
     reorderLevel: Math.round(reorderLevel),
     updatedAt: todayISO(),
+    location,
     retailPrice: retailPrice && retailPrice > 0 ? retailPrice : undefined,
   });
   await writeDb(db);
@@ -1843,6 +1853,8 @@ export async function updateInventoryItem(formData: FormData): Promise<void> {
   const unit = String(formData.get("unit") ?? "").trim();
   const quantity = Number(formData.get("quantity") ?? NaN);
   const reorderLevel = Number(formData.get("reorderLevel") ?? NaN);
+  const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
+  const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
   if (!id || !name || !["Spa products", "Café"].includes(category) || !unit) return;
   if (!(quantity >= 0) || !(reorderLevel >= 0)) return;
 
@@ -1856,6 +1868,7 @@ export async function updateInventoryItem(formData: FormData): Promise<void> {
   item.unit = unit;
   item.quantity = Math.round(quantity);
   item.reorderLevel = Math.round(reorderLevel);
+  item.location = location;
   item.updatedAt = todayISO();
   recordAudit(db, actor, "edited stock item", item.name);
   await writeDb(db);

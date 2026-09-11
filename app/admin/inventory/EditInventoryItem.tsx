@@ -33,6 +33,10 @@ export default function EditInventoryItem({ item }: { item: InventoryItem }) {
             ))}
           </select>
         </div>
+        <select name="location" defaultValue={item.location ?? "Kabulonga"} className={cls} aria-label="Location">
+          <option>Kabulonga</option>
+          <option>Twangale</option>
+        </select>
         <div className="grid grid-cols-2 gap-2">
           <label className="block text-[0.65rem] text-mist-600">
             Quantity

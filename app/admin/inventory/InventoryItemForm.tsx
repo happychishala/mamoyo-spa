@@ -67,6 +67,16 @@ export default function InventoryItemForm() {
         </div>
       </div>
 
+      <div>
+        <label htmlFor="inv-location" className="mb-1 block text-xs font-medium text-mist-800">
+          Location <span className="font-normal text-mist-500">— which branch holds this stock</span>
+        </label>
+        <select id="inv-location" name="location" required defaultValue="Kabulonga" className={inputClasses}>
+          <option>Kabulonga</option>
+          <option>Twangale</option>
+        </select>
+      </div>
+
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label htmlFor="inv-qty" className="mb-1 block text-xs font-medium text-mist-800">

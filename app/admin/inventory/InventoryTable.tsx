@@ -29,6 +29,7 @@ const columns: DataColumn<InventoryItem>[] = [
   { key: "brand", header: "Brand", value: (i) => i.brand ?? "—" },
   { key: "volume", header: "Size", value: (i) => i.volume ?? "—" },
   { key: "category", header: "Category", filterable: true },
+  { key: "location", header: "Location", filterable: true, value: (i) => i.location ?? "Kabulonga" },
   {
     key: "quantity",
     header: "In stock",

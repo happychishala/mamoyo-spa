@@ -25,6 +25,7 @@ export default async function PosPage() {
       category: item.category,
       retailPrice: item.retailPrice as number,
       quantity: item.quantity,
+      location: item.location ?? "Kabulonga",
     }))
     .sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
 

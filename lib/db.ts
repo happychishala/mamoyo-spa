@@ -242,6 +242,9 @@ export interface InventoryItem {
   quantity: number;
   reorderLevel: number;
   updatedAt: string;
+  /** Branch this stock is held at, so Kabulonga and Twangale don't get mixed.
+   *  Absent on legacy items means Kabulonga. */
+  location?: Location;
   /** Per-unit retail price. Set only on items sold to guests over the counter;
    *  items with a positive retailPrice appear in the product POS. */
   retailPrice?: number;
@@ -897,6 +900,12 @@ function migrate(db: DB): boolean {
     for (const item of db.inventory) {
       if (item.retailPrice === undefined && seedPrices.has(item.name.toLowerCase())) {
         item.retailPrice = seedPrices.get(item.name.toLowerCase());
+        migrated = true;
+      }
+      // Existing stock predates per-branch inventory — assign it to Kabulonga
+      // (the main branch) so it is no longer ambiguous.
+      if (!item.location) {
+        item.location = "Kabulonga";
         migrated = true;
       }
     }

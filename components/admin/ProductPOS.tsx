@@ -20,6 +20,7 @@ export type RetailItem = {
   category: string;
   retailPrice: number;
   quantity: number; // stock on hand
+  location?: Location; // branch this stock is held at
 };
 
 export default function ProductPOS({ items }: { items: RetailItem[] }) {
@@ -29,6 +30,12 @@ export default function ProductPOS({ items }: { items: RetailItem[] }) {
   const [balanced, setBalanced] = useState(true);
   const { onSubmit, overlay, active } = useCheckoutSubmit((fd) => createProductSale(fd), "payment");
 
+  // Only show stock held at the selected branch, so Kabulonga and Twangale
+  // inventory can't be sold from the wrong till.
+  const visibleItems = useMemo(
+    () => items.filter((it) => (it.location ?? "Kabulonga") === location),
+    [items, location]
+  );
   const byId = useMemo(() => new Map(items.map((it) => [it.id, it])), [items]);
   const lines = Object.entries(cart)
     .map(([id, qty]) => ({ item: byId.get(id)!, qty }))
@@ -58,16 +65,18 @@ export default function ProductPOS({ items }: { items: RetailItem[] }) {
           Retail items from inventory. Selling here reduces stock automatically and prints a receipt.
         </p>
 
-        {items.length === 0 ? (
+        {visibleItems.length === 0 ? (
           <div className="mt-6 flex flex-col items-center gap-2 rounded-2xl border border-dashed border-mist-300 bg-mist-50 p-10 text-center">
             <PackageX className="h-6 w-6 text-mist-400" aria-hidden="true" />
             <p className="text-sm text-mist-700">
-              No products have a retail price yet. Set a sale price on an inventory item to sell it here.
+              {items.length === 0
+                ? "No products have a retail price yet. Set a sale price on an inventory item to sell it here."
+                : `No retail products stocked at ${location}. Switch branch, or add stock at ${location}.`}
             </p>
           </div>
         ) : (
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {items.map((item) => {
+            {visibleItems.map((item) => {
               const inCart = cart[item.id] ?? 0;
               const soldOut = item.quantity <= 0;
               return (
@@ -146,7 +155,10 @@ export default function ProductPOS({ items }: { items: RetailItem[] }) {
             <span className="text-sm font-medium text-mist-700">Location</span>
             <select
               value={location}
-              onChange={(e) => setLocation(e.target.value as Location)}
+              onChange={(e) => {
+                setLocation(e.target.value as Location);
+                setCart({}); // a cart belongs to one branch's stock
+              }}
               className="mt-1.5 w-full rounded-xl border border-mist-200 bg-white px-3.5 py-2.5 text-sm text-mist-900 outline-none focus:border-mist-400"
             >
               {locations.map((l) => (
