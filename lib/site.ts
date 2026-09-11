@@ -3,7 +3,7 @@
  * Set NEXT_PUBLIC_SITE_URL to the live domain before launch.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://mamoyo-spa-tau.vercel.app"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://mamoyowellness.com"
 ).replace(/\/$/, "");
 
 /** Pre-launch switch: set NEXT_PUBLIC_NOINDEX=true to keep the site out of search. */
