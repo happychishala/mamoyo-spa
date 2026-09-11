@@ -15,7 +15,12 @@ export default async function PosPage() {
 
   const db = await readDb();
   const products: RetailItem[] = db.inventory
-    .filter((item) => typeof item.retailPrice === "number" && item.retailPrice > 0)
+    .filter(
+      (item) =>
+        (item.purpose ?? (item.retailPrice ? "retail" : "internal")) === "retail" &&
+        typeof item.retailPrice === "number" &&
+        item.retailPrice > 0
+    )
     .map((item) => ({
       id: item.id,
       name: item.name,

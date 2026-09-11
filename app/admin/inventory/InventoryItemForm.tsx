@@ -93,8 +93,18 @@ export default function InventoryItemForm() {
       </div>
 
       <div>
+        <label htmlFor="inv-purpose" className="mb-1 block text-xs font-medium text-mist-800">
+          Purpose
+        </label>
+        <select id="inv-purpose" name="purpose" required defaultValue="internal" className={inputClasses}>
+          <option value="internal">Internal use (back-of-house stock)</option>
+          <option value="retail">Customer purchase (sold in POS)</option>
+        </select>
+      </div>
+
+      <div>
         <label htmlFor="inv-retail" className="mb-1 block text-xs font-medium text-mist-800">
-          Retail price (K) <span className="font-normal text-mist-500">— set to sell this item in POS → Products</span>
+          Retail price (K) <span className="font-normal text-mist-500">— only for customer-purchase items</span>
         </label>
         <input
           id="inv-retail"

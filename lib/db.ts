@@ -245,8 +245,12 @@ export interface InventoryItem {
   /** Branch this stock is held at, so Kabulonga and Twangale don't get mixed.
    *  Absent on legacy items means Kabulonga. */
   location?: Location;
+  /** Whether this stock is back-of-house ("internal") or sold to guests
+   *  ("retail"). Only retail items with a price appear in the product POS.
+   *  Absent on legacy items is derived from retailPrice by migrate(). */
+  purpose?: "internal" | "retail";
   /** Per-unit retail price. Set only on items sold to guests over the counter;
-   *  items with a positive retailPrice appear in the product POS. */
+   *  retail items with a positive retailPrice appear in the product POS. */
   retailPrice?: number;
 }
 
@@ -906,6 +910,11 @@ function migrate(db: DB): boolean {
       // (the main branch) so it is no longer ambiguous.
       if (!item.location) {
         item.location = "Kabulonga";
+        migrated = true;
+      }
+      // Derive internal vs retail from whether a sale price was set.
+      if (!item.purpose) {
+        item.purpose = item.retailPrice && item.retailPrice > 0 ? "retail" : "internal";
         migrated = true;
       }
     }

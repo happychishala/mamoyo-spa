@@ -37,6 +37,15 @@ export default function EditInventoryItem({ item }: { item: InventoryItem }) {
           <option>Kabulonga</option>
           <option>Twangale</option>
         </select>
+        <select
+          name="purpose"
+          defaultValue={item.purpose ?? (item.retailPrice ? "retail" : "internal")}
+          className={cls}
+          aria-label="Purpose"
+        >
+          <option value="internal">Internal use</option>
+          <option value="retail">Customer purchase</option>
+        </select>
         <div className="grid grid-cols-2 gap-2">
           <label className="block text-[0.65rem] text-mist-600">
             Quantity

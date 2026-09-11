@@ -1784,6 +1784,7 @@ export async function addInventoryItem(
   const reorderLevel = Number(formData.get("reorderLevel") ?? 0);
   const retailRaw = String(formData.get("retailPrice") ?? "").trim();
   const retailPrice = retailRaw ? Number(retailRaw) : undefined;
+  const purpose = String(formData.get("purpose") ?? "internal") === "retail" ? "retail" : "internal";
   const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
   const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
 
@@ -1819,7 +1820,9 @@ export async function addInventoryItem(
     reorderLevel: Math.round(reorderLevel),
     updatedAt: todayISO(),
     location,
-    retailPrice: retailPrice && retailPrice > 0 ? retailPrice : undefined,
+    purpose,
+    // Only customer-purchase items carry a sale price / show in the POS.
+    retailPrice: purpose === "retail" && retailPrice && retailPrice > 0 ? retailPrice : undefined,
   });
   await writeDb(db);
   revalidatePath("/admin/inventory");
@@ -1855,6 +1858,7 @@ export async function updateInventoryItem(formData: FormData): Promise<void> {
   const reorderLevel = Number(formData.get("reorderLevel") ?? NaN);
   const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
   const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
+  const purpose = String(formData.get("purpose") ?? "internal") === "retail" ? "retail" : "internal";
   if (!id || !name || !["Spa products", "Café"].includes(category) || !unit) return;
   if (!(quantity >= 0) || !(reorderLevel >= 0)) return;
 
@@ -1869,6 +1873,9 @@ export async function updateInventoryItem(formData: FormData): Promise<void> {
   item.quantity = Math.round(quantity);
   item.reorderLevel = Math.round(reorderLevel);
   item.location = location;
+  item.purpose = purpose;
+  // Switching to internal use pulls it from the POS by clearing its sale price.
+  if (purpose === "internal") item.retailPrice = undefined;
   item.updatedAt = todayISO();
   recordAudit(db, actor, "edited stock item", item.name);
   await writeDb(db);
