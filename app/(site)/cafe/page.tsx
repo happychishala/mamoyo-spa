@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 // without giving up caching. Evaluated in Lusaka time at regeneration.
 export const revalidate = 1800;
 
-const CAFE_OPEN_DATE = "2026-09-18"; // launch day
-const CAFE_BANNER_HIDE_DATE = "2026-09-25"; // banner clears one week after opening
+const CAFE_OPEN_DATE = "2026-09-19"; // launch day
+const CAFE_BANNER_HIDE_DATE = "2026-09-26"; // banner clears one week after opening
 
 /** "opening" before launch, "open" for the launch week, then null. */
 function cafeOpeningPhase(): "opening" | "open" | null {
@@ -77,7 +77,7 @@ export default function CafePage() {
               <CalendarClock className="h-4 w-4" aria-hidden="true" />
               Now Opening
             </p>
-            <p className="mt-1.5 font-serif text-2xl text-cocoa-700 sm:text-3xl">18 September 2026</p>
+            <p className="mt-1.5 font-serif text-2xl text-cocoa-700 sm:text-3xl">19 September 2026</p>
             <p className="mt-1 text-sm text-mist-700">
               We can’t wait to welcome you — reserve a table below and be among the first through the door.
             </p>
