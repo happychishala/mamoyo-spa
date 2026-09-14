@@ -6,8 +6,10 @@ import { getSession, canAccessModule } from "@/lib/auth";
 import { updateCafeMenuItem, deleteCafeMenuItem } from "@/lib/actions";
 import { SITE_URL } from "@/lib/site";
 import { qrSvg } from "@/lib/qr";
+import { orderCafeMenu } from "@/lib/menu-order";
 import { PageHeader, Card, NoAccess } from "@/components/admin/ui";
 import MenuItemForm from "../chef/MenuItemForm";
+import MenuArranger from "./MenuArranger";
 
 export const metadata: Metadata = { title: "Café Menu (QR)" };
 export const dynamic = "force-dynamic";
@@ -22,10 +24,14 @@ export default async function MenuPage() {
   }
 
   const db = await readDb();
-  const items = [...db.cafeMenuItems].sort(
-    (a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name)
-  );
-  const sections = [...new Set(items.map((i) => i.section))];
+  const ordered = orderCafeMenu(db.cafeMenuItems, db.cafeMenuOrder);
+  const items = db.cafeMenuItems;
+  const sections = ordered.map((s) => s.title);
+  const arrangerData = ordered.map((s) => ({
+    title: s.title,
+    items: s.items.map((i) => ({ id: i.id, name: i.name })),
+  }));
+  const arrangerKey = items.map((i) => i.id).sort().join(",");
   const menuUrl = `${SITE_URL}${MENU_PATH}`;
   const qr = await qrSvg(menuUrl);
   const availableCount = items.filter((i) => i.available).length;
@@ -99,13 +105,11 @@ export default async function MenuPage() {
             </p>
           ) : (
             <div className="mt-4 space-y-6">
-              {sections.map((section) => (
-                <div key={section}>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-mist-500">{section}</p>
+              {ordered.map((section) => (
+                <div key={section.title}>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-mist-500">{section.title}</p>
                   <div className="mt-2 divide-y divide-mist-100">
-                    {items
-                      .filter((i) => i.section === section)
-                      .map((item) => (
+                    {section.items.map((item) => (
                         <div key={item.id} className={`flex flex-wrap items-center gap-x-4 gap-y-2 py-3 ${item.available ? "" : "opacity-55"}`}>
                           <div className="min-w-0 flex-1">
                             <p className="font-medium text-mist-950">{item.name}</p>
@@ -156,6 +160,16 @@ export default async function MenuPage() {
           )}
         </Card>
       </div>
+
+      <Card className="p-6">
+        <h3 className="font-serif text-lg font-semibold text-mist-950">Arrange menu</h3>
+        <p className="mt-1 text-sm text-mist-700">
+          Drag sections and items into the order guests should see them. Changes save automatically.
+        </p>
+        <div className="mt-5">
+          <MenuArranger key={arrangerKey} initial={arrangerData} />
+        </div>
+      </Card>
     </div>
   );
 }

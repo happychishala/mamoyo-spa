@@ -1050,6 +1050,30 @@ export async function deleteCafeMenuItem(formData: FormData): Promise<void> {
   }
 }
 
+/** Persist a drag-arranged café menu: section order + each item's position. */
+export async function saveCafeMenuArrangement(
+  groups: { section: string; ids: string[] }[]
+): Promise<void> {
+  await requireModule("menu");
+  if (!Array.isArray(groups) || groups.length === 0) return;
+
+  const db = await readDb();
+  db.cafeMenuOrder = groups.map((g) => String(g.section));
+  for (const g of groups) {
+    (g.ids ?? []).forEach((id, idx) => {
+      const item = db.cafeMenuItems.find((m) => m.id === id);
+      if (item) {
+        item.sort = idx;
+        item.section = g.section; // supports moving an item between sections
+      }
+    });
+  }
+  await writeDb(db);
+  revalidateChef();
+  revalidatePath("/admin/menu");
+  revalidatePath("/cafe/menu");
+}
+
 export async function addRecipe(
   _prev: ActionResult | null,
   formData: FormData

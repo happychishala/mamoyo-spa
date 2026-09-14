@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { UtensilsCrossed, NotebookPen, Download, Trash2, Eye, EyeOff, Plus, Check } from "lucide-react";
 import { readDb } from "@/lib/db";
+import { orderCafeMenu } from "@/lib/menu-order";
 import { getSession, canAccessModule } from "@/lib/auth";
 import {
   importCafeMenu,
@@ -25,10 +26,9 @@ export default async function ChefPage() {
   }
 
   const db = await readDb();
-  const items = [...db.cafeMenuItems].sort(
-    (a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name)
-  );
-  const sections = [...new Set(items.map((i) => i.section))];
+  const ordered = orderCafeMenu(db.cafeMenuItems, db.cafeMenuOrder);
+  const items = ordered.flatMap((s) => s.items); // section order, then per-section sort
+  const sections = ordered.map((s) => s.title);
   const recipes = db.recipes;
   const onMenu = new Set(items.map((i) => i.name.toLowerCase()));
 

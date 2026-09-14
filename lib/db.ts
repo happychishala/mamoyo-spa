@@ -134,6 +134,8 @@ export interface CafeMenuItem {
   price: number;
   available: boolean;
   createdAt: string;
+  /** Display order within its section (drag-to-arrange). Absent = fall back to name. */
+  sort?: number;
 }
 
 export interface RecipeIngredient {
@@ -483,6 +485,8 @@ export interface DB {
   recipes: Recipe[];
   workShifts: WorkShift[];
   auditLog: AuditEntry[];
+  /** Owner-arranged order of café menu section names (drag-to-arrange). */
+  cafeMenuOrder?: string[];
   /** True once the AZURE chef recipe pack has been seeded (one-time, so a recipe
    *  the chef later deletes is not re-created). */
   seededRecipesV1?: boolean;
@@ -862,6 +866,24 @@ function migrate(db: DB): boolean {
   if (!Array.isArray(db.auditLog)) {
     db.auditLog = [];
     migrated = true;
+  }
+  // Backfill café menu ordering: give items a per-section sort index and record
+  // the section order, both from the current alphabetical layout.
+  if (Array.isArray(db.cafeMenuItems) && db.cafeMenuItems.length > 0) {
+    if (db.cafeMenuItems.some((i) => typeof i.sort !== "number")) {
+      const counters: Record<string, number> = {};
+      [...db.cafeMenuItems]
+        .sort((a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name))
+        .forEach((i) => {
+          counters[i.section] = (counters[i.section] ?? -1) + 1;
+          i.sort = counters[i.section];
+        });
+      migrated = true;
+    }
+    if (!Array.isArray(db.cafeMenuOrder)) {
+      db.cafeMenuOrder = [...new Set(db.cafeMenuItems.map((i) => i.section))].sort();
+      migrated = true;
+    }
   }
   // One-time: seed the chef's AZURE recipe pack. Keyed by a flag so recipes the
   // chef later deletes are not resurrected; skips any name already present.

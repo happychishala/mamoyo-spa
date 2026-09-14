@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { readDb } from "@/lib/db";
 import { cafeMenu, type MenuSection } from "@/lib/content";
+import { orderCafeMenu } from "@/lib/menu-order";
 import { formatMoney } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -27,12 +28,10 @@ export default async function CafeMenuPage() {
   const configured = db.cafeMenuItems.length > 0;
 
   const sections: MenuSection[] = configured
-    ? [...new Set(available.map((m) => m.section))].map((section) => ({
-        title: section,
+    ? orderCafeMenu(available, db.cafeMenuOrder).map((s) => ({
+        title: s.title,
         note: "",
-        items: available
-          .filter((m) => m.section === section)
-          .map((m) => ({ name: m.name, description: m.description ?? "", price: m.price })),
+        items: s.items.map((m) => ({ name: m.name, description: m.description ?? "", price: m.price })),
       }))
     : cafeMenu;
 
