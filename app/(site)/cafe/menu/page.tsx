@@ -21,19 +21,20 @@ export const dynamic = "force-dynamic";
 export default async function CafeMenuPage() {
   const db = await readDb();
   const available = db.cafeMenuItems.filter((m) => m.available);
+  // Once the café has any items of its own, that IS the menu — never fall back to
+  // the built-in demo (guests must never see items the café doesn't serve). The
+  // demo only shows on a truly unconfigured install with no café items at all.
+  const configured = db.cafeMenuItems.length > 0;
 
-  // The owner-managed menu is the source of truth once it has items; before that
-  // the built-in menu keeps the page useful out of the box.
-  const sections: MenuSection[] =
-    available.length > 0
-      ? [...new Set(available.map((m) => m.section))].map((section) => ({
-          title: section,
-          note: "",
-          items: available
-            .filter((m) => m.section === section)
-            .map((m) => ({ name: m.name, description: m.description ?? "", price: m.price })),
-        }))
-      : cafeMenu;
+  const sections: MenuSection[] = configured
+    ? [...new Set(available.map((m) => m.section))].map((section) => ({
+        title: section,
+        note: "",
+        items: available
+          .filter((m) => m.section === section)
+          .map((m) => ({ name: m.name, description: m.description ?? "", price: m.price })),
+      }))
+    : cafeMenu;
 
   return (
     <main className="mx-auto max-w-2xl px-5 py-10 sm:py-14">
@@ -49,6 +50,12 @@ export default async function CafeMenuPage() {
         <h1 className="mt-5 font-serif text-3xl text-cocoa-700">Café Menu</h1>
         <p className="mt-2 text-sm text-mist-600">Prices in Zambian Kwacha (K)</p>
       </header>
+
+      {sections.length === 0 && (
+        <p className="mt-12 rounded-2xl border border-dashed border-mist-200 bg-white/60 p-10 text-center text-mist-600">
+          Our full menu is being prepared — please ask a member of the team, or check back shortly.
+        </p>
+      )}
 
       <div className="mt-10 space-y-10">
         {sections.map((section) => (

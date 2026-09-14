@@ -130,6 +130,7 @@ export default async function MenuPage() {
                             <input type="hidden" name="toggle" value="available" />
                             <button
                               type="submit"
+                              title={item.available ? "Showing to guests — click to hide" : "Hidden — click to show to guests"}
                               className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-xs font-semibold transition-colors duration-200 ${
                                 item.available
                                   ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
