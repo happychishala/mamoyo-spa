@@ -52,6 +52,7 @@ import { savePop } from "./pop-store";
 import { docAttachment } from "./pdf/render";
 import { suites, bookablePriceMap, cafeMenu } from "./content";
 import { bookingNeedsTherapist } from "./facility-services";
+import { parseRecipesFromText, type ParsedRecipe } from "./recipe-import";
 import { allow, LIMITS } from "./rate-limit";
 import {
   alertBooking,
@@ -1103,6 +1104,112 @@ export async function saveCafeMenuArrangement(
   revalidateChef();
   revalidatePath("/admin/menu");
   revalidatePath("/cafe/menu");
+}
+
+export interface RecipeExtractResult {
+  ok: boolean;
+  message: string;
+  recipes?: ParsedRecipe[];
+}
+
+/** Read an uploaded recipe PDF and return the recipes it contains (not saved).
+ *  Extraction runs in the Node runtime via unpdf, dynamically imported so it
+ *  stays out of the common bundle. */
+export async function extractRecipesFromPdf(
+  _prev: RecipeExtractResult | null,
+  formData: FormData
+): Promise<RecipeExtractResult> {
+  await requireModule("chef");
+  const file = formData.get("pdf") as File | null;
+  if (!file || typeof file.arrayBuffer !== "function" || file.size === 0) {
+    return { ok: false, message: "Choose a PDF file to import." };
+  }
+  if (file.size > 12 * 1024 * 1024) {
+    return { ok: false, message: "That PDF is too large — 12 MB maximum." };
+  }
+
+  let text = "";
+  try {
+    const { extractText, getDocumentProxy } = await import("unpdf");
+    const pdf = await getDocumentProxy(new Uint8Array(await file.arrayBuffer()));
+    text = (await extractText(pdf, { mergePages: true })).text;
+  } catch {
+    return { ok: false, message: "Couldn't read that PDF. Make sure it's a text PDF, not a scanned image." };
+  }
+
+  const recipes = parseRecipesFromText(text);
+  if (recipes.length === 0) {
+    return {
+      ok: false,
+      message:
+        "No recipes found. This reads AZURE-style technical fiches best (an Ingredient / Quantity table per recipe). You can still add recipes manually.",
+    };
+  }
+  return {
+    ok: true,
+    message: `Found ${recipes.length} recipe${recipes.length === 1 ? "" : "s"} — review and add the ones you want.`,
+    recipes,
+  };
+}
+
+/** Save recipes the user confirmed from a PDF import into the recipe book. */
+export async function importParsedRecipes(recipesJson: string): Promise<ActionResult> {
+  const actor = await requireModule("chef");
+  let parsed: ParsedRecipe[];
+  try {
+    parsed = JSON.parse(recipesJson);
+  } catch {
+    return { ok: false, message: "Could not read the selected recipes." };
+  }
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    return { ok: false, message: "Select at least one recipe to add." };
+  }
+
+  const db = await readDb();
+  const have = new Set(db.recipes.map((r) => r.name.toLowerCase()));
+  let added = 0;
+  let skipped = 0;
+  for (const r of parsed) {
+    const name = String(r?.name ?? "").trim();
+    const ingredients = Array.isArray(r?.ingredients)
+      ? r.ingredients
+          .filter((i) => i && i.name)
+          .map((i) => ({
+            name: String(i.name).trim(),
+            qty: i.qty ? String(i.qty) : undefined,
+            unit: i.unit ? String(i.unit) : undefined,
+          }))
+      : [];
+    if (!name || ingredients.length === 0 || have.has(name.toLowerCase())) {
+      skipped++;
+      continue;
+    }
+    have.add(name.toLowerCase());
+    db.recipes.unshift({
+      id: crypto.randomUUID(),
+      name,
+      category: r.category ? String(r.category) : undefined,
+      yield: r.yield ? String(r.yield) : undefined,
+      ingredients,
+      method: r.method ? String(r.method) : undefined,
+      notes: r.notes ? String(r.notes) : undefined,
+      createdAt: todayISO(),
+    });
+    added++;
+  }
+
+  if (added > 0) {
+    recordAudit(db, actor, `imported ${added} recipe(s) from PDF`);
+    await writeDb(db);
+    revalidatePath("/admin/chef");
+  }
+  return {
+    ok: added > 0,
+    message:
+      added > 0
+        ? `Added ${added} recipe${added === 1 ? "" : "s"}${skipped ? ` (${skipped} skipped — already in the book or incomplete)` : ""}.`
+        : "Nothing added — those recipes are already in the book.",
+  };
 }
 
 export async function addRecipe(

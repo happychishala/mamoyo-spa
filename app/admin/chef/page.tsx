@@ -14,6 +14,7 @@ import { formatMoney } from "@/lib/format";
 import { PageHeader, Card, NoAccess } from "@/components/admin/ui";
 import MenuItemForm from "./MenuItemForm";
 import RecipeForm from "./RecipeForm";
+import RecipeImport from "./RecipeImport";
 
 export const metadata: Metadata = { title: "Chef" };
 export const dynamic = "force-dynamic";
@@ -147,6 +148,13 @@ export default async function ChefPage() {
           <NotebookPen className="h-5 w-5 text-mist-500" aria-hidden="true" />
           <h2 className="font-serif text-xl font-semibold text-mist-950">Recipes</h2>
         </div>
+
+        <Card className="p-6">
+          <h3 className="font-serif text-lg font-semibold text-mist-950">Import from a PDF</h3>
+          <div className="mt-4">
+            <RecipeImport />
+          </div>
+        </Card>
 
         <div className="grid gap-6 xl:grid-cols-[1fr_1.6fr]">
           <Card className="h-fit p-6">
