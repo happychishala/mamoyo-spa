@@ -1,13 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Coffee, ShoppingBag } from "lucide-react";
+import { Coffee, ShoppingBag, Wine } from "lucide-react";
 import type { MenuSection } from "@/lib/content";
 import CafePOS from "./CafePOS";
 import ProductPOS, { type RetailItem } from "./ProductPOS";
 
-export default function PosTabs({ products, menu }: { products: RetailItem[]; menu: MenuSection[] }) {
-  const [tab, setTab] = useState<"cafe" | "products">("cafe");
+export default function PosTabs({
+  products,
+  bar,
+  menu,
+}: {
+  products: RetailItem[];
+  bar: RetailItem[];
+  menu: MenuSection[];
+}) {
+  const [tab, setTab] = useState<"cafe" | "bar" | "products">("cafe");
 
   const tabCls = (active: boolean) =>
     `inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-200 ${
@@ -21,13 +29,19 @@ export default function PosTabs({ products, menu }: { products: RetailItem[]; me
           <Coffee className="h-4 w-4" aria-hidden="true" />
           Café
         </button>
+        <button type="button" onClick={() => setTab("bar")} className={tabCls(tab === "bar")}>
+          <Wine className="h-4 w-4" aria-hidden="true" />
+          Bar
+        </button>
         <button type="button" onClick={() => setTab("products")} className={tabCls(tab === "products")}>
           <ShoppingBag className="h-4 w-4" aria-hidden="true" />
           Products
         </button>
       </div>
 
-      {tab === "cafe" ? <CafePOS menu={menu} /> : <ProductPOS items={products} />}
+      {tab === "cafe" && <CafePOS menu={menu} />}
+      {tab === "bar" && <ProductPOS items={bar} />}
+      {tab === "products" && <ProductPOS items={products} />}
     </div>
   );
 }

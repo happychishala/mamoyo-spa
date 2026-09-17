@@ -53,6 +53,7 @@ export default function InventoryItemForm() {
           <select id="inv-category" name="category" required defaultValue="Spa products" className={inputClasses}>
             <option>Spa products</option>
             <option>Café</option>
+          <option>Bar</option>
           </select>
         </div>
         <div>

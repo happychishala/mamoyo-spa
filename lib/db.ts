@@ -232,7 +232,7 @@ export interface Therapist {
   phone?: string;
 }
 
-export type InventoryCategory = "Spa products" | "Café";
+export type InventoryCategory = "Spa products" | "Café" | "Bar";
 
 export interface InventoryItem {
   id: string;

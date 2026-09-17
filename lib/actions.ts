@@ -1985,7 +1985,7 @@ export async function addInventoryItem(
   const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
   const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
 
-  if (!name || !["Spa products", "Café"].includes(category)) {
+  if (!name || !["Spa products", "Café", "Bar"].includes(category)) {
     return { ok: false, message: "Please provide a name and pick a category." };
   }
   if (!(quantity >= 0) || !(reorderLevel >= 0)) {
@@ -2058,7 +2058,7 @@ export async function updateInventoryItem(formData: FormData): Promise<void> {
   const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
   const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
   const purpose = String(formData.get("purpose") ?? "internal") === "retail" ? "retail" : "internal";
-  if (!id || !name || !["Spa products", "Café"].includes(category) || !unit) return;
+  if (!id || !name || !["Spa products", "Café", "Bar"].includes(category) || !unit) return;
   if (!(quantity >= 0) || !(reorderLevel >= 0)) return;
 
   const db = await readDb();

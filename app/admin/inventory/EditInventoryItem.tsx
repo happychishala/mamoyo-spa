@@ -26,6 +26,7 @@ export default function EditInventoryItem({ item }: { item: InventoryItem }) {
           <select name="category" defaultValue={item.category} className={cls}>
             <option>Spa products</option>
             <option>Café</option>
+            <option>Bar</option>
           </select>
           <select name="unit" defaultValue={item.unit} className={cls}>
             {INVENTORY_UNITS.map((u) => (

@@ -14,13 +14,12 @@ export default async function PosPage() {
   if (!session) return null;
 
   const db = await readDb();
+  const isRetail = (item: (typeof db.inventory)[number]) =>
+    (item.purpose ?? (item.retailPrice ? "retail" : "internal")) === "retail";
+
+  // Products tab: retail stock that isn't Bar (spa products, café retail).
   const products: RetailItem[] = db.inventory
-    .filter(
-      (item) =>
-        (item.purpose ?? (item.retailPrice ? "retail" : "internal")) === "retail" &&
-        typeof item.retailPrice === "number" &&
-        item.retailPrice > 0
-    )
+    .filter((item) => item.category !== "Bar" && isRetail(item) && typeof item.retailPrice === "number" && item.retailPrice > 0)
     .map((item) => ({
       id: item.id,
       name: item.name,
@@ -34,25 +33,40 @@ export default async function PosPage() {
     }))
     .sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
 
-  // Items priced by the shot (e.g. spirits) appear as their own "(shot)" line,
-  // deducting a fraction of a bottle per shot. Id is prefixed so the sale action
-  // knows to pour a shot rather than sell a whole unit.
-  const shots: RetailItem[] = db.inventory
-    .filter((item) => typeof item.shotPrice === "number" && item.shotPrice > 0 && typeof item.shotsPerUnit === "number" && item.shotsPerUnit > 0)
-    .map((item) => ({
-      id: `shot:${item.id}`,
-      name: `${item.name} (shot)`,
-      brand: item.brand,
-      volume: undefined,
-      unit: "shot",
-      category: item.category,
-      retailPrice: item.shotPrice as number,
-      quantity: Math.floor(item.quantity * (item.shotsPerUnit as number)),
-      location: item.location ?? "Kabulonga",
-    }));
-  const allProducts = [...products, ...shots].sort(
-    (a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name)
-  );
+  // Bar tab: Bar-category stock, sold by the bottle (retailPrice) and/or by the
+  // shot. Shot ids are prefixed so the sale action pours a shot (fractional stock).
+  const barItems: RetailItem[] = [];
+  for (const item of db.inventory) {
+    if (item.category !== "Bar" || !isRetail(item)) continue;
+    const loc = item.location ?? "Kabulonga";
+    if (typeof item.retailPrice === "number" && item.retailPrice > 0) {
+      barItems.push({
+        id: item.id,
+        name: item.name,
+        brand: item.brand,
+        volume: item.volume,
+        unit: item.unit,
+        category: "Bar",
+        retailPrice: item.retailPrice,
+        quantity: item.quantity,
+        location: loc,
+      });
+    }
+    if (typeof item.shotPrice === "number" && item.shotPrice > 0 && typeof item.shotsPerUnit === "number" && item.shotsPerUnit > 0) {
+      barItems.push({
+        id: `shot:${item.id}`,
+        name: `${item.name} (shot)`,
+        brand: item.brand,
+        volume: undefined,
+        unit: "shot",
+        category: "Bar",
+        retailPrice: item.shotPrice,
+        quantity: Math.floor(item.quantity * item.shotsPerUnit),
+        location: loc,
+      });
+    }
+  }
+  barItems.sort((a, b) => a.name.localeCompare(b.name));
 
   // The chef-managed café menu drives the POS once any items exist; until then
   // the built-in menu is used so the till works out of the box.
@@ -74,7 +88,7 @@ export default async function PosPage() {
         title="Point of sale"
         description="Ring up café orders and retail products, split payment across methods, and print the receipt. Product sales adjust inventory automatically."
       />
-      <PosTabs products={allProducts} menu={menu} />
+      <PosTabs products={products} bar={barItems} menu={menu} />
     </div>
   );
 }
