@@ -1251,23 +1251,58 @@ export async function importParsedRecipes(recipesJson: string): Promise<ActionRe
   };
 }
 
-export async function addRecipe(
-  _prev: ActionResult | null,
-  formData: FormData
-): Promise<ActionResult> {
-  await requireModule("chef");
-  const name = String(formData.get("name") ?? "").trim();
-  const category = String(formData.get("category") ?? "").trim();
-  const yieldText = String(formData.get("yield") ?? "").trim();
-  const method = String(formData.get("method") ?? "").trim();
-  const notes = String(formData.get("notes") ?? "").trim();
-
+/** Read the shared recipe form fields (name, category, yield, method, notes,
+ *  ingredient rows) from a FormData. */
+function readRecipeForm(formData: FormData) {
   const names = formData.getAll("ingredientName").map((v) => String(v).trim());
   const qtys = formData.getAll("ingredientQty").map((v) => String(v).trim());
   const units = formData.getAll("ingredientUnit").map((v) => String(v).trim());
   const ingredients: RecipeIngredient[] = names
     .map((n, i) => ({ name: n, qty: qtys[i] || undefined, unit: units[i] || undefined }))
     .filter((ing) => ing.name);
+  return {
+    name: String(formData.get("name") ?? "").trim(),
+    category: String(formData.get("category") ?? "").trim(),
+    yieldText: String(formData.get("yield") ?? "").trim(),
+    method: String(formData.get("method") ?? "").trim(),
+    notes: String(formData.get("notes") ?? "").trim(),
+    ingredients,
+  };
+}
+
+/** Edit an existing recipe in place. */
+export async function updateRecipe(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  const actor = await requireModule("chef");
+  const id = String(formData.get("id") ?? "");
+  const { name, category, yieldText, method, notes, ingredients } = readRecipeForm(formData);
+  if (!id) return { ok: false, message: "Recipe not found." };
+  if (!name) return { ok: false, message: "Give the recipe a name." };
+  if (ingredients.length === 0) return { ok: false, message: "Add at least one ingredient." };
+
+  const db = await readDb();
+  const recipe = db.recipes.find((r) => r.id === id);
+  if (!recipe) return { ok: false, message: "Recipe not found." };
+  recipe.name = name;
+  recipe.category = category || undefined;
+  recipe.yield = yieldText || undefined;
+  recipe.ingredients = ingredients;
+  recipe.method = method || undefined;
+  recipe.notes = notes || undefined;
+  recordAudit(db, actor, "edited recipe", name);
+  await writeDb(db);
+  revalidatePath("/admin/chef");
+  return { ok: true, message: `Recipe “${name}” updated.` };
+}
+
+export async function addRecipe(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireModule("chef");
+  const { name, category, yieldText, method, notes, ingredients } = readRecipeForm(formData);
 
   if (!name) return { ok: false, message: "Give the recipe a name." };
   if (ingredients.length === 0) return { ok: false, message: "Add at least one ingredient." };

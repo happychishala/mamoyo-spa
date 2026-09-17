@@ -15,6 +15,7 @@ import { PageHeader, Card, NoAccess } from "@/components/admin/ui";
 import MenuItemForm from "./MenuItemForm";
 import RecipeForm from "./RecipeForm";
 import RecipeImport from "./RecipeImport";
+import EditRecipe from "./EditRecipe";
 
 export const metadata: Metadata = { title: "Chef" };
 export const dynamic = "force-dynamic";
@@ -243,6 +244,7 @@ export default async function ChefPage() {
                         </button>
                       </form>
                     </div>
+                    <EditRecipe recipe={r} />
                   </details>
                 ))}
               </div>
