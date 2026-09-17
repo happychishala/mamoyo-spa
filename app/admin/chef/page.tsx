@@ -54,18 +54,18 @@ export default async function ChefPage() {
             <div className="mt-5">
               <MenuItemForm sections={sections} />
             </div>
-            {items.length === 0 && (
-              <form action={importCafeMenu} className="mt-5 border-t border-mist-100 pt-5">
-                <p className="text-xs text-mist-600">Start from the current built-in café menu, then edit freely.</p>
-                <button
-                  type="submit"
-                  className="mt-3 inline-flex items-center gap-2 rounded-full border border-mist-300 px-4 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
-                >
-                  <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                  Import current menu
-                </button>
-              </form>
-            )}
+            <form action={importCafeMenu} className="mt-5 border-t border-mist-100 pt-5">
+              <p className="text-xs text-mist-600">
+                Add the built-in café items (juices, teas &amp; coffee, light fare). Skips any already on your menu.
+              </p>
+              <button
+                type="submit"
+                className="mt-3 inline-flex items-center gap-2 rounded-full border border-mist-300 px-4 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+              >
+                <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                Import café menu
+              </button>
+            </form>
           </Card>
 
           <Card className="p-6">

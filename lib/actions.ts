@@ -995,10 +995,14 @@ function revalidateChef() {
 export async function importCafeMenu(): Promise<void> {
   await requireModule("chef");
   const db = await readDb();
-  if (db.cafeMenuItems.length > 0) return; // never clobber edits
+  // Add the built-in café items, skipping any already on the menu (by name), so
+  // it can be run even when the menu has items — never overwrites existing ones.
+  const have = new Set(db.cafeMenuItems.map((m) => m.name.toLowerCase()));
   const now = todayISO();
+  let added = false;
   for (const section of cafeMenu) {
     for (const item of section.items) {
+      if (have.has(item.name.toLowerCase())) continue;
       db.cafeMenuItems.push({
         id: crypto.randomUUID(),
         section: section.title,
@@ -1008,10 +1012,14 @@ export async function importCafeMenu(): Promise<void> {
         available: true,
         createdAt: now,
       });
+      have.add(item.name.toLowerCase());
+      added = true;
     }
   }
-  await writeDb(db);
-  revalidateChef();
+  if (added) {
+    await writeDb(db);
+    revalidateChef();
+  }
 }
 
 export async function addCafeMenuItem(
