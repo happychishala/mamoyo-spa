@@ -34,6 +34,26 @@ export default async function PosPage() {
     }))
     .sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
 
+  // Items priced by the shot (e.g. spirits) appear as their own "(shot)" line,
+  // deducting a fraction of a bottle per shot. Id is prefixed so the sale action
+  // knows to pour a shot rather than sell a whole unit.
+  const shots: RetailItem[] = db.inventory
+    .filter((item) => typeof item.shotPrice === "number" && item.shotPrice > 0 && typeof item.shotsPerUnit === "number" && item.shotsPerUnit > 0)
+    .map((item) => ({
+      id: `shot:${item.id}`,
+      name: `${item.name} (shot)`,
+      brand: item.brand,
+      volume: undefined,
+      unit: "shot",
+      category: item.category,
+      retailPrice: item.shotPrice as number,
+      quantity: Math.floor(item.quantity * (item.shotsPerUnit as number)),
+      location: item.location ?? "Kabulonga",
+    }));
+  const allProducts = [...products, ...shots].sort(
+    (a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name)
+  );
+
   // The chef-managed café menu drives the POS once any items exist; until then
   // the built-in menu is used so the till works out of the box.
   const availableItems = db.cafeMenuItems.filter((m) => m.available);
@@ -54,7 +74,7 @@ export default async function PosPage() {
         title="Point of sale"
         description="Ring up café orders and retail products, split payment across methods, and print the receipt. Product sales adjust inventory automatically."
       />
-      <PosTabs products={products} menu={menu} />
+      <PosTabs products={allProducts} menu={menu} />
     </div>
   );
 }

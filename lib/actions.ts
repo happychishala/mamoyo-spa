@@ -623,30 +623,61 @@ export async function createProductSale(formData: FormData): Promise<void> {
 
   const db = await readDb();
 
-  const lines: { item: (typeof db.inventory)[number]; qty: number }[] = [];
+  // A line is either a whole unit or, when the id is "shot:<itemId>", one or
+  // more shots poured from that item's stock (deducts a fraction of a unit).
+  const lines: {
+    item: (typeof db.inventory)[number];
+    qty: number;
+    unitPrice: number;
+    description: string;
+    deductUnits: number;
+  }[] = [];
   for (let i = 0; i < ids.length; i++) {
-    const item = db.inventory.find((it) => it.id === ids[i]);
+    const raw = ids[i];
     const qty = Number.isFinite(qtys[i]) && qtys[i] > 0 ? Math.round(qtys[i]) : 0;
-    if (!item || !item.retailPrice || item.retailPrice <= 0 || qty <= 0) continue;
-    // Never sell more than we hold in stock.
-    const sellable = Math.min(qty, item.quantity);
-    if (sellable <= 0) continue;
-    lines.push({ item, qty: sellable });
+    if (qty <= 0) continue;
+
+    if (raw.startsWith("shot:")) {
+      const item = db.inventory.find((it) => it.id === raw.slice(5));
+      if (!item || !item.shotPrice || item.shotPrice <= 0 || !item.shotsPerUnit || item.shotsPerUnit <= 0) continue;
+      const shotsInStock = Math.floor(item.quantity * item.shotsPerUnit);
+      const sellable = Math.min(qty, shotsInStock);
+      if (sellable <= 0) continue;
+      lines.push({
+        item,
+        qty: sellable,
+        unitPrice: item.shotPrice,
+        description: `${item.name} (shot)`,
+        deductUnits: sellable / item.shotsPerUnit,
+      });
+    } else {
+      const item = db.inventory.find((it) => it.id === raw);
+      if (!item || !item.retailPrice || item.retailPrice <= 0) continue;
+      const sellable = Math.min(qty, item.quantity);
+      if (sellable <= 0) continue;
+      lines.push({
+        item,
+        qty: sellable,
+        unitPrice: item.retailPrice,
+        description: `${item.name}${item.brand ? ` — ${item.brand}` : ""}`,
+        deductUnits: sellable,
+      });
+    }
   }
 
   if (lines.length === 0) return;
 
-  const items: InvoiceItem[] = lines.map(({ item, qty }) => ({
-    description: `${item.name}${item.brand ? ` — ${item.brand}` : ""}`,
+  const items: InvoiceItem[] = lines.map(({ description, qty, unitPrice }) => ({
+    description,
     qty,
-    unitPrice: item.retailPrice ?? 0,
+    unitPrice,
   }));
   const total = items.reduce((sum, item) => sum + item.qty * item.unitPrice, 0);
   const { payments, summary } = readPayments(formData, total);
 
   // Decrement stock now that the sale is confirmed.
-  for (const { item, qty } of lines) {
-    item.quantity = Math.max(0, item.quantity - qty);
+  for (const { item, deductUnits } of lines) {
+    item.quantity = Math.max(0, Math.round((item.quantity - deductUnits) * 1000) / 1000);
     item.updatedAt = todayISO();
   }
 
@@ -1946,6 +1977,10 @@ export async function addInventoryItem(
   const reorderLevel = Number(formData.get("reorderLevel") ?? 0);
   const retailRaw = String(formData.get("retailPrice") ?? "").trim();
   const retailPrice = retailRaw ? Number(retailRaw) : undefined;
+  const shotPriceRaw = String(formData.get("shotPrice") ?? "").trim();
+  const shotPrice = shotPriceRaw ? Number(shotPriceRaw) : undefined;
+  const shotsRaw = String(formData.get("shotsPerUnit") ?? "").trim();
+  const shotsPerUnit = shotsRaw ? Number(shotsRaw) : undefined;
   const purpose = String(formData.get("purpose") ?? "internal") === "retail" ? "retail" : "internal";
   const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
   const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
@@ -1985,6 +2020,8 @@ export async function addInventoryItem(
     purpose,
     // Only customer-purchase items carry a sale price / show in the POS.
     retailPrice: purpose === "retail" && retailPrice && retailPrice > 0 ? retailPrice : undefined,
+    shotPrice: purpose === "retail" && shotPrice && shotPrice > 0 ? shotPrice : undefined,
+    shotsPerUnit: purpose === "retail" && shotPrice && shotPrice > 0 && shotsPerUnit && shotsPerUnit > 0 ? Math.round(shotsPerUnit) : undefined,
   });
   await writeDb(db);
   revalidatePath("/admin/inventory");
@@ -2036,7 +2073,15 @@ export async function updateInventoryItem(formData: FormData): Promise<void> {
   item.reorderLevel = Math.round(reorderLevel);
   item.location = location;
   item.purpose = purpose;
-  // Switching to internal use pulls it from the POS by clearing its sale price.
+  // Sell-by-the-shot fields (spirits): price per shot + shots per bottle.
+  const shotPriceRaw = String(formData.get("shotPrice") ?? "").trim();
+  const shotPrice = shotPriceRaw ? Number(shotPriceRaw) : undefined;
+  const shotsRaw = String(formData.get("shotsPerUnit") ?? "").trim();
+  const shotsPerUnit = shotsRaw ? Number(shotsRaw) : undefined;
+  const shotOk = purpose === "retail" && shotPrice && shotPrice > 0 && shotsPerUnit && shotsPerUnit > 0;
+  item.shotPrice = shotOk ? shotPrice : undefined;
+  item.shotsPerUnit = shotOk ? Math.round(shotsPerUnit as number) : undefined;
+  // Switching to internal use pulls it from the POS by clearing its sale prices.
   if (purpose === "internal") item.retailPrice = undefined;
   item.updatedAt = todayISO();
   recordAudit(db, actor, "edited stock item", item.name);

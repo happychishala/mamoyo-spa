@@ -254,6 +254,11 @@ export interface InventoryItem {
   /** Per-unit retail price. Set only on items sold to guests over the counter;
    *  retail items with a positive retailPrice appear in the product POS. */
   retailPrice?: number;
+  /** Sell this item by the shot (e.g. spirits): price per shot and how many
+   *  shots a full unit/bottle pours. A shot sale deducts 1/shotsPerUnit of a
+   *  unit from stock. Items with both appear in the POS as a "(shot)" line. */
+  shotPrice?: number;
+  shotsPerUnit?: number;
 }
 
 /** One tender in a payment. A sale can be settled with several of these. */

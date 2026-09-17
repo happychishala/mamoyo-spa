@@ -48,6 +48,16 @@ export default function EditInventoryItem({ item }: { item: InventoryItem }) {
         </select>
         <div className="grid grid-cols-2 gap-2">
           <label className="block text-[0.65rem] text-mist-600">
+            Shot price (K)
+            <input name="shotPrice" type="number" min="0" step="0.01" defaultValue={item.shotPrice ?? ""} placeholder="spirits only" className={cls} />
+          </label>
+          <label className="block text-[0.65rem] text-mist-600">
+            Shots / bottle
+            <input name="shotsPerUnit" type="number" min="1" step="1" defaultValue={item.shotsPerUnit ?? ""} placeholder="e.g. 30" className={cls} />
+          </label>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <label className="block text-[0.65rem] text-mist-600">
             Quantity
             <input name="quantity" type="number" min="0" defaultValue={item.quantity} className={cls} />
           </label>

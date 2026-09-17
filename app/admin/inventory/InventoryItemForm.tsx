@@ -117,6 +117,20 @@ export default function InventoryItemForm() {
         />
       </div>
 
+      <div className="rounded-xl border border-mist-100 bg-mist-50/60 p-3">
+        <p className="text-xs font-medium text-mist-800">Sell by the shot <span className="font-normal text-mist-500">— optional, for spirits</span></p>
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="inv-shot-price" className="mb-1 block text-[0.7rem] text-mist-600">Shot price (K)</label>
+            <input id="inv-shot-price" name="shotPrice" type="number" min="0" step="0.01" placeholder="e.g. 40" className={inputClasses} />
+          </div>
+          <div>
+            <label htmlFor="inv-shots" className="mb-1 block text-[0.7rem] text-mist-600">Shots per bottle</label>
+            <input id="inv-shots" name="shotsPerUnit" type="number" min="1" step="1" placeholder="e.g. 30" className={inputClasses} />
+          </div>
+        </div>
+      </div>
+
       {state && (
         <p
           role="status"
