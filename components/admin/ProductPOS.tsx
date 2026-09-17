@@ -6,6 +6,7 @@ import { createProductSale } from "@/lib/actions";
 import { formatMoney } from "@/lib/format";
 import type { Location } from "@/lib/db";
 import PaymentSplitFields from "./PaymentSplitFields";
+import PosStickyBar from "./PosStickyBar";
 import { useCheckoutSubmit } from "@/components/site/PaymentProcessingOverlay";
 
 const methods = ["Cash", "Card", "Mobile Money", "Bank Transfer"];
@@ -55,8 +56,10 @@ export default function ProductPOS({ items }: { items: RetailItem[] }) {
   };
   const add = (id: string) => setQty(id, (cart[id] ?? 0) + 1);
   const sub = (id: string) => setQty(id, (cart[id] ?? 0) - 1);
+  const cartCount = lines.reduce((n, l) => n + l.qty, 0);
 
   return (
+    <div className="pb-24 xl:pb-0">
     <section className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
       {/* Product grid */}
       <div className="rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
@@ -192,7 +195,7 @@ export default function ProductPOS({ items }: { items: RetailItem[] }) {
           <span className="font-serif text-xl font-semibold">{formatMoney(total)}</span>
         </div>
 
-        <form onSubmit={onSubmit} className="mt-4 space-y-4">
+        <form id="product-pay" onSubmit={onSubmit} className="mt-4 space-y-4 scroll-mt-24">
           {lines.map((l) => (
             <span key={l.item.id}>
               <input type="hidden" name="itemId" value={l.item.id} />
@@ -215,5 +218,7 @@ export default function ProductPOS({ items }: { items: RetailItem[] }) {
       </div>
       {overlay}
     </section>
+      <PosStickyBar count={cartCount} total={total} targetId="product-pay" />
+    </div>
   );
 }

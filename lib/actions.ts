@@ -67,7 +67,7 @@ import {
 import { generateCode, expiryFrom, GIFT_EXPERIENCES, GIFT_MIN_CUSTOM, giftValueLabel, isRedeemable } from "./gift-cards";
 import { formatDate, formatMoney, todayISO, addDaysISO } from "./format";
 import { requireAdmin, requireRole, requireModule } from "./auth";
-import { hashPassword } from "./auth-token";
+import { hashPassword, passwordHashMatches } from "./auth-token";
 import { syncStayToChannels } from "./channel-manager";
 import { normalizeRoleName } from "./permissions";
 
@@ -383,6 +383,37 @@ export async function createBooking(
     ok: true,
     message: `Thank you, ${customer.split(" ")[0]}! Your request (${booking.ref}) at MaMoyo ${location} is in — we'll confirm by email within a few hours.`,
   };
+}
+
+/** Self-service: the signed-in user changes their own password. */
+export async function changeOwnPassword(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  const session = await requireAdmin();
+  const current = String(formData.get("current") ?? "");
+  const next = String(formData.get("next") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+
+  // The root "admin" account is authenticated by ADMIN_PASSWORD in the server
+  // environment, not a stored hash — it can't be changed from here.
+  if (session.username === "admin") {
+    return { ok: false, message: "The root admin password is set in the server environment (ADMIN_PASSWORD) and can't be changed here." };
+  }
+  if (next.length < 8) return { ok: false, message: "Your new password must be at least 8 characters." };
+  if (next !== confirm) return { ok: false, message: "The new password and confirmation don't match." };
+
+  const db = await readDb();
+  const user = db.users.find((u) => u.username === session.username);
+  if (!user) return { ok: false, message: "Your account could not be found. Sign out and back in, then try again." };
+  if (!passwordHashMatches(current, user.passwordHash)) {
+    return { ok: false, message: "Your current password is incorrect." };
+  }
+
+  user.passwordHash = hashPassword(next);
+  recordAudit(db, session, "changed own password");
+  await writeDb(db);
+  return { ok: true, message: "Password updated — use your new password next time you sign in." };
 }
 
 export async function updateBookingStatus(formData: FormData): Promise<void> {

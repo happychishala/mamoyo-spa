@@ -21,6 +21,7 @@ import {
   Settings2,
   ScrollText,
   QrCode,
+  KeyRound,
   ExternalLink,
   LogOut,
   Menu,
@@ -142,6 +143,16 @@ export default function Sidebar({
     </form>
   );
 
+  const accountLink = (
+    <Link
+      href="/admin/account"
+      className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-mist-700 transition-colors duration-200 hover:bg-mist-100 hover:text-mist-900"
+    >
+      <KeyRound className="h-4 w-4" aria-hidden="true" />
+      Account &amp; password
+    </Link>
+  );
+
   const navList = (
     <div className="space-y-4">
       {groups.map((g) => (
@@ -204,7 +215,10 @@ export default function Sidebar({
       {open && (
         <div className="max-h-[70vh] overflow-y-auto border-b border-mist-200 bg-white px-5 py-4 lg:hidden">
           {navList}
-          <div className="mt-3 border-t border-mist-100 pt-3">{signOutButton}</div>
+          <div className="mt-3 space-y-1 border-t border-mist-100 pt-3">
+            {accountLink}
+            {signOutButton}
+          </div>
         </div>
       )}
 
@@ -239,6 +253,7 @@ export default function Sidebar({
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
             View public site
           </Link>
+          {accountLink}
           {signOutButton}
         </div>
       </aside>

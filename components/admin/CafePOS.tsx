@@ -6,6 +6,7 @@ import type { MenuSection } from "@/lib/content";
 import { formatMoney } from "@/lib/format";
 import type { Location } from "@/lib/db";
 import PaymentSplitFields from "./PaymentSplitFields";
+import PosStickyBar from "./PosStickyBar";
 import { useCheckoutSubmit } from "@/components/site/PaymentProcessingOverlay";
 
 const methods: string[] = ["Cash", "Card", "Mobile Money", "Bank Transfer"];
@@ -57,9 +58,11 @@ export default function CafePOS({ menu }: { menu: MenuSection[] }) {
     setCart((current) => current.filter((item) => item.description !== description));
   };
 
+  const cartCount = cart.reduce((n, item) => n + item.qty, 0);
+
   return (
-    <div className="space-y-8">
-      <section className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+    <div className="flex flex-col gap-8 pb-24 xl:pb-0">
+      <section className="order-2 grid gap-6 xl:order-1 xl:grid-cols-[1.5fr_1fr]">
         <div className="rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
           <h2 className="font-serif text-xl font-semibold text-mist-950">Café POS</h2>
           <p className="mt-2 text-sm leading-relaxed text-mist-700">
@@ -151,7 +154,8 @@ export default function CafePOS({ menu }: { menu: MenuSection[] }) {
           )}
 
           <form
-            className="mt-6"
+            id="cafe-pay"
+            className="mt-6 scroll-mt-24"
             onSubmit={onSubmit}
           >
             {cart.map((item, index) => (
@@ -177,7 +181,7 @@ export default function CafePOS({ menu }: { menu: MenuSection[] }) {
         </div>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-mist-200 bg-white p-6 shadow-soft">
+      <section className="order-1 space-y-4 rounded-2xl border border-mist-200 bg-white p-6 shadow-soft xl:order-2">
         <h3 className="font-serif text-xl font-semibold text-mist-950">Café menu</h3>
         <div className="grid gap-5 lg:grid-cols-2">
           {menu.map((section) => (
@@ -213,6 +217,8 @@ export default function CafePOS({ menu }: { menu: MenuSection[] }) {
           ))}
         </div>
       </section>
+
+      <PosStickyBar count={cartCount} total={total} targetId="cafe-pay" />
       {overlay}
     </div>
   );
