@@ -20,13 +20,22 @@ import type { NextConfig } from "next";
 // is scoped to dev only.
 const isDev = process.env.NODE_ENV === "development";
 
+// Epson ePOS-Print: the POS prints by POSTing to the receipt printer on the
+// local network, so its address(es) must be allowed in connect-src. Set
+// NEXT_PUBLIC_EPOS_HOSTS (space/comma-separated) to your printer's address(es);
+// defaults cover a common static IP so it works out of the box.
+const eposHosts = (process.env.NEXT_PUBLIC_EPOS_HOSTS ?? "https://192.168.1.171 http://192.168.1.171")
+  .split(/[\s,]+/)
+  .filter(Boolean)
+  .join(" ");
+
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  "connect-src 'self' https://va.vercel-scripts.com",
+  `connect-src 'self' https://va.vercel-scripts.com ${eposHosts}`,
   "form-action 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",

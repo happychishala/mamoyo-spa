@@ -5,9 +5,11 @@ import { getSession } from "@/lib/auth";
 import { formatAmount, formatDate } from "@/lib/format";
 import { inclusiveVatBreakdown, VAT_RATE } from "@/lib/tax";
 import { NoAccess } from "@/components/admin/ui";
+import { locationInfo, contactInfo } from "@/lib/content";
+import type { EposReceipt } from "@/lib/epos";
 import PrintDocument from "@/components/admin/PrintDocument";
 import ThermalReceipt from "@/components/admin/ThermalReceipt";
-import ReceiptPrintControls from "@/components/admin/ReceiptPrintControls";
+import ReceiptPrinter from "@/components/admin/ReceiptPrinter";
 
 export const metadata: Metadata = { title: "Print receipt" };
 export const dynamic = "force-dynamic";
@@ -37,10 +39,37 @@ export default async function ReceiptPrintPage({
   const logoSrc = isCafe ? "/cafe-mamoyo-logo.png" : "/logo-mamoyo.png";
   const logoAlt = isCafe ? "MaMoyo Café receipt" : "MaMoyo Wellness & Beauty receipt";
 
+  const branch = locationInfo[receipt.location ?? "Kabulonga"];
+  const eposData: EposReceipt = {
+    title: isCafe ? "MaMoyo Cafe" : "MaMoyo",
+    branch: branch.name,
+    address: branch.address,
+    phone: contactInfo.phone,
+    number: receipt.number,
+    date: formatDate(receipt.date),
+    reference: receipt.invoiceNumber,
+    customer: receipt.customer,
+    items: (receipt.items ?? []).map((it) => ({
+      name: it.description,
+      qty: it.qty,
+      price: m(it.unitPrice),
+      amount: m(it.qty * it.unitPrice),
+    })),
+    subtotal: m(receivedVat.netAmount),
+    vat: m(receivedVat.vatAmount),
+    vatRate: `${VAT_RATE * 100}%`,
+    total: m(receipt.amount),
+    payments:
+      receipt.payments && receipt.payments.length > 1
+        ? receipt.payments.map((p) => ({ method: p.method, amount: m(p.amount) }))
+        : null,
+    method: receipt.method,
+  };
+
   if (format === "thermal") {
     return (
       <div className="mx-auto max-w-sm">
-        <ReceiptPrintControls backHref="/admin/receipts" />
+        <ReceiptPrinter backHref="/admin/receipts" receipt={eposData} />
         <ThermalReceipt receipt={receipt} cafe={isCafe} />
       </div>
     );
@@ -48,7 +77,7 @@ export default async function ReceiptPrintPage({
 
   return (
     <>
-      <ReceiptPrintControls backHref="/admin/receipts" />
+      <ReceiptPrinter backHref="/admin/receipts" receipt={eposData} />
       <PrintDocument
         backHref="/admin/receipts"
         backLabel="Back to receipts"
