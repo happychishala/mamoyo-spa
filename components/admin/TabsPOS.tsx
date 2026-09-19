@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, Minus, X, Users, Wine } from "lucide-react";
+import { Plus, Minus, X, Users, Wine, Search } from "lucide-react";
 import { openTab, addTabItem, setTabItemQty, closeTab, settleTab } from "@/lib/actions";
 import { formatMoney } from "@/lib/format";
 import type { Location, OpenTab } from "@/lib/db";
@@ -18,9 +18,19 @@ const tabTotal = (t: OpenTab) => t.items.reduce((s, i) => s + i.qty * i.unitPric
 export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickables: PickSection[] }) {
   const [activeId, setActiveId] = useState<string | null>(tabs[0]?.id ?? null);
   const [balanced, setBalanced] = useState(true);
+  const [query, setQuery] = useState("");
 
   const active = useMemo(() => tabs.find((t) => t.id === activeId) ?? tabs[0] ?? null, [tabs, activeId]);
   const total = active ? tabTotal(active) : 0;
+
+  const q = query.trim().toLowerCase();
+  const filtered = useMemo(
+    () =>
+      pickables
+        .map((s) => ({ title: s.title, items: q ? s.items.filter((i) => i.description.toLowerCase().includes(q)) : s.items }))
+        .filter((s) => s.items.length > 0),
+    [pickables, q]
+  );
 
   return (
     <div className="space-y-6">
@@ -84,8 +94,20 @@ export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickable
               <Wine className="h-5 w-5 text-mist-500" aria-hidden="true" />
               <h3 className="font-serif text-lg font-semibold text-mist-950">Add to “{active.name}”</h3>
             </div>
+
+            <div className="relative mt-4">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-mist-400" aria-hidden="true" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search items to add…"
+                aria-label="Search items"
+                className="w-full rounded-xl border border-mist-200 bg-white py-2.5 pl-9 pr-3 text-sm text-mist-900 focus:border-mist-500 focus:outline-none"
+              />
+            </div>
+
             <div className="mt-4 space-y-5">
-              {pickables.map((section) => (
+              {filtered.map((section) => (
                 <div key={section.title}>
                   <p className="text-xs font-semibold uppercase tracking-wide text-mist-500">{section.title}</p>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -113,8 +135,12 @@ export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickable
                   </div>
                 </div>
               ))}
-              {pickables.every((s) => s.items.length === 0) && (
-                <p className="text-sm text-mist-600">Add café items in Chef, or bar stock in Inventory (category Bar), to sell them on a tab.</p>
+              {filtered.length === 0 && (
+                <p className="text-sm text-mist-600">
+                  {q
+                    ? `No items match “${query.trim()}”.`
+                    : "Add café items in Chef, or bar stock in Inventory (category Bar), to sell them on a tab."}
+                </p>
               )}
             </div>
           </div>

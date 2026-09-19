@@ -9,6 +9,7 @@ import { buildEposXml, eposEndpoint, type EposReceipt } from "@/lib/epos";
 const MODE_KEY = "mamoyo-print-mode"; // "browser" | "epos"
 const URL_KEY = "mamoyo-epos-url";
 const FMT_KEY = "mamoyo-receipt-format"; // "a4" | "thermal"
+const DEFAULT_EPOS_URL = "https://192.168.1.171";
 
 function ls(key: string): string | null {
   try {
@@ -41,7 +42,7 @@ export default function ReceiptPrinter({ backHref, receipt }: { backHref: string
   // Load per-device preferences on mount.
   useEffect(() => {
     setMode(ls(MODE_KEY) === "epos" ? "epos" : "browser");
-    setEposUrl(ls(URL_KEY) ?? "");
+    setEposUrl(ls(URL_KEY) || DEFAULT_EPOS_URL);
   }, []);
 
   async function sendEpos(host: string) {
@@ -77,7 +78,7 @@ export default function ReceiptPrinter({ backHref, receipt }: { backHref: string
   useEffect(() => {
     const m = ls(MODE_KEY) === "epos" ? "epos" : "browser";
     if (m === "epos") {
-      if (auto) sendEpos(ls(URL_KEY) ?? "");
+      if (auto) sendEpos(ls(URL_KEY) || DEFAULT_EPOS_URL);
       return;
     }
     // browser mode: apply remembered format, then auto-print
