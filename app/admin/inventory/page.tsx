@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { readDb } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 import { PageHeader, Card } from "@/components/admin/ui";
 import InventoryItemForm from "./InventoryItemForm";
 import InventoryTable from "./InventoryTable";
@@ -8,6 +9,8 @@ export const metadata: Metadata = { title: "Inventory" };
 export const dynamic = "force-dynamic";
 
 export default async function InventoryPage() {
+  const session = await getSession();
+  const canDelete = session?.role === "Owner" || session?.role === "Manager";
   const db = await readDb();
   const lowCount = db.inventory.filter((i) => i.quantity <= i.reorderLevel).length;
 
@@ -27,7 +30,7 @@ export default async function InventoryPage() {
             </p>
           </div>
           <div className="mt-3">
-            <InventoryTable items={db.inventory} />
+            <InventoryTable items={db.inventory} canDelete={canDelete} />
           </div>
         </Card>
 

@@ -6,6 +6,17 @@ import { adjustInventory, setRetailPrice } from "@/lib/actions";
 import { formatDate } from "@/lib/format";
 import { DataTable, type DataColumn } from "@/components/admin/DataTable";
 import EditInventoryItem from "./EditInventoryItem";
+import DeleteInventoryButton from "./DeleteInventoryButton";
+
+const deleteColumn: DataColumn<InventoryItem> = {
+  key: "delete",
+  header: "",
+  align: "right",
+  sortable: false,
+  searchable: false,
+  exportable: false,
+  cell: (item) => <DeleteInventoryButton id={item.id} name={item.name} />,
+};
 
 const isLow = (item: InventoryItem) => item.quantity <= item.reorderLevel;
 
@@ -147,11 +158,11 @@ const columns: DataColumn<InventoryItem>[] = [
   },
 ];
 
-export default function InventoryTable({ items }: { items: InventoryItem[] }) {
+export default function InventoryTable({ items, canDelete = false }: { items: InventoryItem[]; canDelete?: boolean }) {
   return (
     <DataTable
       rows={items}
-      columns={columns}
+      columns={canDelete ? [...columns, deleteColumn] : columns}
       filename="mamoyo-inventory"
       title="MaMoyo Inventory"
       pageSize={12}

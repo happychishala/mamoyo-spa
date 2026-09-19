@@ -2178,7 +2178,7 @@ export async function addInventoryItem(
   if (
     db.inventory.some(
       (i) =>
-        i.name.toLowerCase() === name.toLowerCase() &&
+        i.name.trim().replace(/\s+/g, " ").toLowerCase() === name.replace(/\s+/g, " ").toLowerCase() &&
         i.category === category &&
         (i.location ?? "Kabulonga") === location
     )
@@ -2285,6 +2285,21 @@ export async function adjustInventory(formData: FormData): Promise<void> {
   recordAudit(db, actor, `stock ${direction} ${Math.round(amount)}`, item.name);
   await writeDb(db);
   revalidatePath("/admin/inventory");
+}
+
+/** Remove an inventory item — e.g. a duplicate entered twice. Owner/Manager only. */
+export async function deleteInventoryItem(formData: FormData): Promise<void> {
+  const actor = await requireRole("Owner", "Manager");
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  const db = await readDb();
+  const item = db.inventory.find((i) => i.id === id);
+  if (!item) return;
+  db.inventory = db.inventory.filter((i) => i.id !== id);
+  recordAudit(db, actor, "deleted stock item", item.name);
+  await writeDb(db);
+  revalidatePath("/admin/inventory");
+  revalidatePath("/admin/pos");
 }
 
 export async function addTransaction(
