@@ -12,6 +12,7 @@ export default function PrintDocument({
   children,
   logoSrc = "/logo-mamoyo.png",
   logoAlt = "MaMoyo Wellness & Beauty — Kabulonga",
+  hideControls = false,
 }: {
   backHref: string;
   backLabel: string;
@@ -19,20 +20,24 @@ export default function PrintDocument({
   children: React.ReactNode;
   logoSrc?: string;
   logoAlt?: string;
+  /** Suppress the built-in back/print bar when the caller supplies its own. */
+  hideControls?: boolean;
 }) {
   const branch = locationInfo[location];
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="mb-6 flex items-center justify-between print:hidden">
-        <Link
-          href={backHref}
-          className="inline-flex items-center gap-2 text-sm font-medium text-mist-700 transition-colors duration-200 hover:text-mist-900"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          {backLabel}
-        </Link>
-        <PrintButton />
-      </div>
+      {!hideControls && (
+        <div className="mb-6 flex items-center justify-between print:hidden">
+          <Link
+            href={backHref}
+            className="inline-flex items-center gap-2 text-sm font-medium text-mist-700 transition-colors duration-200 hover:text-mist-900"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            {backLabel}
+          </Link>
+          <PrintButton />
+        </div>
+      )}
 
       <div className="rounded-2xl border border-mist-200 bg-white p-10 shadow-soft print:rounded-none print:border-0 print:p-0 print:shadow-none">
         <div className="flex items-start justify-between gap-6 border-b border-mist-200 pb-6">

@@ -6,19 +6,24 @@ import { formatAmount, formatDate } from "@/lib/format";
 import { inclusiveVatBreakdown, VAT_RATE } from "@/lib/tax";
 import { NoAccess } from "@/components/admin/ui";
 import PrintDocument from "@/components/admin/PrintDocument";
+import ThermalReceipt from "@/components/admin/ThermalReceipt";
+import ReceiptPrintControls from "@/components/admin/ReceiptPrintControls";
 
 export const metadata: Metadata = { title: "Print receipt" };
 export const dynamic = "force-dynamic";
 
 export default async function ReceiptPrintPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ format?: string }>;
 }) {
   const session = await getSession();
   if (!session) return null;
 
   const { id } = await params;
+  const { format } = await searchParams;
   const db = await readDb();
   const receipt = db.receipts.find((r) => r.id === id);
   if (!receipt) notFound();
@@ -28,19 +33,30 @@ export default async function ReceiptPrintPage({
   const receivedVat = inclusiveVatBreakdown(receipt.amount);
   const m = (n: number) => formatAmount(n, receipt.currency);
 
-  const logoSrc = receipt.invoiceNumber.startsWith("POS-") ? "/cafe-mamoyo-logo.png" : "/logo-mamoyo.png";
-  const logoAlt = receipt.invoiceNumber.startsWith("POS-")
-    ? "MaMoyo Café receipt"
-    : "MaMoyo Wellness & Beauty receipt";
+  const isCafe = receipt.invoiceNumber.startsWith("POS-");
+  const logoSrc = isCafe ? "/cafe-mamoyo-logo.png" : "/logo-mamoyo.png";
+  const logoAlt = isCafe ? "MaMoyo Café receipt" : "MaMoyo Wellness & Beauty receipt";
+
+  if (format === "thermal") {
+    return (
+      <div className="mx-auto max-w-sm">
+        <ReceiptPrintControls backHref="/admin/receipts" />
+        <ThermalReceipt receipt={receipt} cafe={isCafe} />
+      </div>
+    );
+  }
 
   return (
-    <PrintDocument
-      backHref="/admin/receipts"
-      backLabel="Back to receipts"
-      location={receipt.location}
-      logoSrc={logoSrc}
-      logoAlt={logoAlt}
-    >
+    <>
+      <ReceiptPrintControls backHref="/admin/receipts" />
+      <PrintDocument
+        backHref="/admin/receipts"
+        backLabel="Back to receipts"
+        location={receipt.location}
+        logoSrc={logoSrc}
+        logoAlt={logoAlt}
+        hideControls
+      >
       <div className="mt-8 flex flex-wrap items-start justify-between gap-6">
         <div>
           <h1 className="font-serif text-3xl text-mist-950">Receipt</h1>
@@ -149,6 +165,7 @@ export default async function ReceiptPrintPage({
           ? `Part payment received. Please quote ${receipt.invoiceNumber} for the balance.`
           : "This receipt confirms payment received for the amount shown above."}
       </p>
-    </PrintDocument>
+      </PrintDocument>
+    </>
   );
 }

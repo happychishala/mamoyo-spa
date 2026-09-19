@@ -606,7 +606,7 @@ export async function createCafeSale(formData: FormData): Promise<void> {
   revalidatePath("/admin/receipts");
   revalidatePath("/admin/finance");
   revalidatePath("/admin");
-  redirect(`/admin/receipts/${receipt.id}/print`);
+  redirect(`/admin/receipts/${receipt.id}/print?auto=1`);
 }
 
 /**
@@ -688,7 +688,7 @@ export async function createProductSale(formData: FormData): Promise<void> {
   revalidatePath("/admin/finance");
   revalidatePath("/admin/daysheet");
   revalidatePath("/admin");
-  redirect(`/admin/receipts/${receipt.id}/print`);
+  redirect(`/admin/receipts/${receipt.id}/print?auto=1`);
 }
 
 /**
