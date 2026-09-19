@@ -17,8 +17,6 @@ const tabTotal = (t: OpenTab) => t.items.reduce((s, i) => s + i.qty * i.unitPric
 
 export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickables: PickSection[] }) {
   const [activeId, setActiveId] = useState<string | null>(tabs[0]?.id ?? null);
-  const [newName, setNewName] = useState("");
-  const [newLocation, setNewLocation] = useState<Location>("Kabulonga");
   const [balanced, setBalanced] = useState(true);
 
   const active = useMemo(() => tabs.find((t) => t.id === activeId) ?? tabs[0] ?? null, [tabs, activeId]);
@@ -56,16 +54,13 @@ export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickable
         <form action={openTab} className="mt-4 flex flex-col gap-2 border-t border-mist-100 pt-4 sm:flex-row">
           <input
             name="name"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
             required
             placeholder="Customer or table name"
             className="w-full rounded-xl border border-mist-200 bg-white px-3.5 py-2.5 text-sm text-mist-900 focus:border-mist-500 focus:outline-none"
           />
           <select
             name="location"
-            value={newLocation}
-            onChange={(e) => setNewLocation(e.target.value as Location)}
+            defaultValue="Kabulonga"
             className="rounded-xl border border-mist-200 bg-white px-3.5 py-2.5 text-sm text-mist-900 focus:border-mist-500 focus:outline-none"
           >
             {locations.map((l) => (
@@ -74,7 +69,6 @@ export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickable
           </select>
           <button
             type="submit"
-            onClick={() => setNewName("")}
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-mist-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-mist-700"
           >
             <Plus className="h-4 w-4" aria-hidden="true" /> Open tab
