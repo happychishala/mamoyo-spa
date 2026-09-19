@@ -223,6 +223,10 @@ function createCounterReceipt(
     description: `${incomeCategory === "Retail products" ? "Product" : incomeCategory} sale — ${receipt.invoiceNumber} (${receipt.customer})`,
     amount: total,
   });
+  // Queue the receipt for the local print bridge (Epson). Harmless if no bridge
+  // is running; kept trimmed so the DB blob doesn't grow unbounded.
+  db.printJobs.unshift({ id: crypto.randomUUID(), receiptId: receipt.id, status: "pending", createdAt: new Date().toISOString() });
+  if (db.printJobs.length > 200) db.printJobs.length = 200;
   return receipt;
 }
 

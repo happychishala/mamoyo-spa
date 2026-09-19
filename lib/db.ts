@@ -135,6 +135,15 @@ export interface OpenTabItem {
   shot?: boolean;
 }
 
+/** A queued receipt for the local print bridge to send to the Epson printer. */
+export interface PrintJob {
+  id: string;
+  receiptId: string;
+  status: "pending" | "printed";
+  createdAt: string;
+  printedAt?: string;
+}
+
 /** An open running bill for a customer/table, settled later at the POS. */
 export interface OpenTab {
   id: string;
@@ -510,6 +519,7 @@ export interface DB {
   recipes: Recipe[];
   workShifts: WorkShift[];
   openTabs: OpenTab[];
+  printJobs: PrintJob[];
   auditLog: AuditEntry[];
   /** Owner-arranged order of café menu section names (drag-to-arrange). */
   cafeMenuOrder?: string[];
@@ -716,6 +726,7 @@ const seed: DB = {
   recipes: [],
   workShifts: [],
   openTabs: [],
+  printJobs: [],
   auditLog: [],
 };
 
@@ -896,6 +907,10 @@ function migrate(db: DB): boolean {
   }
   if (!Array.isArray(db.openTabs)) {
     db.openTabs = [];
+    migrated = true;
+  }
+  if (!Array.isArray(db.printJobs)) {
+    db.printJobs = [];
     migrated = true;
   }
   // Backfill café menu ordering: give items a per-section sort index and record
