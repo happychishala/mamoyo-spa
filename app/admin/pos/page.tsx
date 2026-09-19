@@ -82,13 +82,31 @@ export default async function PosPage() {
         }))
       : cafeMenu;
 
+  // What can be added to an open tab: café items (no stock) + bar + products.
+  const pickables = [
+    { title: "Café", items: menu.flatMap((s) => s.items.map((i) => ({ description: i.name, unitPrice: i.price }))) },
+    {
+      title: "Bar",
+      items: barItems.map((b) => ({
+        description: b.name,
+        unitPrice: b.retailPrice,
+        itemId: b.id.startsWith("shot:") ? b.id.slice(5) : b.id,
+        shot: b.id.startsWith("shot:"),
+      })),
+    },
+    {
+      title: "Products",
+      items: products.map((p) => ({ description: p.name, unitPrice: p.retailPrice, itemId: p.id })),
+    },
+  ].filter((s) => s.items.length > 0);
+
   return (
     <div className="space-y-8">
       <PageHeader
         title="Point of sale"
-        description="Ring up café orders and retail products, split payment across methods, and print the receipt. Product sales adjust inventory automatically."
+        description="Ring up café orders, bar drinks and retail products, or keep open customer tabs. Split payment across methods and print the receipt; stock adjusts automatically."
       />
-      <PosTabs products={products} bar={barItems} menu={menu} />
+      <PosTabs products={products} bar={barItems} menu={menu} tabs={db.openTabs} pickables={pickables} />
     </div>
   );
 }

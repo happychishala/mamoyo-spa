@@ -10,6 +10,8 @@ import {
   staysOverlap,
   settleStayIncome,
   recordAudit,
+  type OpenTab,
+  type OpenTabItem,
   type DB,
   type Invoice,
   type InvoiceItem,
@@ -192,7 +194,7 @@ function createCounterReceipt(
   method: string,
   location: Location,
   ref: string,
-  incomeCategory: "Café" | "Retail products",
+  incomeCategory: "Café" | "Retail products" | "Bar",
   payments?: PaymentSplit[]
 ): Receipt {
   const total = items.reduce((sum, item) => sum + item.qty * item.unitPrice, 0);
@@ -218,7 +220,7 @@ function createCounterReceipt(
     date: todayISO(),
     type: "Income",
     category: incomeCategory,
-    description: `${incomeCategory === "Café" ? "Café" : "Product"} sale — ${receipt.invoiceNumber} (${receipt.customer})`,
+    description: `${incomeCategory === "Retail products" ? "Product" : incomeCategory} sale — ${receipt.invoiceNumber} (${receipt.customer})`,
     amount: total,
   });
   return receipt;
@@ -576,6 +578,136 @@ export async function updateChannelIntegrationSetting(formData: FormData): Promi
   await writeDb(db);
   revalidatePath("/admin/integrations");
   redirect("/admin/integrations");
+}
+
+// ---- Open customer tabs (bar/café running bills) ----
+
+function revalidatePos() {
+  revalidatePath("/admin/pos");
+}
+
+/** Open a new named tab for a customer/table. */
+export async function openTab(formData: FormData): Promise<void> {
+  const actor = await requireAdmin();
+  const name = String(formData.get("name") ?? "").trim();
+  const rawLocation = String(formData.get("location") ?? "Kabulonga") as Location;
+  const location = LOCATIONS.includes(rawLocation) ? rawLocation : "Kabulonga";
+  if (!name) return;
+  const db = await readDb();
+  db.openTabs.unshift({
+    id: crypto.randomUUID(),
+    name,
+    location,
+    items: [],
+    createdBy: actor.username,
+    createdAt: new Date().toISOString(),
+  });
+  await writeDb(db);
+  revalidatePos();
+}
+
+/** Add a line to a tab (merges with an identical existing line). */
+export async function addTabItem(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const tabId = String(formData.get("tabId") ?? "");
+  const description = String(formData.get("description") ?? "").trim();
+  const qty = Math.max(1, Math.round(Number(formData.get("qty") ?? 1)));
+  const unitPrice = Number(formData.get("unitPrice") ?? NaN);
+  const itemId = String(formData.get("itemId") ?? "").trim() || undefined;
+  const shot = String(formData.get("shot") ?? "") === "1";
+  if (!tabId || !description || !(unitPrice >= 0)) return;
+
+  const db = await readDb();
+  const tab = db.openTabs.find((t) => t.id === tabId);
+  if (!tab) return;
+  const existing = tab.items.find(
+    (i) => i.description === description && i.unitPrice === unitPrice && i.itemId === itemId && Boolean(i.shot) === shot
+  );
+  if (existing) existing.qty += qty;
+  else tab.items.push({ description, qty, unitPrice, itemId, shot: shot || undefined });
+  await writeDb(db);
+  revalidatePos();
+}
+
+/** Set a tab line's quantity (0 removes it). */
+export async function setTabItemQty(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const tabId = String(formData.get("tabId") ?? "");
+  const index = Math.round(Number(formData.get("index") ?? -1));
+  const qty = Math.round(Number(formData.get("qty") ?? 0));
+  const db = await readDb();
+  const tab = db.openTabs.find((t) => t.id === tabId);
+  if (!tab || index < 0 || index >= tab.items.length) return;
+  if (qty <= 0) tab.items.splice(index, 1);
+  else tab.items[index].qty = qty;
+  await writeDb(db);
+  revalidatePos();
+}
+
+/** Discard an open tab without charging (a mistake / walk-out). */
+export async function closeTab(formData: FormData): Promise<void> {
+  const actor = await requireAdmin();
+  const tabId = String(formData.get("tabId") ?? "");
+  const db = await readDb();
+  const tab = db.openTabs.find((t) => t.id === tabId);
+  if (!tab) return;
+  db.openTabs = db.openTabs.filter((t) => t.id !== tabId);
+  if (tab.items.length > 0) recordAudit(db, actor, "discarded open tab", tab.name);
+  await writeDb(db);
+  revalidatePos();
+}
+
+/** Settle a tab: deduct stock for inventory lines, raise a receipt + income,
+ *  close the tab and print the receipt. */
+export async function settleTab(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const tabId = String(formData.get("tabId") ?? "");
+  const db = await readDb();
+  const tab = db.openTabs.find((t) => t.id === tabId);
+  if (!tab || tab.items.length === 0) return;
+
+  const receiptItems: InvoiceItem[] = [];
+  const deductions: { item: (typeof db.inventory)[number]; units: number }[] = [];
+  for (const line of tab.items) {
+    if (line.itemId) {
+      const item = db.inventory.find((it) => it.id === line.itemId);
+      if (item) {
+        if (line.shot && item.shotsPerUnit && item.shotsPerUnit > 0) {
+          const shotsInStock = Math.floor(item.quantity * item.shotsPerUnit);
+          const sellable = Math.min(line.qty, shotsInStock);
+          if (sellable <= 0) continue;
+          receiptItems.push({ description: line.description, qty: sellable, unitPrice: line.unitPrice });
+          deductions.push({ item, units: sellable / item.shotsPerUnit });
+          continue;
+        }
+        const sellable = Math.min(line.qty, item.quantity);
+        if (sellable <= 0) continue;
+        receiptItems.push({ description: line.description, qty: sellable, unitPrice: line.unitPrice });
+        deductions.push({ item, units: sellable });
+        continue;
+      }
+    }
+    receiptItems.push({ description: line.description, qty: line.qty, unitPrice: line.unitPrice });
+  }
+  if (receiptItems.length === 0) return;
+
+  const total = receiptItems.reduce((sum, i) => sum + i.qty * i.unitPrice, 0);
+  const { payments, summary } = readPayments(formData, total);
+
+  for (const { item, units } of deductions) {
+    item.quantity = Math.max(0, Math.round((item.quantity - units) * 1000) / 1000);
+    item.updatedAt = todayISO();
+  }
+
+  const receipt = createCounterReceipt(db, receiptItems, tab.name, summary, tab.location, nextSaleRef(db), "Bar", payments);
+  db.openTabs = db.openTabs.filter((t) => t.id !== tabId);
+  await writeDb(db);
+  revalidatePath("/admin/receipts");
+  revalidatePath("/admin/inventory");
+  revalidatePath("/admin/finance");
+  revalidatePath("/admin/pos");
+  revalidatePath("/admin");
+  redirect(`/admin/receipts/${receipt.id}/print?auto=1`);
 }
 
 export async function createCafeSale(formData: FormData): Promise<void> {

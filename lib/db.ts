@@ -125,6 +125,26 @@ export interface Quotation {
   createdAt: string;
 }
 
+/** One line on an open customer tab. `itemId` links to inventory (so settling
+ *  deducts stock); `shot` marks a by-the-shot pour. Café menu lines have neither. */
+export interface OpenTabItem {
+  description: string;
+  qty: number;
+  unitPrice: number;
+  itemId?: string;
+  shot?: boolean;
+}
+
+/** An open running bill for a customer/table, settled later at the POS. */
+export interface OpenTab {
+  id: string;
+  name: string;
+  location: Location;
+  items: OpenTabItem[];
+  createdBy: string;
+  createdAt: string;
+}
+
 /** A café menu item the chef manages from the back office. */
 export interface CafeMenuItem {
   id: string;
@@ -489,6 +509,7 @@ export interface DB {
   cafeMenuItems: CafeMenuItem[];
   recipes: Recipe[];
   workShifts: WorkShift[];
+  openTabs: OpenTab[];
   auditLog: AuditEntry[];
   /** Owner-arranged order of café menu section names (drag-to-arrange). */
   cafeMenuOrder?: string[];
@@ -694,6 +715,7 @@ const seed: DB = {
   cafeMenuItems: [],
   recipes: [],
   workShifts: [],
+  openTabs: [],
   auditLog: [],
 };
 
@@ -870,6 +892,10 @@ function migrate(db: DB): boolean {
   }
   if (!Array.isArray(db.auditLog)) {
     db.auditLog = [];
+    migrated = true;
+  }
+  if (!Array.isArray(db.openTabs)) {
+    db.openTabs = [];
     migrated = true;
   }
   // Backfill café menu ordering: give items a per-section sort index and record
