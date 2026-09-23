@@ -428,20 +428,38 @@ export default async function BookingsPage({
                 Previous
               </Link>
               <div className="flex items-center gap-1.5">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Link
-                    key={page}
-                    href={`/admin/bookings?page=${page}`}
-                    aria-current={page === currentPage ? "page" : undefined}
-                    className={`flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-xs font-semibold transition-colors duration-200 ${
-                      page === currentPage
-                        ? "bg-mist-600 text-white"
-                        : "text-mist-600 hover:bg-mist-100 hover:text-mist-950"
-                    }`}
-                  >
-                    {page}
-                  </Link>
-                ))}
+                {(() => {
+                  // Compact window: 1 … (current-1, current, current+1) … last
+                  const win = 1;
+                  const items: (number | "ellipsis")[] = [];
+                  const from = Math.max(2, currentPage - win);
+                  const to = Math.min(totalPages - 1, currentPage + win);
+                  items.push(1);
+                  if (from > 2) items.push("ellipsis");
+                  for (let p = from; p <= to; p++) items.push(p);
+                  if (to < totalPages - 1) items.push("ellipsis");
+                  if (totalPages > 1) items.push(totalPages);
+                  return items.map((it, i) =>
+                    it === "ellipsis" ? (
+                      <span key={`e${i}`} className="px-1 text-xs text-mist-400" aria-hidden="true">
+                        …
+                      </span>
+                    ) : (
+                      <Link
+                        key={it}
+                        href={`/admin/bookings?page=${it}`}
+                        aria-current={it === currentPage ? "page" : undefined}
+                        className={`flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-xs font-semibold transition-colors duration-200 ${
+                          it === currentPage
+                            ? "bg-mist-600 text-white"
+                            : "text-mist-600 hover:bg-mist-100 hover:text-mist-950"
+                        }`}
+                      >
+                        {it}
+                      </Link>
+                    )
+                  );
+                })()}
               </div>
               <Link
                 href={`/admin/bookings?page=${Math.min(totalPages, currentPage + 1)}`}
