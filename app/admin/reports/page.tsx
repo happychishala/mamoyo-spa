@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { Target, Save } from "lucide-react";
+import { Target, Save, Printer, FileSpreadsheet, MapPin } from "lucide-react";
 import Link from "next/link";
-import { readDb, TREATMENT_PAYMENTS } from "@/lib/db";
+import { readDb, TREATMENT_PAYMENTS, LOCATIONS, type Treatment } from "@/lib/db";
 import { updateTherapistTarget } from "@/lib/actions";
 import { formatMoney, formatDate, todayISO } from "@/lib/format";
 import { PageHeader, Card } from "@/components/admin/ui";
+import PrintButton from "@/components/admin/PrintButton";
+
+const branchRevenue = (rows: Treatment[]) =>
+  LOCATIONS.map((loc) => ({
+    loc,
+    total: rows.filter((t) => (t.location ?? "Kabulonga") === loc).reduce((s, t) => s + t.amount, 0),
+  }));
 
 export const metadata: Metadata = { title: "Reports" };
 export const dynamic = "force-dynamic";
@@ -40,6 +47,7 @@ export default async function ReportsPage({
     payment: p,
     total: dayRows.filter((t) => t.payment === p).reduce((s, t) => s + t.amount, 0),
   }));
+  const dayByLocation = branchRevenue(dayRows);
   const dayByTherapist = [...new Set(dayRows.map((t) => t.therapist))].map((name) => ({
     name,
     total: dayRows.filter((t) => t.therapist === name).reduce((s, t) => s + t.amount, 0),
@@ -52,6 +60,7 @@ export default async function ReportsPage({
     payment: p,
     total: monthRows.filter((t) => t.payment === p).reduce((s, t) => s + t.amount, 0),
   }));
+  const monthByLocation = branchRevenue(monthRows);
   // Active therapists always show; ex-employees stay when they earned that month.
   const monthByTherapist = db.therapists
     .map((t) => {
@@ -84,7 +93,7 @@ export default async function ReportsPage({
       <section className="space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <h2 className="font-serif text-2xl font-semibold text-mist-950">Daily treatments</h2>
-          <form method="GET" className="flex items-center gap-2">
+          <form method="GET" className="flex items-center gap-2 print:hidden">
             <input type="hidden" name="month" value={month} />
             <label htmlFor="report-date" className="text-xs font-medium text-mist-700">
               Day
@@ -110,6 +119,18 @@ export default async function ReportsPage({
             <Card key={p.payment} className="px-4 py-3">
               <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-mist-600">{p.payment}</p>
               <p className="mt-1 font-serif text-xl text-mist-950">{formatMoney(p.total)}</p>
+            </Card>
+          ))}
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {dayByLocation.map((b) => (
+            <Card key={b.loc} className="flex items-center justify-between px-5 py-4">
+              <span className="inline-flex items-center gap-2 text-sm font-semibold text-mist-800">
+                <MapPin className="h-4 w-4 text-mist-500" aria-hidden="true" />
+                {b.loc}
+              </span>
+              <span className="font-serif text-xl text-mist-950">{formatMoney(b.total)}</span>
             </Card>
           ))}
         </div>
@@ -208,7 +229,19 @@ export default async function ReportsPage({
           <h2 className="font-serif text-2xl font-semibold text-mist-950">
             Monthly revenue — {fullMonthLabel(month)}
           </h2>
-          <form method="GET" className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 print:hidden">
+            <Link
+              href={`/admin/reports/export?month=${month}`}
+              className="inline-flex items-center gap-2 rounded-full border border-mist-300 px-4 py-2 text-xs font-semibold text-mist-700 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+            >
+              <FileSpreadsheet className="h-3.5 w-3.5" aria-hidden="true" />
+              Excel
+            </Link>
+            <span className="inline-flex items-center gap-2 [&_button]:px-4 [&_button]:py-2 [&_button]:text-xs">
+              <PrintButton />
+            </span>
+          </div>
+          <form method="GET" className="flex items-center gap-2 print:hidden">
             <input type="hidden" name="date" value={day} />
             <label htmlFor="report-month" className="text-xs font-medium text-mist-700">
               Month
@@ -247,6 +280,25 @@ export default async function ReportsPage({
               className="h-full rounded-full bg-mist-500 transition-all duration-500"
               style={{ width: `${Math.min(100, (monthTotal / HOUSE_MONTHLY_TARGET) * 100)}%` }}
             />
+          </div>
+        </Card>
+
+        {/* Revenue by branch */}
+        <Card className="p-6">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-mist-500" aria-hidden="true" />
+            <h3 className="font-serif text-lg font-semibold text-mist-950">Revenue by branch</h3>
+          </div>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {monthByLocation.map((b) => (
+              <div key={b.loc} className="rounded-2xl border border-mist-100 bg-mist-50 px-5 py-4">
+                <p className="text-sm font-semibold text-mist-800">{b.loc}</p>
+                <p className="mt-1 font-serif text-2xl text-mist-950">{formatMoney(b.total)}</p>
+                <p className="mt-0.5 text-xs text-mist-500">
+                  {monthTotal > 0 ? Math.round((b.total / monthTotal) * 100) : 0}% of the month
+                </p>
+              </div>
+            ))}
           </div>
         </Card>
 
