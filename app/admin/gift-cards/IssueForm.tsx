@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { Gift, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { issueGiftCard, type ActionResult } from "@/lib/actions";
 import { useCheckoutSubmit } from "@/components/site/PaymentProcessingOverlay";
+import ExperiencePicker, { type ExperienceGroup } from "./ExperiencePicker";
 
 const input =
   "w-full rounded-xl border border-mist-200 bg-white px-3.5 py-2.5 text-sm text-mist-950 placeholder:text-mist-400 transition-colors duration-200 focus:border-mist-500 focus:outline-none focus:ring-2 focus:ring-mist-200";
@@ -11,13 +12,13 @@ const label = "mb-1 block text-xs font-medium text-mist-800";
 
 export default function IssueForm({
   values,
-  experiences,
+  experienceGroups,
   prompts,
   minCustom,
   locations,
 }: {
   values: readonly number[];
-  experiences: readonly string[];
+  experienceGroups: ExperienceGroup[];
   prompts: { occasion: string; message: string }[];
   minCustom: number;
   locations: readonly string[];
@@ -95,16 +96,9 @@ export default function IssueForm({
         </div>
       ) : (
         <div>
-          <label htmlFor="gc-exp" className={label}>
-            Experience
-          </label>
-          <select id="gc-exp" name="experience" defaultValue={experiences[0]} className={input}>
-            {experiences.map((e) => (
-              <option key={e} value={e}>
-                {e}
-              </option>
-            ))}
-          </select>
+          <label className={label}>Experience(s)</label>
+          <ExperiencePicker name="experience" groups={experienceGroups} />
+          <p className="mt-1 text-xs text-mist-500">Search and add one or more treatments.</p>
           <input type="hidden" name="value" value="0" />
         </div>
       )}

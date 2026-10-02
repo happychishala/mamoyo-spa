@@ -2618,7 +2618,9 @@ export async function issueGiftCard(
     return { ok: false, message: "Who the card is for and who it is from are both needed." };
   }
 
-  const experience = String(formData.get("experience") ?? "").trim();
+  // One or more experiences may be chosen; they're combined into one card.
+  const experiences = formData.getAll("experience").map((v) => String(v).trim()).filter(Boolean);
+  const experience = experiences.join(" + ");
   const rawValue = Number(formData.get("value") ?? 0);
   const value = experience ? 0 : Math.round(rawValue);
 
@@ -2626,8 +2628,8 @@ export async function issueGiftCard(
     if (!Number.isFinite(value) || value < GIFT_MIN_CUSTOM) {
       return { ok: false, message: `Choose an experience, or a value of at least K${GIFT_MIN_CUSTOM}.` };
     }
-  } else if (!GIFT_EXPERIENCES.includes(experience as (typeof GIFT_EXPERIENCES)[number])) {
-    return { ok: false, message: "That experience is not on the gift list." };
+  } else if (experiences.some((e) => !GIFT_EXPERIENCES.includes(e))) {
+    return { ok: false, message: "One of the selected experiences is not on the gift list." };
   }
 
   const rawDelivery = String(formData.get("delivery") ?? "Email");

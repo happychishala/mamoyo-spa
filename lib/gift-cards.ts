@@ -15,13 +15,18 @@ const GIFT_PACKAGES = [
   "Café ritual",
 ];
 
-// Every spa treatment on the menu can be gifted, plus the curated packages.
-export const GIFT_EXPERIENCES: string[] = [
-  ...new Set([
-    ...spaMenu.flatMap((section) => section.treatments.map((t) => t.name)),
-    ...GIFT_PACKAGES,
-  ]),
-];
+// Every spa treatment on the menu can be gifted, grouped by menu section, plus
+// the curated packages — used by the searchable experience picker.
+export const GIFT_EXPERIENCE_GROUPS: { group: string; items: string[] }[] = [
+  ...spaMenu.map((section) => ({
+    group: section.title,
+    items: section.treatments.map((t) => t.name),
+  })),
+  { group: "Gift packages", items: GIFT_PACKAGES },
+].filter((g) => g.items.length > 0);
+
+// Flat list of every giftable experience (for validation).
+export const GIFT_EXPERIENCES: string[] = [...new Set(GIFT_EXPERIENCE_GROUPS.flatMap((g) => g.items))];
 
 /** The deck's message prompts, offered as one-click dedications. */
 export const GIFT_MESSAGES: { occasion: string; message: string }[] = [

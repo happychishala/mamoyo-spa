@@ -7,7 +7,7 @@ import { formatMoney, formatDate, todayISO } from "@/lib/format";
 import { giftCardMessage } from "@/lib/notify";
 import {
   GIFT_VALUES,
-  GIFT_EXPERIENCES,
+  GIFT_EXPERIENCE_GROUPS,
   GIFT_MESSAGES,
   GIFT_MIN_CUSTOM,
   giftValueLabel,
@@ -122,7 +122,7 @@ export default async function GiftCardsPage() {
         <div className="mt-6">
           <IssueForm
             values={GIFT_VALUES}
-            experiences={GIFT_EXPERIENCES}
+            experienceGroups={GIFT_EXPERIENCE_GROUPS}
             prompts={GIFT_MESSAGES}
             minCustom={GIFT_MIN_CUSTOM}
             locations={LOCATIONS}
