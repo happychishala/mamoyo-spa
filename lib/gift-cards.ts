@@ -1,18 +1,27 @@
 import type { GiftCard, DB } from "./db";
+import { spaMenu } from "./content";
 
 /** Values the deck offers, plus a custom amount from K300. */
 export const GIFT_VALUES = [500, 1000, 1500, 2500, 5000] as const;
 export const GIFT_MIN_CUSTOM = 300;
 
 /** Named experiences that can be gifted instead of a value. */
-export const GIFT_EXPERIENCES = [
-  "MaMoyo Signature Massage",
+// Curated experience packages that aren't single menu treatments.
+const GIFT_PACKAGES = [
   "Executive Reset",
   "Mom To Be",
   "Couples Retreat",
   "Full Day Escape",
   "Café ritual",
-] as const;
+];
+
+// Every spa treatment on the menu can be gifted, plus the curated packages.
+export const GIFT_EXPERIENCES: string[] = [
+  ...new Set([
+    ...spaMenu.flatMap((section) => section.treatments.map((t) => t.name)),
+    ...GIFT_PACKAGES,
+  ]),
+];
 
 /** The deck's message prompts, offered as one-click dedications. */
 export const GIFT_MESSAGES: { occasion: string; message: string }[] = [

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { TrendingUp, TrendingDown, Scale } from "lucide-react";
-import { readDb } from "@/lib/db";
+import { TrendingUp, TrendingDown, Scale, MapPin } from "lucide-react";
+import { readDb, LOCATIONS } from "@/lib/db";
 import { formatMoney, formatUSD } from "@/lib/format";
 import { PageHeader, Card, NoAccess } from "@/components/admin/ui";
 import { getSession } from "@/lib/auth";
@@ -27,6 +27,17 @@ export default async function FinancePage() {
   const expenses = transactions.filter((t) => t.type === "Expense").reduce((s, t) => s + t.amount, 0);
   const net = incomeKwacha - expenses;
 
+  // Total revenue by branch — from receipts, which carry the branch (spa, café,
+  // bar and product sales). Kwacha and USD (suite) kept apart.
+  const branchRevenue = LOCATIONS.map((loc) => {
+    const atBranch = db.receipts.filter((r) => (r.location ?? "Kabulonga") === loc);
+    return {
+      loc,
+      kwacha: atBranch.filter((r) => r.currency !== "USD").reduce((s, r) => s + r.amount, 0),
+      usd: atBranch.filter((r) => r.currency === "USD").reduce((s, r) => s + r.amount, 0),
+    };
+  });
+
   const totals = [
     { label: "Income (Kwacha)", value: formatMoney(incomeKwacha), icon: TrendingUp, tone: "text-emerald-700" },
     { label: "Studio income (USD)", value: formatUSD(incomeUsd), icon: TrendingUp, tone: "text-emerald-700" },
@@ -52,6 +63,23 @@ export default async function FinancePage() {
           </Card>
         ))}
       </div>
+
+      <Card className="p-6">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-5 w-5 text-mist-500" aria-hidden="true" />
+          <h2 className="font-serif text-xl font-semibold text-mist-950">Total revenue by branch</h2>
+        </div>
+        <p className="mt-1 text-sm text-mist-700">All sales taken at each branch — spa, café, bar and products.</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {branchRevenue.map((b) => (
+            <div key={b.loc} className="rounded-2xl border border-mist-100 bg-mist-50 px-5 py-4">
+              <p className="text-sm font-semibold text-mist-800">{b.loc}</p>
+              <p className="mt-1 font-serif text-2xl text-mist-950">{formatMoney(b.kwacha)}</p>
+              {b.usd > 0 && <p className="mt-0.5 text-xs text-mist-500">+ {formatUSD(b.usd)} suite stays</p>}
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <div className="grid gap-6 xl:grid-cols-5">
         <Card className="p-6 xl:col-span-3">
