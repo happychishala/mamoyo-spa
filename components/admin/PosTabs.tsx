@@ -14,12 +14,14 @@ export default function PosTabs({
   menu,
   tabs,
   pickables,
+  cafeOnly = false,
 }: {
   products: RetailItem[];
   bar: RetailItem[];
   menu: MenuSection[];
   tabs: OpenTab[];
   pickables: PickSection[];
+  cafeOnly?: boolean;
 }) {
   const [tab, setTab] = useState<"cafe" | "bar" | "products" | "tabs">("cafe");
 
@@ -39,10 +41,12 @@ export default function PosTabs({
           <Wine className="h-4 w-4" aria-hidden="true" />
           Bar
         </button>
-        <button type="button" onClick={() => setTab("products")} className={tabCls(tab === "products")}>
-          <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-          Products
-        </button>
+        {!cafeOnly && (
+          <button type="button" onClick={() => setTab("products")} className={tabCls(tab === "products")}>
+            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+            Products
+          </button>
+        )}
         <button type="button" onClick={() => setTab("tabs")} className={tabCls(tab === "tabs")}>
           <Users className="h-4 w-4" aria-hidden="true" />
           Tabs
@@ -55,7 +59,7 @@ export default function PosTabs({
       {tab === "cafe" && <CafePOS menu={menu} />}
       {tab === "bar" && <ProductPOS items={bar} />}
       {tab === "tabs" && <TabsPOS tabs={tabs} pickables={pickables} />}
-      {tab === "products" && <ProductPOS items={products} />}
+      {tab === "products" && !cafeOnly && <ProductPOS items={products} />}
     </div>
   );
 }

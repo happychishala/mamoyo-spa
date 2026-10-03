@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, Minus, X, Users, Wine, Search } from "lucide-react";
+import { Plus, Minus, X, Users, Wine, Search, Receipt } from "lucide-react";
 import { openTab, addTabItem, setTabItemQty, closeTab, settleTab } from "@/lib/actions";
 import { formatMoney } from "@/lib/format";
 import type { Location, OpenTab } from "@/lib/db";
@@ -19,6 +19,12 @@ export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickable
   const [activeId, setActiveId] = useState<string | null>(tabs[0]?.id ?? null);
   const [balanced, setBalanced] = useState(true);
   const [query, setQuery] = useState("");
+  const [tabPage, setTabPage] = useState(0);
+
+  const TABS_PER_PAGE = 12;
+  const tabPages = Math.max(1, Math.ceil(tabs.length / TABS_PER_PAGE));
+  const page = Math.min(tabPage, tabPages - 1);
+  const pagedTabs = tabs.slice(page * TABS_PER_PAGE, (page + 1) * TABS_PER_PAGE);
 
   const active = useMemo(() => tabs.find((t) => t.id === activeId) ?? tabs[0] ?? null, [tabs, activeId]);
   const total = active ? tabTotal(active) : 0;
@@ -43,7 +49,7 @@ export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickable
 
         <div className="mt-4 flex flex-wrap gap-2">
           {tabs.length === 0 && <p className="text-sm text-mist-600">No open tabs. Open one below to start a running bill.</p>}
-          {tabs.map((t) => {
+          {pagedTabs.map((t) => {
             const on = active?.id === t.id;
             return (
               <button
@@ -60,6 +66,30 @@ export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickable
             );
           })}
         </div>
+
+        {tabPages > 1 && (
+          <div className="mt-3 flex items-center gap-3 text-xs text-mist-600">
+            <button
+              type="button"
+              onClick={() => setTabPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0}
+              className="rounded-full border border-mist-200 px-3 py-1.5 font-semibold text-mist-700 hover:bg-mist-50 disabled:opacity-40"
+            >
+              Previous
+            </button>
+            <span>
+              Page {page + 1} of {tabPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setTabPage((p) => Math.min(tabPages - 1, p + 1))}
+              disabled={page === tabPages - 1}
+              className="rounded-full border border-mist-200 px-3 py-1.5 font-semibold text-mist-700 hover:bg-mist-50 disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+        )}
 
         <form action={openTab} className="mt-4 flex flex-col gap-2 border-t border-mist-100 pt-4 sm:flex-row">
           <input
@@ -195,6 +225,18 @@ export default function TabsPOS({ tabs, pickables }: { tabs: OpenTab[]; pickable
               <span className="text-sm">Total</span>
               <span className="font-serif text-xl font-semibold">{formatMoney(total)}</span>
             </div>
+
+            {active.items.length > 0 && (
+              <a
+                href={`/admin/pos/tab/${active.id}/bill`}
+                target="_blank"
+                rel="noopener"
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-mist-300 px-4 py-3 text-sm font-semibold text-mist-800 transition-colors duration-200 hover:border-mist-400 hover:bg-mist-50"
+              >
+                <Receipt className="h-4 w-4" aria-hidden="true" />
+                Print bill (before payment)
+              </a>
+            )}
 
             <form action={settleTab} className="mt-4 space-y-4">
               <input type="hidden" name="tabId" value={active.id} />

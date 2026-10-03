@@ -17,6 +17,8 @@ export interface EposReceipt {
   total: string;
   payments?: { method: string; amount: string }[] | null;
   method: string;
+  /** A pre-payment bill (check) rather than a paid receipt. */
+  isBill?: boolean;
 }
 
 const esc = (s: string) =>
@@ -46,11 +48,12 @@ export function buildEposXml(rec: EposReceipt, width = 42): string {
   parts.push(line(rec.branch));
   if (rec.address) parts.push(line(rec.address));
   if (rec.phone) parts.push(line(rec.phone));
+  if (rec.isBill) parts.push(`<text align="center" em="true" dw="true">* BILL *&#10;</text><text em="false" dw="false"/>`);
   parts.push(`<text align="left"/>`);
   parts.push(rule);
-  parts.push(line(row("Receipt", rec.number, width)));
+  parts.push(line(row(rec.isBill ? "Tab" : "Receipt", rec.number, width)));
   parts.push(line(row("Date", rec.date, width)));
-  parts.push(line(row("Ref", rec.reference, width)));
+  if (rec.reference) parts.push(line(row("Ref", rec.reference, width)));
   parts.push(line(row("Customer", rec.customer, width)));
   parts.push(rule);
   for (const it of rec.items) {
@@ -63,16 +66,23 @@ export function buildEposXml(rec: EposReceipt, width = 42): string {
   parts.push(`<text em="true" dw="true">${esc(row("TOTAL", rec.total, Math.floor(width / 2)))}&#10;</text>`);
   parts.push(`<text em="false" dw="false"/>`);
   parts.push(rule);
-  if (rec.payments && rec.payments.length > 0) {
-    parts.push(line("Paid by:"));
-    for (const p of rec.payments) parts.push(line(row(p.method, p.amount, width)));
-  } else {
-    parts.push(line(row("Paid by", rec.method, width)));
+  if (!rec.isBill) {
+    if (rec.payments && rec.payments.length > 0) {
+      parts.push(line("Paid by:"));
+      for (const p of rec.payments) parts.push(line(row(p.method, p.amount, width)));
+    } else {
+      parts.push(line(row("Paid by", rec.method, width)));
+    }
   }
   parts.push(`<text align="center"/>`);
   parts.push(line(""));
-  parts.push(line("Thank you - see you again!"));
-  parts.push(line("spa - cafe - suites - wellness"));
+  if (rec.isBill) {
+    parts.push(line("Please pay at the counter."));
+    parts.push(line("This is not a receipt."));
+  } else {
+    parts.push(line("Thank you - see you again!"));
+    parts.push(line("spa - cafe - suites - wellness"));
+  }
   parts.push(`<feed line="2"/>`);
   parts.push(`<cut type="feed"/>`);
 

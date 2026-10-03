@@ -106,7 +106,14 @@ export default async function PosPage() {
         title="Point of sale"
         description="Ring up café orders, bar drinks and retail products, or keep open customer tabs. Split payment across methods and print the receipt; stock adjusts automatically."
       />
-      <PosTabs products={products} bar={barItems} menu={menu} tabs={db.openTabs} pickables={pickables} />
+      <PosTabs
+        products={products}
+        bar={barItems}
+        menu={menu}
+        tabs={db.openTabs}
+        pickables={pickables}
+        cafeOnly={session.role === "Cafe Supervisor"}
+      />
     </div>
   );
 }

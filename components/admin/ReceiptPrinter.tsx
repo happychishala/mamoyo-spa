@@ -26,7 +26,15 @@ function setLs(key: string, val: string) {
   }
 }
 
-export default function ReceiptPrinter({ backHref, receipt }: { backHref: string; receipt: EposReceipt }) {
+export default function ReceiptPrinter({
+  backHref,
+  receipt,
+  backLabel = "Back to receipts",
+}: {
+  backHref: string;
+  receipt: EposReceipt;
+  backLabel?: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -134,7 +142,7 @@ export default function ReceiptPrinter({ backHref, receipt }: { backHref: string
           className="inline-flex items-center gap-2 text-sm font-medium text-mist-700 transition-colors duration-200 hover:text-mist-900"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          Back to receipts
+          {backLabel}
         </Link>
 
         <div className="flex flex-wrap items-center gap-2">

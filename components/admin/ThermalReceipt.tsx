@@ -8,7 +8,7 @@ import type { Receipt } from "@/lib/db";
  * amounts. The @page rule sizes the paper to an 80mm roll so it prints without
  * scaling on a receipt printer (or as a compact slip on any printer).
  */
-export default function ThermalReceipt({ receipt, cafe }: { receipt: Receipt; cafe: boolean }) {
+export default function ThermalReceipt({ receipt, cafe, isBill = false }: { receipt: Receipt; cafe: boolean; isBill?: boolean }) {
   const items = receipt.items ?? [];
   const vat = inclusiveVatBreakdown(receipt.amount);
   const m = (n: number) => formatAmount(n, receipt.currency);
@@ -36,10 +36,11 @@ export default function ThermalReceipt({ receipt, cafe }: { receipt: Receipt; ca
         <p>{contactInfo.phone}</p>
       </div>
 
+      {isBill && <p className="center b big" style={{ marginTop: "4px" }}>— BILL —</p>}
       <div className="hr" />
-      <div className="r"><span>Receipt</span><span className="b">{receipt.number}</span></div>
+      <div className="r"><span>{isBill ? "Tab" : "Receipt"}</span><span className="b">{receipt.number}</span></div>
       <div className="r"><span>Date</span><span>{formatDate(receipt.date)}</span></div>
-      <div className="r"><span>Ref</span><span>{receipt.invoiceNumber}</span></div>
+      {!isBill && <div className="r"><span>Ref</span><span>{receipt.invoiceNumber}</span></div>}
       <div className="r"><span>Customer</span><span>{receipt.customer}</span></div>
       <div className="hr" />
 
@@ -63,20 +64,33 @@ export default function ThermalReceipt({ receipt, cafe }: { receipt: Receipt; ca
       <div className="r b big"><span>TOTAL</span><span>{m(receipt.amount)}</span></div>
 
       <div className="hr" />
-      {receipt.payments && receipt.payments.length > 1 ? (
+      {!isBill &&
+        (receipt.payments && receipt.payments.length > 1 ? (
+          <>
+            <div>Paid by:</div>
+            {receipt.payments.map((p, i) => (
+              <div key={i} className="r"><span>{p.method}</span><span>{m(p.amount)}</span></div>
+            ))}
+            <div className="hr" />
+          </>
+        ) : (
+          <>
+            <div className="r"><span>Paid by</span><span>{receipt.method}</span></div>
+            <div className="hr" />
+          </>
+        ))}
+
+      {isBill ? (
         <>
-          <div>Paid by:</div>
-          {receipt.payments.map((p, i) => (
-            <div key={i} className="r"><span>{p.method}</span><span>{m(p.amount)}</span></div>
-          ))}
+          <p className="center b">Please pay at the counter</p>
+          <p className="center" style={{ fontSize: "9px", marginTop: "4px" }}>This is not a receipt</p>
         </>
       ) : (
-        <div className="r"><span>Paid by</span><span>{receipt.method}</span></div>
+        <>
+          <p className="center">Thank you — see you again!</p>
+          <p className="center" style={{ fontSize: "9px", marginTop: "4px" }}>spa · café · suites · wellness</p>
+        </>
       )}
-
-      <div className="hr" />
-      <p className="center">Thank you — see you again!</p>
-      <p className="center" style={{ fontSize: "9px", marginTop: "4px" }}>spa · café · suites · wellness</p>
     </div>
   );
 }
