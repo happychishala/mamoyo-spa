@@ -106,9 +106,10 @@ export default function BookingItemsPicker({
       {items.length > 0 && (
         <ul className="space-y-2">
           {items.map((it) => (
-            <li key={it.key} className="flex items-center gap-3 rounded-xl border border-mist-200 bg-white p-2.5">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-mist-950">{it.name}</p>
+            <li key={it.key} className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-mist-200 bg-white p-2.5">
+              {/* On phones the name takes its own line so the controls never push the page wider. */}
+              <div className="min-w-0 basis-full sm:flex-1 sm:basis-0">
+                <p className="text-sm font-medium text-mist-950 sm:truncate">{it.name}</p>
                 <p className="text-xs text-mist-500">
                   {formatK(it.price)}
                   <span className={`ml-2 rounded-full px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wide ${it.kind === "product" ? "bg-amber-50 text-amber-700" : "bg-mist-100 text-mist-600"}`}>
@@ -125,7 +126,7 @@ export default function BookingItemsPicker({
                   <Plus className="h-3 w-3" aria-hidden="true" />
                 </button>
               </div>
-              <span className="w-16 shrink-0 text-right text-sm font-semibold text-mist-950">{formatK(it.price * it.qty)}</span>
+              <span className="ml-auto w-16 shrink-0 text-right text-sm font-semibold text-mist-950 sm:ml-0">{formatK(it.price * it.qty)}</span>
               <button type="button" onClick={() => remove(it.key)} aria-label={`Remove ${it.name}`} className="shrink-0 rounded-full p-1 text-mist-400 hover:bg-red-50 hover:text-red-600">
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>

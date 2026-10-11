@@ -54,10 +54,11 @@ export default function BookingForm({
       {overlay}
       <form
         onSubmit={onSubmit}
-        className="rounded-2xl border border-mist-200 bg-white p-8 shadow-soft sm:p-10"
+        className="rounded-2xl border border-mist-200 bg-white p-5 shadow-soft sm:p-10"
       >
-      <div className="grid gap-5 sm:grid-cols-2">
-        <fieldset className="sm:col-span-2">
+      {/* grid-cols-1 + min-w-0: tracks may shrink below their content, so nothing widens the page. */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <fieldset className="min-w-0 sm:col-span-2">
           <legend className="mb-1.5 block text-sm font-medium text-mist-900">Location</legend>
           <div className="grid grid-cols-2 gap-3">
             <label className="cursor-pointer">
