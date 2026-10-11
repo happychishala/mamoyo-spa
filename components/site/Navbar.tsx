@@ -85,13 +85,19 @@ export default function Navbar() {
     }`;
 
   return (
-    <header className="fixed inset-x-4 top-10 z-40">
+    <header
+      className={`fixed z-40 transition-all duration-300 ${
+        scrolled || open
+          ? "inset-x-0 top-8 border-b border-mist-200 bg-white/95 shadow-soft backdrop-blur-lg"
+          : "inset-x-4 top-10"
+      }`}
+    >
       <nav
         aria-label="Main navigation"
-        className={`mx-auto max-w-7xl rounded-2xl border transition-all duration-300 ${
+        className={`mx-auto max-w-7xl border transition-all duration-300 ${
           scrolled || open
-            ? "border-mist-200 bg-white/90 shadow-soft backdrop-blur-lg"
-            : "border-white/40 bg-white/70 backdrop-blur-md"
+            ? "border-transparent"
+            : "rounded-2xl border-white/40 bg-white/70 backdrop-blur-md"
         }`}
       >
         <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
