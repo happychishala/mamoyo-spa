@@ -1,5 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { brotliCompressSync, brotliDecompressSync, constants as zlibConstants } from "node:zlib";
+import { cache } from "react";
 import { Redis } from "@upstash/redis";
 import { getDefaultRoleDefinitions } from "./permissions";
 import { RECIPE_SEED, BREAKFAST_SEED } from "./recipe-seed";
@@ -590,6 +592,25 @@ function getRedis(): Redis | null {
   return redisClient;
 }
 
+// Upstash bills bandwidth per byte and every read pulls the whole DB, so the
+// value is stored brotli-compressed (~4.6x smaller) as "br:<base64>". A legacy
+// plain-JSON value still reads fine and is packed on the next write.
+const PACKED = "br:";
+function pack(db: DB): string {
+  const bytes = brotliCompressSync(JSON.stringify(db), {
+    params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 6 },
+  });
+  return PACKED + bytes.toString("base64");
+}
+function unpack(stored: string): DB {
+  return JSON.parse(brotliDecompressSync(Buffer.from(stored.slice(PACKED.length), "base64")).toString("utf8")) as DB;
+}
+
+// One Redis fetch per request: getSession, canAccessModule and the page itself
+// all share it. writeDb refreshes it so a re-render after an action sees the new
+// data. Outside a request, cache() doesn't memoise, so every call fetches.
+const requestStore = cache((): { stored?: Promise<unknown> } => ({}));
+
 const seed: DB = {
   bookings: [
     { id: "b1", ref: "MS-1042", customer: "Chanda Mwila", email: "chanda.mwila@gmail.com", phone: "+260 97 445 2210", service: "Hot Stone Massage", date: "2026-07-09", time: "10:00", durationMin: 90, price: 850, status: "Confirmed", therapist: "Fadzi", createdAt: "2026-07-02" },
@@ -1019,13 +1040,17 @@ export async function readDb(): Promise<DB> {
   const redis = getRedis();
   let db: DB;
   if (redis) {
-    const stored = await redis.get<DB>(DB_KEY);
-    if (stored) {
-      db = stored;
+    const box = requestStore();
+    box.stored ??= redis.get(DB_KEY);
+    const stored = await box.stored;
+    if (typeof stored === "string" && stored.startsWith(PACKED)) {
+      db = unpack(stored); // a fresh object per call, so callers can't share mutations
+    } else if (stored) {
+      db = structuredClone(stored as DB); // legacy plain-JSON value
     } else {
       // First boot on a fresh store: seed it.
       db = JSON.parse(JSON.stringify(seed)) as DB;
-      await redis.set(DB_KEY, db);
+      await writeDb(db);
     }
   } else {
     await ensureFileDb();
@@ -1038,7 +1063,9 @@ export async function readDb(): Promise<DB> {
 export async function writeDb(db: DB): Promise<void> {
   const redis = getRedis();
   if (redis) {
-    await redis.set(DB_KEY, db);
+    const packed = pack(db);
+    await redis.set(DB_KEY, packed);
+    requestStore().stored = Promise.resolve(packed);
     return;
   }
   await fs.mkdir(path.dirname(DB_PATH), { recursive: true });
@@ -1064,7 +1091,7 @@ export async function snapshotDb(): Promise<{ id: string; bytes: number }> {
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   const redis = getRedis();
   if (redis) {
-    await redis.set(`${DB_KEY}:backup:${stamp}`, db, { ex: BACKUP_TTL_SECONDS });
+    await redis.set(`${DB_KEY}:backup:${stamp}`, pack(db), { ex: BACKUP_TTL_SECONDS });
     return { id: stamp, bytes: payload.length };
   }
   await fs.mkdir(BACKUPS_DIR, { recursive: true });
