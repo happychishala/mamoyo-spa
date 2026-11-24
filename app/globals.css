@@ -407,4 +407,8 @@ body {
   html {
     @apply font-sans;
   }
+  /* The page behind an open modal (e.g. the promo popup) shouldn't scroll. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
 }
